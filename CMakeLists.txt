@@ -3,7 +3,7 @@
 cmake_minimum_required(VERSION 3.21)
 
 # Set your project name. This will be the name of your SKSE .dll file.
-project(TemplatePlugin VERSION 0.0.1 LANGUAGES CXX)
+project(AchievementInjector VERSION 0.0.1 LANGUAGES CXX)
 
 #
 
@@ -28,6 +28,7 @@ endif()
 # to the path of your "mods" folder
 if(DEFINED ENV{SKYRIM_MODS_FOLDER} AND IS_DIRECTORY "$ENV{SKYRIM_MODS_FOLDER}")
     set(OUTPUT_FOLDER "$ENV{SKYRIM_MODS_FOLDER}/${PROJECT_NAME} ${CMAKE_BUILD_TYPE}")
+    configure_file("AchievementsData/SkyrimSE.json" "${OUTPUT_FOLDER}/AchievementsData/SkyrimSE.json" COPYONLY)
 endif()
 
 # Otherwise, you can set OUTPUT_FOLDER to any place you'd like :)

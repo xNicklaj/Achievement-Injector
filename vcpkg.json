@@ -5,6 +5,7 @@
     "dependencies": [
         "commonlibsse-ng",
         "simpleini",
-        "nlohmann-json"
+        "nlohmann-json",
+        "eventpp"
     ]
 }

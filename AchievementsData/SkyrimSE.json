@@ -1,0 +1,919 @@
+[
+    {
+        "achievementName": "Unbound",
+        "description": "Complete \"Unbound\"",
+        "conditions": [
+            {
+                "type": "QuestStageDone",
+                "questID": "MQ101",
+                "stage": 900
+            }
+        ]
+    },
+    {
+        "achievementName": "Bleak Falls Barrow",
+        "description": "Complete \"Bleak Falls Barrow\"",
+        "conditions": [
+            {
+                "type": "QuestStageDone",
+                "questID": "MQ103",
+                "stage": 190
+            }
+        ]
+    },
+    {
+        "achievementName": "The Way of the Voice",
+        "description": "Complete \"The Way of the Voice\"",
+        "conditions": [
+            {
+                "type": "QuestStageDone",
+                "questID": "MQ105",
+                "stage": 160
+            }
+        ]
+    },
+    {
+        "achievementName": "Diplomatic Immunity",
+        "description": "Complete \"Diplomatic Immunity\"",
+        "conditions": [
+            {
+                "type": "QuestStageDone",
+                "questID": "MQ201",
+                "stage": 255
+            }
+        ]
+    },
+    {
+        "achievementName": "Alduin's Wall",
+        "description": "Complete \"Alduin's Wall\"",
+        "conditions": [
+            {
+                "type": "QuestStageDone",
+                "questID": "MQ203",
+                "stage": 280
+            }
+        ]
+    },
+    {
+        "achievementName": "Elder Knowledge",
+        "description": "Complete \"Elder Knowledge\"",
+        "conditions": [
+            {
+                "type": "QuestStageDone",
+                "questID": "MQ205",
+                "stage": 100
+            }
+        ]
+    },
+    {
+        "achievementName": "The Fallen",
+        "description": "Complete \"The Fallen\"",
+        "conditions": [
+            {
+                "type": "QuestStageDone",
+                "questID": "MQ301",
+                "stage": 220
+            }
+        ]
+    },
+    {
+        "achievementName": "Dragonslayer",
+        "description": "Complete \"Dragonslayer\"",
+        "conditions": [
+            {
+                "type": "QuestStageDone",
+                "questID": "MQ305",
+                "stage": 220
+            }
+        ]
+    },
+    {
+        "achievementName": "Take Up Arms",
+        "description": "Join the Companions",
+        "conditions": [
+            {
+                "type": "QuestStageDone",
+                "questID": "C01",
+                "stage": 100
+            }
+        ]
+    },
+    {
+        "achievementName": "Blood Oath",
+        "description": "Become a member of the Circle",
+        "conditions": [
+            {
+                "type": "QuestStageDone",
+                "questID": "C04",
+                "stage": 25
+            }
+        ]
+    },
+    {
+        "achievementName": "Glory of the Dead",
+        "description": "Complete \"Glory of the Dead\"",
+        "conditions": [
+            {
+                "type": "QuestStageDone",
+                "questID": "C06",
+                "stage": 200
+            }
+        ]
+    },
+    {
+        "achievementName": "Gatekeeper",
+        "description": "Join the College of Winterhold",
+        "conditions": [
+            {
+                "type": "QuestStageDone",
+                "questID": "MG01",
+                "stage": 40
+            }
+        ]
+    },
+    {
+        "achievementName": "Revealing the Unseen",
+        "description": "Complete \"Revealing the Unseen\"",
+        "conditions": [
+            {
+                "type": "QuestStageDone",
+                "questID": "MG06",
+                "stage": 200
+            }
+        ]
+    },
+    {
+        "achievementName": "The Eye of Magnus",
+        "description": "Complete \"The Eye of Magnus\"",
+        "conditions": [
+            {
+                "type": "QuestStageDone",
+                "questID": "MG08",
+                "stage": 200
+            }
+        ]
+    },
+    {
+        "achievementName": "Taking Care of Business",
+        "description": "Join the Thieves Guild",
+        "conditions": [
+            {
+                "type": "QuestStageDone",
+                "questID": "TG01",
+                "stage": 200
+            }
+        ]
+    },
+    {
+        "achievementName": "Darkness Returns",
+        "description": "Complete \"Darkness Returns\"",
+        "conditions": [
+            {
+                "type": "QuestStageDone",
+                "questID": "TG08A",
+                "stage": 200
+            }
+        ]
+    },
+    {
+        "achievementName": "One with the Shadows",
+        "description": "Returned the Thieves Guild to its former glory",
+        "conditions": [
+
+        ]
+    },
+    {
+        "achievementName": "With Friends Like These",
+        "description": "Join the Dark Brotherhood",
+        "conditions": [
+            {
+                "type": "QuestStageDone",
+                "questID": "DB02",
+                "stage": 200
+            }
+        ]
+    },
+    {
+        "achievementName": "Bound Until Death",
+        "description": "Complete \"Bound Until Death\"",
+        "conditions": [
+            {
+                "type": "QuestStageDone",
+                "questID": "DB05",
+                "stage": 200
+            }
+        ]
+    },
+    {
+        "achievementName": "Hail Sithis!",
+        "description": "Complete \"Hail Sithis!\"",
+        "conditions": [
+            {
+                "type": "QuestStageDone",
+                "questID": "DB10",
+                "stage": 200
+            }
+        ]
+    },
+    {
+        "achievementName": "Taking Sides",
+        "description": "Join the Stormcloaks or the Imperial Army",
+        "conditions": [
+            {
+                "type": "QuestStageDone",
+                "questID": "CW01A",
+                "stage": 200
+            },
+            {
+                "type": "QuestStageDone",
+                "questID": "CW01B",
+                "stage": 200
+            }
+        ]
+    },
+    {
+        "achievementName": "War Hero",
+        "description": "Capture Fort Sungard or Fort Greenwall",
+        "conditions": [
+            {
+                "type": "QuestStageDone",
+                "questID": "CWFortSiegeFort",
+                "stage": 9000
+            }
+        ]
+    },
+    {
+        "achievementName": "Hero of Skyrim",
+        "description": "Capture Solitude or Windhelm",
+        "conditions": [
+            {
+                "type": "QuestStageDone",
+                "questID": "CWSiegeObj",
+                "stage": 9000
+            }
+        ]
+    },
+    {
+        "achievementName": "Sideways",
+        "description": "Complete 10 side quests"
+    },
+    {
+        "achievementName": "Hero of the People",
+        "description": "Complete 50 Misc Objectives"
+    },
+    {
+        "achievementName": "Hard Worker",
+        "description": "Chop wood, mine ore, and cook food"
+    },
+    {
+        "achievementName": "Thief",
+        "description": "Pick 50 locks and 50 pockets"
+    },
+    {
+        "achievementName": "Snake Tongue",
+        "description": "Successfully persuade, bribe, and intimidate"
+    },
+    {
+        "achievementName": "Blessed",
+        "description": "Select a Standing Stone blessing",
+        "conditions": [
+            {
+                "type": "ItemActivation",
+                "itemFormID": "TODO: complete"
+            }
+        ]
+    },
+    {
+        "achievementName": "Standing Stones",
+        "description": "Find 13 Standing Stones",
+        "conditions": [
+            {
+                "type": "LocationDiscover",
+                "locationID": "TODO: complete"
+            }
+        ]
+    },
+    {
+        "achievementName": "Citizen",
+        "description": "Buy a house"
+    },
+    {
+        "achievementName": "Wanted",
+        "description": "Escape from jail"
+    },
+    {
+        "achievementName": "Married",
+        "description": "Get married",
+        "conditions": [
+            {
+                "type": "QuestStageDone",
+                "questID": "RelationshipMarriage",
+                "stage": 30
+            }
+        ]
+    },
+    {
+        "achievementName": "Artificer",
+        "description": "Make a smithed item, an enchanted item, and a potion"
+    },
+    {
+        "achievementName": "Master Criminal",
+        "description": "Bounty of 1000 gold in all nine holds",
+        "conditionsJoinType": "AND",
+        "conditions": [
+            {
+                "type": "PlayerCrime",
+                "amount": 1000,
+                "hold": "WhiterunHold"
+            },
+            {
+                "type": "PlayerCrime",
+                "amount": 1000,
+                "hold": "HaafingarHold"
+            },
+            {
+                "type": "PlayerCrime",
+                "amount": 1000,
+                "hold": "HjaalmarchHold"
+            },
+            {
+                "type": "PlayerCrime",
+                "amount": 1000,
+                "hold": "ThePale"
+            },
+            {
+                "type": "PlayerCrime",
+                "amount": 1000,
+                "hold": "Winterhold"
+            },
+            {
+                "type": "PlayerCrime",
+                "amount": 1000,
+                "hold": "Eastmarch"
+            },
+            {
+                "type": "PlayerCrime",
+                "amount": 1000,
+                "hold": "TheRift"
+            },
+            {
+                "type": "PlayerCrime",
+                "amount": 1000,
+                "hold": "FalkreathHold"
+            },
+            {
+                "type": "PlayerCrime",
+                "amount": 1000,
+                "hold": "TheReach"
+            }
+        ]
+    },
+    {
+        "achievementName": "Golden Touch",
+        "description": "Have 100,000 gold",
+        "conditions": [
+            {
+                "type": "ItemInInventory",
+                "itemFormID": "0000000F",
+                "quantity": 100000
+            }
+        ]
+    },
+    {
+        "achievementName": "Delver",
+        "description": "Clear 50 dungeons",
+        "conditions": [
+            {
+                "type": "DungeonCleared",
+                "dungeonID": "*",
+                "count": 50
+            }
+        ]
+    },
+    {
+        "achievementName": "Skill Master",
+        "description": "Get a skill to 100",
+        "conditionsJoinType": "OR",
+        "conditions": [
+            {
+                "type": "SkillLevel",
+                "skill": "alchemy",
+                "level": 100
+            },
+            {
+                "type": "SkillLevel",
+                "skill": "alteration",
+                "level": 100
+            },
+            {
+                "type": "SkillLevel",
+                "skill": "marksman",
+                "level": 100
+            },
+            {
+                "type": "SkillLevel",
+                "skill": "block",
+                "level": 100
+            },
+            {
+                "type": "SkillLevel",
+                "skill": "conjuration",
+                "level": 100
+            },
+            {
+                "type": "SkillLevel",
+                "skill": "destruction",
+                "level": 100
+            },
+            {
+                "type": "SkillLevel",
+                "skill": "enchanting",
+                "level": 100
+            },
+            {
+                "type": "SkillLevel",
+                "skill": "heavyarmor",
+                "level": 100
+            },
+            {
+                "type": "SkillLevel",
+                "skill": "illusion",
+                "level": 100
+            },
+            {
+                "type": "SkillLevel",
+                "skill": "lightarmor",
+                "level": 100
+            },
+            {
+                "type": "SkillLevel",
+                "skill": "lockpicking",
+                "level": 100
+            },
+            {
+                "type": "SkillLevel",
+                "skill": "onehanded",
+                "level": 100
+            },
+            {
+                "type": "SkillLevel",
+                "skill": "pickpocket",
+                "level": 100
+            },
+            {
+                "type": "SkillLevel",
+                "skill": "restoration",
+                "level": 100
+            },
+            {
+                "type": "SkillLevel",
+                "skill": "smithing",
+                "level": 100
+            },
+            {
+                "type": "SkillLevel",
+                "skill": "sneak",
+                "level": 100
+            },
+            {
+                "type": "SkillLevel",
+                "skill": "speechcraft",
+                "level": 100
+            },
+            {
+                "type": "SkillLevel",
+                "skill": "twohanded",
+                "level": 100
+            }
+        ]
+    },
+    {
+        "achievementName": "Explorer",
+        "description": "Discover 100 Locations",
+        "conditions": [
+            {
+                "type": "LocationDiscover",
+                "locationID": "*"
+            }
+        ]
+    },
+    {
+        "achievementName": "Reader",
+        "description": "Read 50 Skill Books"
+    },
+    {
+        "achievementName": "Daedric Influence",
+        "description": "Acquire a Daedric Artifact",
+        "conditionsJoinType": "OR",
+        "conditions": [
+
+        ]
+    },
+    {
+        "achievementName": "Oblivion Walker",
+        "description": "Collect 15 Daedric Artifacts",
+        "conditionsJoinType": "AND",
+        "conditions": [
+            {
+                "type": "QuestStageDone",
+                "questID": "DA01",
+                "stage": 100
+            },
+            {
+                "type": "QuestStageDone",
+                "questID": "DA02",
+                "stage": 31
+            },
+            {
+                "type": "QuestStageDone",
+                "questID": "DA03",
+                "stage": 200
+            },
+            {
+                "type": "QuestStageDone",
+                "questID": "DA04",
+                "stage": 100
+            },
+            {
+                "type": "QuestStageDone",
+                "questID": "DA05",
+                "stage": 100
+            },
+            {
+                "type": "QuestStageDone",
+                "questID": "DA06",
+                "stage": 200
+            },
+            {
+                "type": "QuestStageDone",
+                "questID": "DA07",
+                "stage": 100
+            },
+            {
+                "type": "QuestStageDone",
+                "questID": "DA08",
+                "stage": 50
+            },
+            {
+                "type": "QuestStageDone",
+                "questID": "DA09",
+                "stage": 410
+            },
+            {
+                "type": "QuestStageDone",
+                "questID": "DA10",
+                "stage": 200
+            },
+            {
+                "type": "QuestStageDone",
+                "questID": "DA11",
+                "stage": 100
+            },
+            {
+                "type": "QuestStageDone",
+                "questID": "DA12",
+                "stage": 100
+            },
+            {
+                "type": "QuestStageDone",
+                "questID": "DA13",
+                "stage": 100
+            },
+            {
+                "type": "QuestStageDone",
+                "questID": "DA14",
+                "stage": 200
+            },
+            {
+                "type": "QuestStageDone",
+                "questID": "DA15",
+                "stage": 200
+            }
+        ]
+    },
+    {
+        "achievementName": "Dragon Soul",
+        "description": "Absorb a dragon soul",
+        "conditions": [
+            {
+                "type": "DragonSoulAbsorbed",
+                "quantity": 1
+            }
+        ]
+    },
+    {
+        "achievementName": "Dragon Hunter",
+        "description": "Absorb 20 dragon souls",
+        "conditions": [
+            {
+                "type": "DragonSoulAbsorbed",
+                "quantity": 20
+            }
+        ]
+    },
+    {
+        "achievementName": "Words of Power",
+        "description": "Learn all three words of a shout"
+    },
+    {
+        "achievementName": "Thu'um Master",
+        "description": "Learn 20 shouts"
+    },
+    {
+        "achievementName": "Apprentice",
+        "description": "Reach Level 5",
+        "conditions": [
+            {
+                "type": "PlayerLevel",
+                "level": 5
+            }
+        ]
+    },
+    {
+        "achievementName": "Adept",
+        "description": "Reach Level 10",
+        "conditions": [
+            {
+                "type": "PlayerLevel",
+                "level": 10
+            }
+        ]
+    },
+    {
+        "achievementName": "Expert",
+        "description": "Reach Level 25",
+        "conditions": [
+            {
+                "type": "PlayerLevel",
+                "level": 25
+            }
+        ]
+    },
+    {
+        "achievementName": "Master",
+        "description": "Reach Level 50",
+        "conditions": [
+            {
+                "type": "PlayerLevel",
+                "level": 50
+            }
+        ]
+    },
+    {
+        "achievementName": "Awakening",
+        "description": "Complete 'Awakening'",
+        "conditions": [
+            {
+                "type": "QuestStageDone",
+                "questID": "DLC1VQ01",
+                "stage": 200
+            }
+        ]
+    },
+    {
+        "achievementName": "Beyond Death",
+        "description": "Complete 'Beyond Death'",
+        "conditions": [
+            {
+                "type": "QuestStageDone",
+                "questID": "DLC1VQ05",
+                "stage": 200
+            }
+        ]
+    },
+    {
+        "achievementName": "Kindred Judgment",
+        "description": "Complete 'Kindred Judgment'",
+        "conditions": [
+            {
+                "type": "QuestStageDone",
+                "questID": "DLC1VQ08",
+                "stage": 200
+            }
+        ]
+    },
+    {
+        "achievementName": "Lost to the Ages",
+        "description": "Complete 'Lost to the Ages'",
+        "conditions": [
+            {
+                "type": "QuestStageDone",
+                "questID": "DLC1LD",
+                "stage": 225
+            }
+        ]
+    },
+    {
+        "achievementName": "Soul Tear",
+        "description": "Learn all three words of Soul Tear",
+        "conditions": []
+    },
+    {
+        "achievementName": "Auriel's Bow",
+        "description": "Use the special power of Auriel's Bow",
+        "conditions": []
+    },
+    {
+        "achievementName": "Werewolf Mastered",
+        "description": "Acquire 11 werewolf perks",
+        "conditions": [
+            {
+                "type": "InvestedPerkPoints",
+                "skill": "TODO: BOH Werewolf",
+                "quantity": 11
+            }
+        ]
+    },
+    {
+        "achievementName": "Vampire Mastered",
+        "description": "Acquire 11 vampire perks",
+        "conditions": [
+            {
+                "type": "InvestedPerkPoints",
+                "skill": "TODO: BOH Vampire",
+                "quantity": 11
+            }
+        ]
+    },
+    {
+        "achievementName": "A New You",
+        "description": "Change your face",
+        "conditions": [
+            {
+                "type": "QuestStageDone",
+                "questID": "DLC1Surgery",
+                "stage": 20
+            }
+        ]
+    },
+    {
+        "achievementName": "Legend",
+        "description": "Defeat a Legendary Dragon",
+        "conditions": [
+            {
+                "type": "EnemySlain",
+                "enemyType": "TODO: Legendary Dragon",
+                "quantity": 1
+            }
+        ]
+    },
+    {
+        "achievementName": "Proud Parent",
+        "description": "Adopt a child"
+    },
+    {
+        "achievementName": "Landowner",
+        "description": "Buy a plot of land",
+        "conditionsJoinType": "OR",
+        "conditions": [
+            {
+                "type": "QuestStageDone",
+                "questID": "BYOHHouseFalkreath",
+                "stage": 100
+            },
+            {
+                "type": "QuestStageDone",
+                "questID": "BYOHHouseHjaalmarch",
+                "stage": 100
+            },
+            {
+                "type": "QuestStageDone",
+                "questID": "BYOHHousePale",
+                "stage": 100
+            }
+        ]
+    },
+    {
+        "achievementName": "Architect",
+        "description": "Build three wings on a house"
+    },
+    {
+        "achievementName": "Land Baron",
+        "description": "Buy three plots of land",
+        "conditionsJoinType": "AND",
+        "conditions": [
+            {
+                "type": "QuestStageDone",
+                "questID": "BYOHHouseFalkreath",
+                "stage": 100
+            },
+            {
+                "type": "QuestStageDone",
+                "questID": "BYOHHouseHjaalmarch",
+                "stage": 100
+            },
+            {
+                "type": "QuestStageDone",
+                "questID": "BYOHHousePale",
+                "stage": 100
+            }
+        ]
+    },
+    {
+        "achievementName": "Master Architect",
+        "description": "Build three houses",
+        "conditionsJoinType": "AND",
+        "conditions": [
+            {
+                "type": "QuestStageDone",
+                "questID": "BYOHHouseFalkreath",
+                "stage": 120
+            },
+            {
+                "type": "QuestStageDone",
+                "questID": "BYOHHouseHjaalmarch",
+                "stage": 120
+            },
+            {
+                "type": "QuestStageDone",
+                "questID": "BYOHHousePale",
+                "stage": 120
+            }
+        ]
+    },
+    {
+        "achievementName": "Outlander",
+        "description": "Arrive on Solstheim",
+        "conditions": [
+            {
+                "type": "FirstEnterCell",
+                "cell": "idk"
+            }
+        ]
+    },
+    {
+        "achievementName": "The Temple of Miraak",
+        "description": "Complete 'The Temple of Miraak'",
+        "conditions": [
+            {
+                "type": "QuestStageDone",
+                "questID": "DLC2MQ02",
+                "stage": 200
+            }
+        ]
+    },
+    {
+        "achievementName": "The Path of Knowledge",
+        "description": "Complete 'The Path of Knowledge'",
+        "conditions": [
+            {
+                "type": "QuestStageDone",
+                "questID": "DLC2MQ04",
+                "stage": 550
+            }
+        ]
+    },
+    {
+        "achievementName": "At the Summit of Apocrypha",
+        "description": "Complete 'At the Summit of Apocrypha'",
+        "conditions": [
+            {
+                "type": "QuestStageDone",
+                "questID": "DLC2MQ06",
+                "stage": 550
+            }
+        ]
+    },
+    {
+        "achievementName": "Dragon Aspect",
+        "description": "Learn all 3 words of Dragon Aspect",
+        "conditions": [
+        ]
+    },
+    {
+        "achievementName": "Hidden Knowledge",
+        "description": "Learn the secrets of 5 Black Books",
+        "conditions": [
+        ]
+    },
+    {
+        "achievementName": "Stalhrim Crafter",
+        "description": "Craft an item out of Stalhrim",
+        "conditions": [
+        ]
+    },
+    {
+        "achievementName": "Dragonrider",
+        "description": "Tame and ride 5 dragons",
+        "conditions": [
+        ]
+    },
+    {
+        "achievementName": "Raven Rock Owner",
+        "description": "Own a house in Raven Rock",
+        "conditions": [
+        ]
+    },
+    {
+        "achievementName": "Solstheim Explorer",
+        "description": "Discover 30 locations on the island of Solstheim",
+        "conditions": [
+            {
+                "type": "LocationDiscover",
+                "locationID": "*",
+                "restrict": "TODO: Solstheim",
+                "quantity": 30
+            }
+        ]
+    }
+]
