@@ -103,3 +103,19 @@ void AddMenuOption() {
     }
     return;
 }
+
+void ReadJson(const std::string& filePath, json* jsonData) {
+    // Open the JSON file
+    std::ifstream file(filePath);
+    if (!file.is_open()) {
+        logger::error("Could not open the file {}!", filePath);
+        return;
+    }
+
+    // Parse the JSON file
+    file >> *jsonData;
+
+    // Close the file
+    file.close();
+    return;
+}

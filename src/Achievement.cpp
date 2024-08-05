@@ -4,6 +4,7 @@
 #include <memory>
 #include "ConditionsJoinType.h"
 #include "Condition.h"
+#include "Serializer.h"
 
 Achievement::Achievement(json& jsonData)
     : achievementName(jsonData["achievementName"]),
@@ -39,6 +40,18 @@ Achievement::Achievement(json& jsonData)
             itemInInventoryCondition->SetConditionParameters(condition["itemFormID"], condition["quantity"]);
             conditions.push_back(itemInInventoryCondition);
         }
+        else if (condition["type"] == "LocationDiscovery") {
+            LocationDiscoveryConditionFactory* locationDiscoveryConditionFactory = new LocationDiscoveryConditionFactory();
+            Condition* locationDiscoveryCondition = locationDiscoveryConditionFactory->createCondition();
+            locationDiscoveryCondition->SetConditionParameters(condition["locationID"], condition["worldspaceID"], condition["quantity"]);
+            conditions.push_back(locationDiscoveryCondition);
+        }
+        else if (condition["type"] == "DragonSoulAbsorbed") {
+            DragonSoulAbsorbedConditionFactory* dragonSoulAbsorbedConditionFactory = new DragonSoulAbsorbedConditionFactory();
+            Condition* dragonSoulAbsorbedCondition = dragonSoulAbsorbedConditionFactory->createCondition();
+            dragonSoulAbsorbedCondition->SetConditionParameters(condition["quantity"]);
+            conditions.push_back(dragonSoulAbsorbedCondition);
+        }
         else {
             logger::warn("Unknown condition type");
         }
@@ -54,7 +67,7 @@ void Achievement::EnableListener(void) {
 }
 
 void Achievement::OnConditionMet(void) {
-    bool allConditionsMet;
+    bool allConditionsMet = false;
     switch (this->joinType) {
     case ConditionsJoinType::OR:
         allConditionsMet = false;
@@ -66,7 +79,7 @@ void Achievement::OnConditionMet(void) {
         }
 		break;
     case ConditionsJoinType::AND:
-        allConditionsMet = false;
+        allConditionsMet = true;
         for (Condition* condition : conditions) {
             if (condition->isMet == false) {
                 allConditionsMet = false;

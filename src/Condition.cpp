@@ -13,15 +13,15 @@ void Condition::EnableListener() {}
 void Condition::OnDataLoaded() {
     CheckCondition();
 }
-void Condition::SetConditionParameters(std::string questId, int stage){}
-void Condition::SetConditionParameters(int level) {}
+void Condition::SetConditionParameters(std::string, int){}
+void Condition::SetConditionParameters(int) {}
+void Condition::SetConditionParameters(std::string, std::string, int) {}
 bool Condition::CheckCondition() { return false; }
 void Condition::SetEventManager(eventpp::EventDispatcher<std::string, void()>* eventManager) {
 	this->eventManager = eventManager;
 }
 
-// QuestStageDoneCondition
-
+// QuestStageDoneCondition - V
 QuestStageDoneCondition::QuestStageDoneCondition() : Condition(ConditionType::QuestStageDone) {}
 void QuestStageDoneCondition::SetConditionParameters(std::string questId, int stage) {
     this->questId = questId;
@@ -48,7 +48,7 @@ RE::BSEventNotifyControl QuestStageDoneCondition::ProcessEvent(const RE::TESQues
     return RE::BSEventNotifyControl::kContinue;
 }
 bool QuestStageDoneCondition::CheckCondition() {
-    if (!this->isMet && CheckQuestStage(this->questId, "Skyrim.esm") >= stage) {
+    if (!this->isMet && CheckQuestStage(this->questId, "Skyrim.esm") >= stage) { // TODO dynamic esp
         logger::info("Quest {} met condition stage {}", this->questId, this->stage);
         this->isMet = true;
         this->eventManager->dispatch("ConditionMet");
@@ -57,7 +57,7 @@ bool QuestStageDoneCondition::CheckCondition() {
     return false;
 }
 
-// PlayerLevelCondition
+// PlayerLevelCondition - V
 PlayerLevelCondition::PlayerLevelCondition() : Condition(ConditionType::PlayerLevel) {}
 void PlayerLevelCondition::OnDataLoaded(void) {
     CheckCondition();
@@ -87,7 +87,7 @@ bool PlayerLevelCondition::CheckCondition() {
     return false;
 }
 
-// PlayerSkillLevelCondition
+// PlayerSkillLevelCondition - V
 PlayerSkillLevelCondition::PlayerSkillLevelCondition() : Condition(ConditionType::PlayerLevel) {}
 void PlayerSkillLevelCondition::OnDataLoaded(void) {
     CheckCondition();
@@ -117,7 +117,7 @@ bool PlayerSkillLevelCondition::CheckCondition() {
     return false;
 }
 
-// ItemInInventoryCondition
+// ItemInInventoryCondition - V
 ItemInInventoryCondition::ItemInInventoryCondition() : Condition(ConditionType::ItemInInventory) {}
 void ItemInInventoryCondition::OnDataLoaded(void) {
     CheckCondition();
@@ -132,7 +132,8 @@ void ItemInInventoryCondition::SetConditionParameters(std::string formid, int qu
 	this->quantity = quantity;
 }
 RE::BSEventNotifyControl ItemInInventoryCondition::ProcessEvent(const RE::TESContainerChangedEvent* a_event, RE::BSTEventSource<RE::TESContainerChangedEvent>*) {
-    if (a_event->baseObj == RE::PlayerCharacter::GetSingleton()->formID) {
+    
+    if (a_event->newContainer == RE::PlayerCharacter::GetSingleton()->GetFormID()) {
         CheckCondition();
     }
     return RE::BSEventNotifyControl::kContinue;
@@ -143,9 +144,9 @@ bool ItemInInventoryCondition::CheckCondition() {
 
     const auto inventory = RE::PlayerCharacter::GetSingleton()->GetInventory();
     for (auto& [item, data] : inventory) {
-        if(item != NULL) logger::debug("ITEM: {} {}", item->GetFormID(), item->GetName());
+        // For fucking reasons data.first is the amount. Ok.
         if (item != NULL && FormIDToString(item->GetFormID()) == this->formid) {
-			quantity += 1;
+			quantity += data.first;
 		}
     }
     if(quantity >= this->quantity){
@@ -157,6 +158,56 @@ bool ItemInInventoryCondition::CheckCondition() {
     return false;
 }
 
+// LocationDiscoveryCondition
+LocationDiscoveryCondition::LocationDiscoveryCondition() : Condition(ConditionType::LocationDiscovery) {}
+void LocationDiscoveryCondition::OnDataLoaded(void) {
+	CheckCondition();
+}
+void LocationDiscoveryCondition::EnableListener() {
+	RegisterPostLoadFunction(this);
+	RE::LocationDiscovery::GetEventSource()->AddEventSink(this);
+}
+void LocationDiscoveryCondition::SetConditionParameters(std::string locationID, std::string worldspaceID, int quantity) {
+	this->locationID = locationID;
+	this->worldspaceID = worldspaceID;
+	this->quantity = quantity;
+}
+bool LocationDiscoveryCondition::CheckCondition() {
+	return false;
+}
+RE::BSEventNotifyControl LocationDiscoveryCondition::ProcessEvent(const RE::LocationDiscovery::Event* a_event, RE::BSTEventSource<RE::LocationDiscovery::Event>*) {
+    logger::debug("Player found {}", a_event->mapMarkerData->locationName.GetFullName());
+    return RE::BSEventNotifyControl::kContinue;
+}
+
+
+DragonSoulAbsorbedCondition::DragonSoulAbsorbedCondition() : Condition(ConditionType::DragonSoulAbsorbed) {}
+void DragonSoulAbsorbedCondition::OnDataLoaded(void) {
+	CheckCondition();
+}
+void DragonSoulAbsorbedCondition::EnableListener() {
+	RegisterPostLoadFunction(this);
+	RE::DragonSoulsGained::GetEventSource()->AddEventSink(this);
+}
+void DragonSoulAbsorbedCondition::SetConditionParameters(int quantity) {
+	this->quantity = quantity;
+}
+bool DragonSoulAbsorbedCondition::CheckCondition() {
+    RE::TESGlobal* absorbed = RE::TESDataHandler::GetSingleton()->LookupForm<RE::TESGlobal>(0x1C0F2, "Skyrim.esm");
+    short totalAbsorbed = absorbed->value;
+    if (totalAbsorbed >= quantity) {
+        logger::info("Player met condition absorbed souls {}", this->quantity);
+        this->isMet = true;
+        this->eventManager->dispatch("ConditionMet");
+        return true;
+    }
+	return false;
+}
+RE::BSEventNotifyControl DragonSoulAbsorbedCondition::ProcessEvent(const RE::DragonSoulsGained::Event* a_event, RE::BSTEventSource<RE::DragonSoulsGained::Event>*) {
+	// TODO tutto ma triggera
+    CheckCondition();
+	return RE::BSEventNotifyControl::kContinue;
+}
 
 // QuestStageDoneConditionFactory
 
@@ -167,19 +218,26 @@ Condition* QuestStageDoneConditionFactory::createCondition() {
 };
 
 PlayerLevelConditionFactory::PlayerLevelConditionFactory() : ConditionFactory() {};
-
 Condition* PlayerLevelConditionFactory::createCondition() {
 	return new PlayerLevelCondition();
 };
 
 PlayerSkillLevelConditionFactory::PlayerSkillLevelConditionFactory() : ConditionFactory() {};
-
 Condition* PlayerSkillLevelConditionFactory::createCondition() {
 	return new PlayerSkillLevelCondition();
 };
 
 ItemInInventoryConditionFactory::ItemInInventoryConditionFactory() : ConditionFactory() {};
-
 Condition* ItemInInventoryConditionFactory::createCondition() {
 	return new ItemInInventoryCondition();
+};
+
+LocationDiscoveryConditionFactory::LocationDiscoveryConditionFactory() : ConditionFactory() {};
+Condition* LocationDiscoveryConditionFactory::createCondition() {
+	return new LocationDiscoveryCondition();
+};
+
+DragonSoulAbsorbedConditionFactory::DragonSoulAbsorbedConditionFactory() : ConditionFactory() {};
+Condition* DragonSoulAbsorbedConditionFactory::createCondition() {
+	return new DragonSoulAbsorbedCondition();
 };

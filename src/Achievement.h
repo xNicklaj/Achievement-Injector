@@ -10,6 +10,9 @@
 #include "log.h"
 #include "CommonFunctions.h"
 
+#ifndef ACHIEVEMENT_H
+#define ACHIEVEMENT_H
+
 namespace logger = SKSE::log;
 
 using json = nlohmann::json;
@@ -25,8 +28,10 @@ public:
     std::string achievementName;
     std::string description;
     std::vector<Condition*> conditions;
+    bool unlocked;
 private:
     std::vector<bool> conditionReached;
     ConditionsJoinType joinType;
-    bool unlocked;
 };
+
+#endif

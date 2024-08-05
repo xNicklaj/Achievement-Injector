@@ -571,22 +571,22 @@
             },
             {
                 "type": "QuestStageDone",
-                "questID": "DA12",
-                "stage": 100
-            },
-            {
-                "type": "QuestStageDone",
                 "questID": "DA13",
                 "stage": 100
             },
             {
                 "type": "QuestStageDone",
                 "questID": "DA14",
-                "stage": 200
+                "stage": 100
             },
             {
                 "type": "QuestStageDone",
                 "questID": "DA15",
+                "stage": 200
+            },
+            {
+                "type": "QuestStageDone",
+                "questID": "DA16",
                 "stage": 200
             }
         ]

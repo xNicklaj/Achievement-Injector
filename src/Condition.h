@@ -9,13 +9,14 @@
 #define CONDITION_H
 
 enum ConditionType {
-	QuestStageDone,
-	PlayerLevel,
-	SkillLevel,
+	QuestStageDone, // Done
+	PlayerLevel, // Done
+	SkillLevel, // done
 	DungeonCleared,
-	ItemInInventory,
-	FindMapLocation,
+	ItemInInventory, // Done
+	LocationDiscovery, // Maybe
 	ItemActivation,
+	DragonSoulAbsorbed, // Done
 	NotSet
 };
 
@@ -29,6 +30,7 @@ public:
 	virtual void OnDataLoaded(void);
 	virtual void SetConditionParameters(std::string, int);
 	virtual void SetConditionParameters(int);
+	virtual void SetConditionParameters(std::string, std::string, int);
 	virtual bool CheckCondition();
 	
 	void SetEventManager(eventpp::EventDispatcher<std::string, void()>* eventManager);
@@ -99,6 +101,33 @@ private:
 	RE::BSEventNotifyControl ProcessEvent(const RE::TESContainerChangedEvent* a_event, RE::BSTEventSource<RE::TESContainerChangedEvent>*) override;
 };
 
+class LocationDiscoveryCondition : public Condition, public RE::BSTEventSink<RE::LocationDiscovery::Event> {
+public:
+	LocationDiscoveryCondition();
+	void OnDataLoaded(void) override;
+	void EnableListener(void) override;
+	void SetConditionParameters(std::string locationID, std::string worldspaceID, int quantity) override;
+	bool CheckCondition() override;
+
+	std::string locationID;
+	std::string worldspaceID;
+	int quantity = 1;
+private:
+	RE::BSEventNotifyControl ProcessEvent(const RE::LocationDiscovery::Event* a_event, RE::BSTEventSource<RE::LocationDiscovery::Event>*) override;
+};
+
+class DragonSoulAbsorbedCondition : public Condition, public RE::BSTEventSink<RE::DragonSoulsGained::Event> {
+public:
+	DragonSoulAbsorbedCondition();
+	void OnDataLoaded(void) override;
+	void EnableListener(void) override;
+	void SetConditionParameters(int quantity) override;
+	bool CheckCondition() override;
+
+	int quantity = 0;
+private:
+	RE::BSEventNotifyControl ProcessEvent(const RE::DragonSoulsGained::Event* a_event, RE::BSTEventSource<RE::DragonSoulsGained::Event>*) override;
+};
 // Factories
 
 class ConditionFactory {
@@ -128,6 +157,18 @@ public:
 class ItemInInventoryConditionFactory : public ConditionFactory {
 public:
 	ItemInInventoryConditionFactory();
+	Condition* createCondition() override;
+};
+
+class LocationDiscoveryConditionFactory : public ConditionFactory {
+	public:
+	LocationDiscoveryConditionFactory();
+	Condition* createCondition() override;
+};
+
+class DragonSoulAbsorbedConditionFactory : public ConditionFactory {
+public:
+	DragonSoulAbsorbedConditionFactory();
 	Condition* createCondition() override;
 };
 
