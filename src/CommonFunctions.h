@@ -10,3 +10,4 @@ RE::ActorValue StringToActorValue(std::string value);
 std::string FormIDToString(RE::FormID formID);
 void AddMenuOption();
 void ReadJson(const std::string& filePath, json* jsonData);
+RE::TESForm* GetForm(std::string FormID, std::string baseEsp);

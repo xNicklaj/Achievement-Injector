@@ -3,28 +3,30 @@
 #include <filesystem>
 #include <nlohmann/json.hpp>
 #include "CommonFunctions.h"
+#include "Singleton.h"
 
 #ifndef SERIALIZER_H
 #define SERIALIZER_H
 
-#define DIRECTORY_PATH "DATA/SKSE/Plugins/AchievementInjector/"
+#define DIRECTORY_PATH "Data/SKSE/Plugins/AchievementInjector/"
 #define FILENAME "UnlockedAchievements_{}.json"
 
 struct SerializedAchievement {
 	std::string achievementName;
 	bool unlocked;
 	int64_t unlockDatetime;
+	std::vector<bool> conditionsMet;
 };
 
-class Serializer {
+class Serializer : public ISingleton<Serializer> {
 public:
 	Serializer();
 	void Save();
 	void SerializeAchievementData(Achievement* achievement);
-	Achievement* DeserializeAchievementData(std::string name);
+	struct SerializedAchievement DeserializeAchievementData(std::string name);
 	void SetGlobal(bool global) { isGlobal = global; }
-private:
 	void CreateFile();
+private:
 	std::string GetFilename() const;
 	const std::string& path = "DATA/SKSE/Plugins/AchievementInjector/UnlockedAchievements_{}.json";
 	bool isGlobal = false;

@@ -15,7 +15,7 @@ enum ConditionType {
 	DungeonCleared,
 	ItemInInventory, // Done
 	LocationDiscovery, // Maybe
-	ItemActivation,
+	PlayerActivation,
 	DragonSoulAbsorbed, // Done
 	NotSet
 };
@@ -31,12 +31,16 @@ public:
 	virtual void SetConditionParameters(std::string, int);
 	virtual void SetConditionParameters(int);
 	virtual void SetConditionParameters(std::string, std::string, int);
+	virtual void SetConditionParameters(std::string);
+	virtual void SetConditionParameters(std::string, std::string);
 	virtual bool CheckCondition();
 	
 	void SetEventManager(eventpp::EventDispatcher<std::string, void()>* eventManager);
+	void SetPlugin(std::string plugin);
 	
 	ConditionType type;
 	bool isMet = false;
+	std::string plugin = "Skyrim.esm";
 protected:
 	eventpp::EventDispatcher<std::string, void()>* eventManager;
 };
@@ -106,12 +110,11 @@ public:
 	LocationDiscoveryCondition();
 	void OnDataLoaded(void) override;
 	void EnableListener(void) override;
-	void SetConditionParameters(std::string locationID, std::string worldspaceID, int quantity) override;
-	bool CheckCondition() override;
+	void SetConditionParameters(std::string locationName, std::string worldspaceID) override;
+	bool CheckCondition(std::string locationName, std::string worldspaceID);
 
-	std::string locationID;
+	std::string locationName;
 	std::string worldspaceID;
-	int quantity = 1;
 private:
 	RE::BSEventNotifyControl ProcessEvent(const RE::LocationDiscovery::Event* a_event, RE::BSTEventSource<RE::LocationDiscovery::Event>*) override;
 };
@@ -128,8 +131,20 @@ public:
 private:
 	RE::BSEventNotifyControl ProcessEvent(const RE::DragonSoulsGained::Event* a_event, RE::BSTEventSource<RE::DragonSoulsGained::Event>*) override;
 };
-// Factories
 
+class PlayerActivationCondition : public Condition, public RE::BSTEventSink<RE::TESActivateEvent> {
+public:
+	PlayerActivationCondition();
+	void OnDataLoaded(void) override;
+	void EnableListener(void) override;
+	void SetConditionParameters(std::string formid) override;
+	bool CheckCondition() override;
+
+	std::string formid;
+private:
+	RE::BSEventNotifyControl ProcessEvent(const RE::TESActivateEvent* a_event, RE::BSTEventSource<RE::TESActivateEvent>*) override;
+};
+// Factories
 class ConditionFactory {
 public:
 	virtual Condition* createCondition() = 0;
@@ -172,6 +187,11 @@ public:
 	Condition* createCondition() override;
 };
 
+class PlayerActivationConditionFactory : public ConditionFactory {
+	public:
+	PlayerActivationConditionFactory();
+	Condition* createCondition() override;
+};
 #endif
 
 //struct PlayerLevelCondition : Condition {

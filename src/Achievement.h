@@ -6,7 +6,6 @@
 #include <eventpp/eventdispatcher.h>
 #include "ConditionsJoinType.h"
 #include "Condition.h"
-#include "AchievementFile.h"
 #include "log.h"
 #include "CommonFunctions.h"
 
@@ -20,7 +19,7 @@ using json = nlohmann::json;
 class Achievement {
 public:
     // Constructor that initializes the Achievement from a JSON object
-    Achievement(json& jsonData);
+    Achievement(json& jsonData, std::string plugin);
     void EnableListener(void);
     void OnConditionMet(void);
     eventpp::EventDispatcher<std::string, void()> eventHandler;
@@ -28,9 +27,11 @@ public:
     std::string achievementName;
     std::string description;
     std::vector<Condition*> conditions;
+    std::string plugin;
     bool unlocked;
+    bool hooked = false;
+    std::vector<bool> conditionMet;
 private:
-    std::vector<bool> conditionReached;
     ConditionsJoinType joinType;
 };
 

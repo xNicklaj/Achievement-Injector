@@ -1,9 +1,9 @@
 #include "log.h"
-#include "AchievementFile.h"
-#include "AchievementGroup.h"
+#include "Serializer.h"
 #include <nlohmann/json.hpp>
 #include <filesystem>
 #include <functional>
+#include "AchievementManager.h"
 
 using json = nlohmann::json;
 namespace fs = std::filesystem;
@@ -18,14 +18,17 @@ void RegisterPostLoadFunction(Condition* condition) {
 
 void ReadAchievementFiles(std::vector<AchievementFile>* achievementFiles) {
 	std::string directoryPath = "Data/AchievementsData";
+	json tmp;
 
 	try {
 		if (fs::exists(directoryPath) && fs::is_directory(directoryPath)) {
 			for (const auto& entry : fs::directory_iterator(directoryPath)) {
 				struct AchievementFile achievementFile;
 				// Read JSON file
-				achievementFile.FileName = entry.path().filename().string();
-				ReadJson(entry.path().string(), &achievementFile.FileData);
+				ReadJson(entry.path().string(), &tmp);
+				achievementFile.FileData = tmp["achievements"];
+				achievementFile.groupName = tmp["groupName"];
+				achievementFile.plugin = tmp["plugin"];
 				(*achievementFiles).push_back(achievementFile);
 			}
 		}
@@ -45,14 +48,38 @@ void OnDataLoaded()
 
 void MessageHandler(SKSE::MessagingInterface::Message* a_msg)
 {
+	AchievementManager::GetSingleton()->achievementFiles;
+
 	switch (a_msg->type) {
 	case SKSE::MessagingInterface::kDataLoaded:
+		ReadAchievementFiles(&(AchievementManager::GetSingleton()->achievementFiles));
+		for (auto& achievementFile : (AchievementManager::GetSingleton()->achievementFiles)) {
+			AchievementGroup ag(achievementFile.groupName, achievementFile.plugin);
+			for (json achievement : achievementFile.FileData) {
+				ag.achievements.push_back(new Achievement(achievement, ag.plugin));
+			}
+			AchievementManager::GetSingleton()->achievementGroups.push_back(ag);
+		}
+
+		for (auto& achievementGroup : AchievementManager::GetSingleton()->achievementGroups) {
+			logger::debug("Achievement group {} has {} achievements", achievementGroup.name, achievementGroup.achievements.size());
+		}
 		break;
 	case SKSE::MessagingInterface::kPostLoad:
 		break;
 	case SKSE::MessagingInterface::kPreLoadGame:
 		break;
 	case SKSE::MessagingInterface::kPostLoadGame:
+		Serializer::GetSingleton()->CreateFile();
+
+		for (auto& achievementGroup : AchievementManager::GetSingleton()->achievementGroups) {
+			logger::debug("Achievement group {} has {} achievements", achievementGroup.name, achievementGroup.achievements.size());
+			for (auto& achievement : achievementGroup.achievements) {
+				achievement->EnableListener();
+			}
+		}
+
+
 		logger::info("Data loaded. Executing {} functions.", postLoadConditionRegistry.size());
 		for (auto& condition : postLoadConditionRegistry) {
 			condition->OnDataLoaded();
@@ -71,25 +98,6 @@ SKSEPluginLoad(const SKSE::LoadInterface *skse) {
     auto messaging = SKSE::GetMessagingInterface();
 	if (!messaging->RegisterListener("SKSE", MessageHandler)) {
 		return false;
-	}
-
-	std::vector<AchievementFile> achievementFiles;
-	std::vector<AchievementGroup> achievementGroups;
-
-	ReadAchievementFiles(&achievementFiles);
-	for (auto& achievementFile : (achievementFiles)) {
-		AchievementGroup ag(achievementFile.FileName);
-		for (json achievement : achievementFile.FileData) {
-			ag.achievements.push_back(new Achievement(achievement));
-		}
-		achievementGroups.push_back(ag);
-	}
-
-	for (auto& achievementGroup : achievementGroups) {
-		logger::debug("Achievement group {} has {} achievements", achievementGroup.name, achievementGroup.achievements.size());
-		for (auto& achievement : achievementGroup.achievements) {
-			achievement->EnableListener();
-		}
 	}
 
 	

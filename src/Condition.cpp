@@ -9,6 +9,9 @@ extern void RegisterPostLoadFunction(Condition* condition);
 Condition::Condition(ConditionType type) {
     this->type = type;
 }
+void Condition::SetPlugin(std::string plugin) {
+    this->plugin = plugin;
+}
 void Condition::EnableListener() {}
 void Condition::OnDataLoaded() {
     CheckCondition();
@@ -16,6 +19,8 @@ void Condition::OnDataLoaded() {
 void Condition::SetConditionParameters(std::string, int){}
 void Condition::SetConditionParameters(int) {}
 void Condition::SetConditionParameters(std::string, std::string, int) {}
+void Condition::SetConditionParameters(std::string) {}
+void Condition::SetConditionParameters(std::string, std::string) {}
 bool Condition::CheckCondition() { return false; }
 void Condition::SetEventManager(eventpp::EventDispatcher<std::string, void()>* eventManager) {
 	this->eventManager = eventManager;
@@ -48,10 +53,11 @@ RE::BSEventNotifyControl QuestStageDoneCondition::ProcessEvent(const RE::TESQues
     return RE::BSEventNotifyControl::kContinue;
 }
 bool QuestStageDoneCondition::CheckCondition() {
-    if (!this->isMet && CheckQuestStage(this->questId, "Skyrim.esm") >= stage) { // TODO dynamic esp
+    if (!this->isMet && CheckQuestStage(this->questId, this->plugin) >= stage) { // TODO dynamic esp
         logger::info("Quest {} met condition stage {}", this->questId, this->stage);
         this->isMet = true;
         this->eventManager->dispatch("ConditionMet");
+        RE::ScriptEventSourceHolder::GetSingleton()->RemoveEventSink(this);
         return true;
     }
     return false;
@@ -82,6 +88,7 @@ bool PlayerLevelCondition::CheckCondition() {
 	if (!this->isMet && RE::PlayerCharacter::GetSingleton()->GetLevel() >= level) {
 		this->isMet = true;
         this->eventManager->dispatch("ConditionMet");
+        RE::LevelIncrease::GetEventSource()->RemoveEventSink(this);
 		return true;
 	}
     return false;
@@ -112,6 +119,7 @@ bool PlayerSkillLevelCondition::CheckCondition() {
         logger::info("Skill {} met condition level {}", this->skill, skillLevel);
 		this->isMet = true;
 		this->eventManager->dispatch("ConditionMet");
+        RE::SkillIncrease::GetEventSource()->RemoveEventSink(this);
 		return true;
 	}
     return false;
@@ -132,8 +140,7 @@ void ItemInInventoryCondition::SetConditionParameters(std::string formid, int qu
 	this->quantity = quantity;
 }
 RE::BSEventNotifyControl ItemInInventoryCondition::ProcessEvent(const RE::TESContainerChangedEvent* a_event, RE::BSTEventSource<RE::TESContainerChangedEvent>*) {
-    
-    if (a_event->newContainer == RE::PlayerCharacter::GetSingleton()->GetFormID()) {
+    if (a_event->newContainer == RE::PlayerCharacter::GetSingleton()->GetForm()) {
         CheckCondition();
     }
     return RE::BSEventNotifyControl::kContinue;
@@ -143,9 +150,11 @@ bool ItemInInventoryCondition::CheckCondition() {
     int quantity = 0;
 
     const auto inventory = RE::PlayerCharacter::GetSingleton()->GetInventory();
+    RE::TESForm* target;
     for (auto& [item, data] : inventory) {
-        // For fucking reasons data.first is the amount. Ok.
-        if (item != NULL && FormIDToString(item->GetFormID()) == this->formid) {
+        // For fucking reasons data.first is the amount. Ok
+        target = GetForm(this->formid, this->plugin);
+        if (item != NULL && target != NULL && item->GetForm() == target->formID) {
 			quantity += data.first;
 		}
     }
@@ -153,6 +162,7 @@ bool ItemInInventoryCondition::CheckCondition() {
         logger::info("Player met condition item {} quantity {}", this->formid, this->quantity);
         this->isMet = true;
         this->eventManager->dispatch("ConditionMet");
+        RE::ScriptEventSourceHolder::GetSingleton()->RemoveEventSink(this);
         return true;
     }
     return false;
@@ -161,26 +171,33 @@ bool ItemInInventoryCondition::CheckCondition() {
 // LocationDiscoveryCondition
 LocationDiscoveryCondition::LocationDiscoveryCondition() : Condition(ConditionType::LocationDiscovery) {}
 void LocationDiscoveryCondition::OnDataLoaded(void) {
-	CheckCondition();
+	
 }
 void LocationDiscoveryCondition::EnableListener() {
 	RegisterPostLoadFunction(this);
 	RE::LocationDiscovery::GetEventSource()->AddEventSink(this);
 }
-void LocationDiscoveryCondition::SetConditionParameters(std::string locationID, std::string worldspaceID, int quantity) {
-	this->locationID = locationID;
-	this->worldspaceID = worldspaceID;
-	this->quantity = quantity;
+void LocationDiscoveryCondition::SetConditionParameters(std::string locationName, std::string worldspaceID) {
+	this->locationName = locationName;
+    this->worldspaceID = worldspaceID;
 }
-bool LocationDiscoveryCondition::CheckCondition() {
-	return false;
+bool LocationDiscoveryCondition::CheckCondition(std::string locationName, std::string worldspaceID) {
+    if (locationName == this->locationName && worldspaceID == this->worldspaceID) {
+        logger::info("Player met condition found {} in {}.", this->locationName, this->worldspaceID);
+        this->isMet = true;
+        this->eventManager->dispatch("ConditionMet");
+        RE::LocationDiscovery::GetEventSource()->RemoveEventSink(this);
+        return true;
+    }
+    return false;
 }
 RE::BSEventNotifyControl LocationDiscoveryCondition::ProcessEvent(const RE::LocationDiscovery::Event* a_event, RE::BSTEventSource<RE::LocationDiscovery::Event>*) {
-    logger::debug("Player found {}", a_event->mapMarkerData->locationName.GetFullName());
+    CheckCondition(a_event->mapMarkerData->locationName.GetFullName(), a_event->worldspaceID);
     return RE::BSEventNotifyControl::kContinue;
 }
 
 
+// DragonSoulAbsorbedCondition - V
 DragonSoulAbsorbedCondition::DragonSoulAbsorbedCondition() : Condition(ConditionType::DragonSoulAbsorbed) {}
 void DragonSoulAbsorbedCondition::OnDataLoaded(void) {
 	CheckCondition();
@@ -199,6 +216,7 @@ bool DragonSoulAbsorbedCondition::CheckCondition() {
         logger::info("Player met condition absorbed souls {}", this->quantity);
         this->isMet = true;
         this->eventManager->dispatch("ConditionMet");
+        RE::DragonSoulsGained::GetEventSource()->RemoveEventSink(this);
         return true;
     }
 	return false;
@@ -209,10 +227,33 @@ RE::BSEventNotifyControl DragonSoulAbsorbedCondition::ProcessEvent(const RE::Dra
 	return RE::BSEventNotifyControl::kContinue;
 }
 
+// PlayerActivationCondition - Kind of V
+PlayerActivationCondition::PlayerActivationCondition() : Condition(PlayerActivation){}
+void PlayerActivationCondition::OnDataLoaded(void) {
+};
+void PlayerActivationCondition::EnableListener(void) {
+    RegisterPostLoadFunction(this);
+	RE::ScriptEventSourceHolder::GetSingleton()->AddEventSink(this);
+};
+void PlayerActivationCondition::SetConditionParameters(std::string formid) {
+    this->formid = formid;
+};
+bool PlayerActivationCondition::CheckCondition() {
+    return false;
+};
+RE::BSEventNotifyControl PlayerActivationCondition::ProcessEvent(const RE::TESActivateEvent* a_event, RE::BSTEventSource<RE::TESActivateEvent>*) {
+    RE::TESForm* target = GetForm(this->formid, this->plugin);
+    if(target == NULL) return RE::BSEventNotifyControl::kContinue;
+    if (a_event->objectActivated->GetForm() == target->formID) {
+		logger::info("Player met condition activation {}", this->formid);
+		this->isMet = true;
+		this->eventManager->dispatch("ConditionMet");
+	}
+	return RE::BSEventNotifyControl::kContinue;
+};
+
 // QuestStageDoneConditionFactory
-
 QuestStageDoneConditionFactory::QuestStageDoneConditionFactory() : ConditionFactory() {};
-
 Condition* QuestStageDoneConditionFactory::createCondition() {
     return new QuestStageDoneCondition();
 };
@@ -240,4 +281,9 @@ Condition* LocationDiscoveryConditionFactory::createCondition() {
 DragonSoulAbsorbedConditionFactory::DragonSoulAbsorbedConditionFactory() : ConditionFactory() {};
 Condition* DragonSoulAbsorbedConditionFactory::createCondition() {
 	return new DragonSoulAbsorbedCondition();
+};
+
+PlayerActivationConditionFactory::PlayerActivationConditionFactory() : ConditionFactory() {};
+Condition* PlayerActivationConditionFactory::createCondition() {
+	return new PlayerActivationCondition();
 };
