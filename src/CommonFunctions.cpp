@@ -1,5 +1,6 @@
 #include "log.h"
 #include "CommonFunctions.h"
+#include "Papyrus.h"
 
 namespace logger = SKSE::log;
 
@@ -72,59 +73,6 @@ RE::ActorValue StringToActorValue(std::string value) {
     else if (value == "twohanded") return RE::ActorValue::kTwoHanded;
     return RE::ActorValue::kNone;
 }
-
-void AddMenuOption() {
-    const auto menu = RE::UI::GetSingleton()->GetMenu<RE::JournalMenu>(RE::JournalMenu::MENU_NAME).get();
-    const auto view = menu ? menu->GetRuntimeData().systemTab.view : nullptr;
-    RE::GFxValue page;
-    if (!view || !view->GetVariable(&page, "_root.QuestJournalFader.Menu_mc.SystemFader.Page_mc")) {
-        logger::warn("Couldn't find _root.QuestJournalFader.Menu_mc.SystemFader.Page_mc");
-        return;
-    }
-    RE::GFxValue showModMenu;
-    if (page.GetMember("_showModMenu", &showModMenu) && showModMenu.GetBool() == false) {
-        std::array<RE::GFxValue, 1> args;
-        args[0] = true;
-        if (!page.Invoke("SetShowMod", nullptr, args.data(), args.size())) {
-            logger::warn("Couldn't invoke SetShowMod");
-            return;
-        }
-    }
-    RE::GFxValue categoryList;
-    if (page.GetMember("CategoryList", &categoryList)) {
-        RE::GFxValue entryList;
-        if (categoryList.GetMember("entryList", &entryList)) {
-            std::uint32_t bestiaryIndex;
-
-            std::uint32_t length = entryList.GetArraySize();
-            for (std::uint32_t index = 0; index < length; ++index) {
-                RE::GFxValue entry;
-                if (entryList.GetElement(index, &entry)) {
-                    RE::GFxValue textVal;
-                    if (entry.GetMember("text", &textVal)) {
-                        std::string text = textVal.GetString();
-                        if (text == "$HELP") {
-                            bestiaryIndex = index;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            if (bestiaryIndex) {
-                RE::GFxValue entryBestiary;
-                view->CreateObject(&entryBestiary);
-                entryBestiary.SetMember("text", SYSTEMMENU_ALIAS);
-                entryList.SetElement(bestiaryIndex, entryBestiary);
-                categoryList.Invoke("InvalidateData");
-
-                return;
-            }
-        }
-    }
-    return;
-}
-
 void ReadJson(const std::string& filePath, json* jsonData) {
     // Open the JSON file
     std::ifstream file(filePath);
@@ -139,4 +87,8 @@ void ReadJson(const std::string& filePath, json* jsonData) {
     // Close the file
     file.close();
     return;
+}
+bool BindPapyrusFunctions(RE::BSScript::IVirtualMachine* vm) {
+    vm->RegisterFunction("OnPowerLearned", "NativePapyrusFunctions", NativePapyrus::OnPowerLearned);
+    return true;
 }

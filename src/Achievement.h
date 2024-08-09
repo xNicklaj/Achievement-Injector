@@ -5,9 +5,9 @@
 #include <nlohmann/json.hpp>
 #include <eventpp/eventdispatcher.h>
 #include "ConditionsJoinType.h"
-#include "Condition.h"
 #include "log.h"
 #include "CommonFunctions.h"
+#include "Conditions/Condition.h"
 
 #ifndef ACHIEVEMENT_H
 #define ACHIEVEMENT_H
@@ -22,6 +22,7 @@ public:
     Achievement(json& jsonData, std::string plugin);
     void EnableListener(void);
     void OnConditionMet(void);
+
     eventpp::EventDispatcher<std::string, void()> eventHandler;
 
     std::string achievementName;

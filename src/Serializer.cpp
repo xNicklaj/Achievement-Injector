@@ -1,4 +1,5 @@
 #include "Serializer.h"
+#include "settings.h"
 
 
 namespace fs = std::filesystem;
@@ -11,7 +12,7 @@ std::string Serializer::GetFilename() const {
 	std::string fileName;
 
 	// Get final configuration path
-	if (!this->isGlobal) {
+	if (!Settings::GetSingleton()->GetGlobal()) {
 		// Get player name
 		std::string playerName = RE::PlayerCharacter::GetSingleton()->GetName();
 		std::transform(playerName.begin(), playerName.end(), playerName.begin(), [](unsigned char c) { return std::toupper(c); });
@@ -88,7 +89,7 @@ void Serializer::Save() {
 	}
 }
 
-void Serializer::CreateFile() {
+void Serializer::CreateFileIfNotExists() {
 	std::string fileName = GetFilename();
 	try {
 		if (!fs::exists(DIRECTORY_PATH)) {

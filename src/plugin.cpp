@@ -1,9 +1,14 @@
 #include "log.h"
 #include "Serializer.h"
+#include "settings.h"
 #include <nlohmann/json.hpp>
 #include <filesystem>
 #include <functional>
 #include "AchievementManager.h"
+#include "UIManager.h"
+#include "AchievementWidget.h"
+#include "Conditions/Condition.h"
+#include "EventProcessor.h"
 
 using json = nlohmann::json;
 namespace fs = std::filesystem;
@@ -48,8 +53,7 @@ void OnDataLoaded()
 
 void MessageHandler(SKSE::MessagingInterface::Message* a_msg)
 {
-	AchievementManager::GetSingleton()->achievementFiles;
-
+	auto eventProcessor = EventProcessor::GetSingleton();
 	switch (a_msg->type) {
 	case SKSE::MessagingInterface::kDataLoaded:
 		ReadAchievementFiles(&(AchievementManager::GetSingleton()->achievementFiles));
@@ -64,13 +68,16 @@ void MessageHandler(SKSE::MessagingInterface::Message* a_msg)
 		for (auto& achievementGroup : AchievementManager::GetSingleton()->achievementGroups) {
 			logger::debug("Achievement group {} has {} achievements", achievementGroup.name, achievementGroup.achievements.size());
 		}
+		EventProcessor::GetSingleton()->Register();
+		Scaleform::AchievementWidget::Register();
+		Scaleform::AchievementWidget::Show();
 		break;
 	case SKSE::MessagingInterface::kPostLoad:
 		break;
 	case SKSE::MessagingInterface::kPreLoadGame:
 		break;
 	case SKSE::MessagingInterface::kPostLoadGame:
-		Serializer::GetSingleton()->CreateFile();
+		Serializer::GetSingleton()->CreateFileIfNotExists();
 
 		for (auto& achievementGroup : AchievementManager::GetSingleton()->achievementGroups) {
 			logger::debug("Achievement group {} has {} achievements", achievementGroup.name, achievementGroup.achievements.size());
@@ -84,15 +91,21 @@ void MessageHandler(SKSE::MessagingInterface::Message* a_msg)
 		for (auto& condition : postLoadConditionRegistry) {
 			condition->OnDataLoaded();
 		}
+
+		Scaleform::AchievementWidget::Show();
+
         break;
 	case SKSE::MessagingInterface::kNewGame:
+		break;
+	case SKSE::MessagingInterface::kSaveGame:
+		Scaleform::AchievementWidget::Show();
 		break;
 	}
 }
 
 SKSEPluginLoad(const SKSE::LoadInterface *skse) {
     SKSE::Init(skse);
-	SetupLog();
+	Settings::GetSingleton()->LoadSettings();
 
 
     auto messaging = SKSE::GetMessagingInterface();
@@ -100,6 +113,6 @@ SKSEPluginLoad(const SKSE::LoadInterface *skse) {
 		return false;
 	}
 
-	
+	//SKSE::GetPapyrusInterface()->Register(BindPapyrusFunctions); TODO REMOVE THIS SHIT
     return true;
 }

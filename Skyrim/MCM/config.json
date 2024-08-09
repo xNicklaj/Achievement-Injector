@@ -1,0 +1,35 @@
+{
+    "$schema": "https://raw.githubusercontent.com/Exit-9B/MCM-Helper/main/docs/config.schema.json",
+    "modName": "AchievementInjector",
+    "displayName": "Achievement Injector",
+    "minMcmVersion": 9,
+    "cursorFillMode": "topToBottom",
+    "content": [
+        {
+            "type": "header",
+            "text": "For players"
+        },
+        {
+            "id": "bGlobal:Main",
+            "type": "toggle",
+            "text": "Enable global profile",
+            "help": "Set this to true if you want all characters to share the same achievements.",
+            "valueOptions": {
+                "sourceType": "ModSettingBool"
+            }
+        },
+        {
+            "type": "header",
+            "text": "For developers"
+        },
+        {
+            "id": "bDebug:Main",
+            "type": "toggle",
+            "text": "Enable debug logs",
+            "help": "Set this to true if you want logs to show all messages. This can be useful for developers.",
+            "valueOptions": {
+                "sourceType": "ModSettingBool"
+            }
+        }
+    ]
+}

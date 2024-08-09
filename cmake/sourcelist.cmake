@@ -1,9 +1,27 @@
 set(sources ${sources}
 	src/Achievement.cpp
+	src/AchievementWidget.cpp
 	src/CommonFunctions.cpp
-	src/Condition.cpp
+	src/Conditions/BookRead/BookReadCondition.cpp
+	src/Conditions/Condition.cpp
+	src/Conditions/DragonSoulAbsorbed/DragonSoulsAbsorbedCondition.cpp
+	src/Conditions/DungeonCleared/DungeonClearedCondition.cpp
+	src/Conditions/ItemCrafted/ItemCraftedCondition.cpp
+	src/Conditions/ItemInInventory/ItemInInventoryCondition.cpp
+	src/Conditions/LocationDiscovery/LocationDiscoveryCondition.cpp
+	src/Conditions/PlayerActivation/PlayerActivationCondition.cpp
+	src/Conditions/PlayerCrime/PlayerCrimeCondition.cpp
+	src/Conditions/PlayerFirstEnterCell/PlayerFirstEnterCellCondition.cpp
+	src/Conditions/PlayerLevel/PlayerLevelCondition.cpp
+	src/Conditions/QuestStageDone/QuestStageDoneCondition.cpp
+	src/Conditions/SkillLevel/SkillLevelCondition.cpp
+	src/EventProcessor.cpp
+	src/Papyrus.cpp
 	src/Serializer.cpp
-	src/hook.cpp
+	src/Settings.cpp
+	src/Sync.cpp
+	src/UIManager.cpp
+	src/Utility.cpp
 	src/log.cpp
 	src/plugin.cpp
 )

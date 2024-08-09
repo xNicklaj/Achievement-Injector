@@ -2,11 +2,15 @@
   "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
   "name": "achievement-injector",
   "version-string": "0.0.1",
-  "dependencies": [
-    "commonlibsse-ng",
-    "simpleini",
-    "nlohmann-json",
-    "eventpp"
-  ],
+    "dependencies": [
+        "commonlibsse-ng",
+        "simpleini",
+        "nlohmann-json",
+        "eventpp",
+        {
+            "name": "imgui",
+            "features": [ "dx11-binding", "win32-binding", "freetype", "wchar32" ]
+        }
+    ],
   "builtin-baseline": "576379156e82da642f8d1834220876759f13534d"
 }

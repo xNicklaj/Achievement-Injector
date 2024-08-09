@@ -3,8 +3,19 @@
 #include <string>
 #include <memory>
 #include "ConditionsJoinType.h"
-#include "Condition.h"
+#include "UIManager.h"
 #include "Serializer.h"
+
+#include "Conditions/DragonSoulAbsorbed/DragonSoulsAbsorbedCondition.h"
+#include "Conditions/ItemInInventory/ItemInInventoryCondition.h"
+#include "Conditions/LocationDiscovery/LocationDiscoveryCondition.h"
+#include "Conditions/PlayerActivation/PlayerActivationCondition.h"
+#include "Conditions/PlayerLevel/PlayerLevelCondition.h"
+#include "Conditions/SkillLevel/SkillLevelCondition.h"
+#include "Conditions/QuestStageDone/QuestStageDoneCondition.h"
+#include "Conditions/PlayerFirstEnterCell/PlayerFirstEnterCellCondition.h"
+#include "Conditions/ItemCrafted/ItemCraftedCondition.h"
+#include "Conditions/BookRead/BookReadCondition.h"
 
 Achievement::Achievement(json& jsonData, std::string plugin)
     : achievementName(jsonData["achievementName"].get<std::string>()),
@@ -57,6 +68,21 @@ Achievement::Achievement(json& jsonData, std::string plugin)
             a_condition = playerActivationConditionFactory->createCondition();
             a_condition->SetConditionParameters(condition["formID"].get<std::string>());
         }
+        else if (type == "FirstEnterCell") {
+            PlayerFirstEnterCellConditionFactory* playerFirstEnterCellConditionFactory = new PlayerFirstEnterCellConditionFactory();
+			a_condition = playerFirstEnterCellConditionFactory->createCondition();
+            a_condition->SetConditionParameters(condition["cellID"].get<std::string>());
+        }
+        else if (type == "ItemCrafted") {
+			ItemCraftedConditionFactory* itemCraftedConditionFactory = new ItemCraftedConditionFactory();
+			a_condition = itemCraftedConditionFactory->createCondition();
+			a_condition->SetConditionParameters(condition["itemID"].get<std::string>());
+		}
+        else if (type == "BookRead"){
+            BookReadConditionFactory* bookReadConditionFactory = new BookReadConditionFactory();
+            a_condition = bookReadConditionFactory->createCondition();
+            a_condition->SetConditionParameters(condition["bookID"].get<std::string>());
+        }
         else {
             logger::warn("Unknown condition type {} in {}.", type, this->achievementName);
         }
@@ -66,6 +92,10 @@ Achievement::Achievement(json& jsonData, std::string plugin)
 }
 
 void Achievement::EnableListener(void) {
+    if(conditions.size() == 0) {
+		logger::warn("Achievement {} has no conditions.", this->achievementName);
+		return;
+	}
 	// Enable listener for this achievement
     SerializedAchievement sa = Serializer::GetSingleton()->DeserializeAchievementData(this->achievementName);
     if (sa.unlocked) {
@@ -122,6 +152,7 @@ void Achievement::OnConditionMet(void) {
     if (allConditionsMet) {
         unlocked = true;
         logger::info("Achievement {} unlocked", achievementName);
+        UIManager::GetSingleton()->eventHandler.dispatch("AchievementUnlocked");
     }
     Serializer::GetSingleton()->SerializeAchievementData(this);
 }

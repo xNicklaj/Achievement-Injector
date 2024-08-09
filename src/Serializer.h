@@ -24,12 +24,10 @@ public:
 	void Save();
 	void SerializeAchievementData(Achievement* achievement);
 	struct SerializedAchievement DeserializeAchievementData(std::string name);
-	void SetGlobal(bool global) { isGlobal = global; }
-	void CreateFile();
+	void CreateFileIfNotExists();
 private:
 	std::string GetFilename() const;
 	const std::string& path = "DATA/SKSE/Plugins/AchievementInjector/UnlockedAchievements_{}.json";
-	bool isGlobal = false;
 	json jsonData;
 };
 

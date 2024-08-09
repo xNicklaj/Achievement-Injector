@@ -1,0 +1,104 @@
+{
+    "groupName": "Dragonborn",
+    "plugin": "Dawnguard.esm",
+    "achievements": [
+        {
+            "achievementName": "Awakening",
+            "description": "Complete 'Awakening'",
+            "conditions": [
+                {
+                    "type": "QuestStageDone",
+                    "questID": "DLC1VQ01",
+                    "stage": 200
+                }
+            ]
+        },
+        {
+            "achievementName": "Beyond Death",
+            "description": "Complete 'Beyond Death'",
+            "conditions": [
+                {
+                    "type": "QuestStageDone",
+                    "questID": "DLC1VQ05",
+                    "stage": 200
+                }
+            ]
+        },
+        {
+            "achievementName": "Kindred Judgment",
+            "description": "Complete 'Kindred Judgment'",
+            "conditions": [
+                {
+                    "type": "QuestStageDone",
+                    "questID": "DLC1VQ08",
+                    "stage": 200
+                }
+            ]
+        },
+        {
+            "achievementName": "Lost to the Ages",
+            "description": "Complete 'Lost to the Ages'",
+            "conditions": [
+                {
+                    "type": "QuestStageDone",
+                    "questID": "DLC1LD",
+                    "stage": 225
+                }
+            ]
+        },
+        {
+            "achievementName": "Soul Tear",
+            "description": "Learn all three words of Soul Tear",
+            "conditions": []
+        },
+        {
+            "achievementName": "Auriel's Bow",
+            "description": "Use the special power of Auriel's Bow",
+            "conditions": []
+        },
+        {
+            "achievementName": "Werewolf Mastered",
+            "description": "Acquire 11 werewolf perks",
+            "conditions": [
+                {
+                    "type": "InvestedPerkPoints",
+                    "skill": "TODO: BOH Werewolf",
+                    "quantity": 11
+                }
+            ]
+        },
+        {
+            "achievementName": "Vampire Mastered",
+            "description": "Acquire 11 vampire perks",
+            "conditions": [
+                {
+                    "type": "InvestedPerkPoints",
+                    "skill": "TODO: BOH Vampire",
+                    "quantity": 11
+                }
+            ]
+        },
+        {
+            "achievementName": "A New You",
+            "description": "Change your face",
+            "conditions": [
+                {
+                    "type": "QuestStageDone",
+                    "questID": "DLC1Surgery",
+                    "stage": 20
+                }
+            ]
+        },
+        {
+            "achievementName": "Legend",
+            "description": "Defeat a Legendary Dragon",
+            "conditions": [
+                {
+                    "type": "EnemySlain",
+                    "enemyType": "TODO: Legendary Dragon",
+                    "quantity": 1
+                }
+            ]
+        }
+    ]
+}

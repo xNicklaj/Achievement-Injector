@@ -28,7 +28,6 @@ endif()
 # to the path of your "mods" folder
 if(DEFINED ENV{SKYRIM_MODS_FOLDER} AND IS_DIRECTORY "$ENV{SKYRIM_MODS_FOLDER}")
     set(OUTPUT_FOLDER "$ENV{SKYRIM_MODS_FOLDER}/${PROJECT_NAME} ${CMAKE_BUILD_TYPE}")
-    configure_file("AchievementsData/SkyrimSE.json" "${OUTPUT_FOLDER}/AchievementsData/SkyrimSE.json" COPYONLY)
 endif()
 
 # Otherwise, you can set OUTPUT_FOLDER to any place you'd like :)
@@ -47,6 +46,7 @@ target_include_directories(
 	"${PROJECT_NAME}"
 	PRIVATE
 		${SIMPLEINI_INCLUDE_DIRS}
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 # When your SKSE .dll is compiled, this will automatically copy the .dll into your mods folder.
 # Only works if you configure DEPLOY_ROOT above (or set the SKYRIM_MODS_FOLDER environment variable)
@@ -64,6 +64,14 @@ if(DEFINED OUTPUT_FOLDER)
         POST_BUILD
         COMMAND "${CMAKE_COMMAND}" -E make_directory "${DLL_FOLDER}"
         COMMAND "${CMAKE_COMMAND}" -E copy_if_different "$<TARGET_FILE:${PROJECT_NAME}>" "${DLL_FOLDER}/$<TARGET_FILE_NAME:${PROJECT_NAME}>"
+        VERBATIM
+    )
+
+    add_custom_command(
+        TARGET "${PROJECT_NAME}"
+        POST_BUILD
+        COMMAND "${CMAKE_COMMAND}" -E make_directory "${DLL_FOLDER}"
+        COMMAND "${CMAKE_COMMAND}" -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/Skyrim/Data" "${OUTPUT_FOLDER}"
         VERBATIM
     )
 

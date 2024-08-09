@@ -1,0 +1,193 @@
+{
+    "groupName": "Dragonborn",
+    "plugin": "Dragonborn.esm",
+    "achievements": [
+        {
+            "achievementName": "Outlander",
+            "description": "Arrive on Solstheim",
+            "joinType":  "OR",
+            "conditions": [
+                {
+                    "type": "FirstEnterCell",
+                    "cellID": "00EEB6"
+                },
+                {
+                    "type": "FirstEnterCell",
+                    "cellID": "00EEB5"
+                },
+                {
+                    "type": "FirstEnterCell",
+                    "cellID": "00EED7"
+                },
+                {
+                    "type": "FirstEnterCell",
+                    "cellID": "00EED6"
+                },
+                {
+                    "type": "FirstEnterCell",
+                    "cellID": "00EED8"
+                },
+                {
+                    "type": "FirstEnterCell",
+                    "cellID": "00EEF8"
+                },
+                {
+                    "type": "FirstEnterCell",
+                    "cellID": "00EEF7"
+                },
+                {
+                    "type": "FirstEnterCell",
+                    "cellID": "00EEB4"
+                },
+                {
+                    "type": "FirstEnterCell",
+                    "cellID": "00EEF6"
+                }
+            ]
+        },
+        {
+            "achievementName": "The Temple of Miraak",
+            "description": "Complete 'The Temple of Miraak'",
+            "conditions": [
+                {
+                    "type": "QuestStageDone",
+                    "questID": "DLC2MQ02",
+                    "stage": 200
+                }
+            ]
+        },
+        {
+            "achievementName": "The Path of Knowledge",
+            "description": "Complete 'The Path of Knowledge'",
+            "conditions": [
+                {
+                    "type": "QuestStageDone",
+                    "questID": "DLC2MQ04",
+                    "stage": 550
+                }
+            ]
+        },
+        {
+            "achievementName": "At the Summit of Apocrypha",
+            "description": "Complete 'At the Summit of Apocrypha'",
+            "conditions": [
+                {
+                    "type": "QuestStageDone",
+                    "questID": "DLC2MQ06",
+                    "stage": 550
+                }
+            ]
+        },
+        {
+            "achievementName": "Dragon Aspect",
+            "description": "Learn all 3 words of Dragon Aspect",
+            "conditions": [
+            ]
+        },
+        {
+            "achievementName": "Hidden Knowledge",
+            "description": "Learn the secrets of 5 Black Books",
+            "conditions": [
+            ]
+        },
+        {
+            "achievementName": "Stalhrim Crafter",
+            "description": "Craft an item out of Stalhrim",
+            "joinCondition":  "OR",
+            "conditions": [
+                {
+                    "type": "ItemCrafted",
+                    "itemID": "01CD9E"
+                },
+                {
+                    "type": "ItemCrafted",
+                    "itemID": "01CDA0"
+                },
+                {
+                    "type": "ItemCrafted",
+                    "itemID": "01CDA1"
+                },
+                {
+                    "type": "ItemCrafted",
+                    "itemID": "01CD7E"
+                },
+                {
+                    "type": "ItemCrafted",
+                    "itemID": "01CDA2"
+                },
+                {
+                    "type": "ItemCrafted",
+                    "itemID": "01CDA5"
+                },
+                {
+                    "type": "ItemCrafted",
+                    "itemID": "01CDA3"
+                },
+                {
+                    "type": "ItemCrafted",
+                    "itemID": "026237"
+                },
+                {
+                    "type": "ItemCrafted",
+                    "itemID": "01CDB4"
+                },
+                {
+                    "type": "ItemCrafted",
+                    "itemID": "026231"
+                },
+                {
+                    "type": "ItemCrafted",
+                    "itemID": "01CDB5"
+                },
+                {
+                    "type": "ItemCrafted",
+                    "itemID": "01CDB6"
+                },
+                {
+                    "type": "ItemCrafted",
+                    "itemID": "01CDB7"
+                },
+                {
+                    "type": "ItemCrafted",
+                    "itemID": "01CDB8"
+                },
+                {
+                    "type": "ItemCrafted",
+                    "itemID": "01CDB9"
+                },
+                {
+                    "type": "ItemCrafted",
+                    "itemID": "01CDBA"
+                },
+                {
+                    "type": "ItemCrafted",
+                    "itemID": "026239"
+                }
+            ]
+        },
+        {
+            "achievementName": "Dragonrider",
+            "description": "Tame and ride 5 dragons",
+            "conditions": [
+            ]
+        },
+        {
+            "achievementName": "Raven Rock Owner",
+            "description": "Own a house in Raven Rock",
+            "conditions": [
+            ]
+        },
+        {
+            "achievementName": "Solstheim Explorer",
+            "description": "Discover 30 locations on the island of Solstheim",
+            "conditions": [
+                {
+                    "type": "LocationDiscover",
+                    "locationID": "*",
+                    "restrict": "TODO: Solstheim",
+                    "quantity": 30
+                }
+            ]
+        }
+    ]
+}
