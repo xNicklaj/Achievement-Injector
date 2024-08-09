@@ -1,5 +1,6 @@
 #include "EventProcessor.h"
 #include "Utility.h"
+#include "log.h"
 #include "AchievementWidget.h"
 
 RE::BSEventNotifyControl EventProcessor::ProcessEvent(const RE::MenuOpenCloseEvent* event,
@@ -12,6 +13,7 @@ RE::BSEventNotifyControl EventProcessor::ProcessEvent(const RE::MenuOpenCloseEve
     if (event->opening) {
         
     } else if (!event->opening && event->menuName == Scaleform::AchievementWidget::MENU_NAME) {
+        logger::debug("MenuOpenCloseEvent triggered.");
         Scaleform::AchievementWidget::Show();
     }
     return RE::BSEventNotifyControl::kContinue;

@@ -5,6 +5,7 @@
 #include "ConditionsJoinType.h"
 #include "UIManager.h"
 #include "Serializer.h"
+#include "AchievementWidget.h"
 
 #include "Conditions/DragonSoulAbsorbed/DragonSoulsAbsorbedCondition.h"
 #include "Conditions/ItemInInventory/ItemInInventoryCondition.h"
@@ -152,7 +153,8 @@ void Achievement::OnConditionMet(void) {
     if (allConditionsMet) {
         unlocked = true;
         logger::info("Achievement {} unlocked", achievementName);
-        UIManager::GetSingleton()->eventHandler.dispatch("AchievementUnlocked");
+        //UIManager::GetSingleton()->eventHandler.dispatch("AchievementUnlocked");
+        Scaleform::AchievementWidget::DisplayEntry(achievementName, description);
     }
     Serializer::GetSingleton()->SerializeAchievementData(this);
 }

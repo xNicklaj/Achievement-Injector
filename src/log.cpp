@@ -10,6 +10,7 @@ void SetupLog() {
     auto loggerPtr = std::make_shared<spdlog::logger>("log", std::move(fileLoggerPtr));
     spdlog::set_default_logger(std::move(loggerPtr));
     if (Settings::GetSingleton()->GetDebug()) {
+        logger::info("Debug enabled.");
         spdlog::set_level(spdlog::level::trace);
         spdlog::flush_on(spdlog::level::trace);
     }
@@ -17,5 +18,4 @@ void SetupLog() {
         spdlog::set_level(spdlog::level::info);
         spdlog::flush_on(spdlog::level::info);
     }
-
 }

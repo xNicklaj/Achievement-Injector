@@ -7,9 +7,12 @@ void Settings::SerializeINI(const wchar_t* a_path, const std::function<void(CSim
 	ini.SetUnicode();
 
 	if (const auto rc = ini.LoadFile(a_path); !a_generate && rc < SI_OK) {
+		logger::error("Failed to load ini file.");
 		return;
 	}
 
+
+	logger::info("Loaded ini file.");
 	a_func(ini);
 
 	(void)ini.SaveFile(a_path);
@@ -21,7 +24,7 @@ void Settings::SerializeINI(const wchar_t* a_defaultPath, const wchar_t* a_userP
 	SerializeINI(a_userPath, a_func);
 }
 
-void Settings::LoadSettings() const
+void Settings::LoadSettings()
 {
 	LoadMCMSettings();
 	SetupLog();
@@ -30,10 +33,10 @@ void Settings::LoadSettings() const
 void Settings::LoadMCMSettings() const
 {
 	constexpr auto load_mcm = [](auto& ini) {
-		Settings::GetSingleton()->bDebug = ini.GetBoolValue("General", "bDebug", false);
-		Settings::GetSingleton()->bGlobal = ini.GetBoolValue("General", "bGlobal", false);
+		Settings::GetSingleton()->bDebug = ini.GetBoolValue("Main", "bDebug", false);
+		Settings::GetSingleton()->bUseDebugger = ini.GetBoolValue("Main", "bUseDebugger", false);
+		Settings::GetSingleton()->bGlobal = ini.GetBoolValue("Main", "bGlobal", false);
 	};
-
 	SerializeINI(defaultMCMPath, userMCMPath, load_mcm);
 }
 

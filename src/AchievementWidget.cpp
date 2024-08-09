@@ -3,130 +3,111 @@
 #include "settings.h"
 
 namespace Scaleform {
-	AchievementWidget::AchievementWidget()
-	{
-		auto scaleformManager = RE::BSScaleformManager::GetSingleton();
+    AchievementWidget::AchievementWidget() {
+        auto scaleformManager = RE::BSScaleformManager::GetSingleton();
+        scaleformManager->LoadMovieEx(this, MENU_PATH, [this](RE::GFxMovieDef* a_def) {
+            using StateType = RE::GFxState::StateType;
 
-		inputContext = Context::kNone;
-		depthPriority = 0;
+            fxDelegate.reset(new RE::FxDelegate());
+            fxDelegate->RegisterHandler(this);
+            a_def->SetState(StateType::kExternalInterface, fxDelegate.get());
+            fxDelegate->Release();
 
-		menuFlags.set(RE::UI_MENU_FLAGS::kAlwaysOpen);
-		menuFlags.set(RE::UI_MENU_FLAGS::kRequiresUpdate);
-		menuFlags.set(RE::UI_MENU_FLAGS::kAllowSaving);
+            //auto logger = new Logger<AchievementWidget>();
+            //a_def->SetState(StateType::kLog, logger);
+            //logger->Release();
+            });
 
-		if (uiMovie) {
-			uiMovie->SetMouseCursorCount(0);  // disable input
-		}
+        inputContext = Context::kNone;
+        depthPriority = 0;
+        menuFlags.set(RE::UI_MENU_FLAGS::kAllowSaving, RE::UI_MENU_FLAGS::kCustomRendering,
+            RE::UI_MENU_FLAGS::kAssignCursorToRenderer);
+    }
 
-		scaleformManager->LoadMovieEx(this, MENU_PATH, [this](RE::GFxMovieDef* a_def) {
-			a_def->SetState(
-				RE::GFxState::StateType::kLog,
-				RE::make_gptr<Logger>().get());
-		});
-	}
+    void AchievementWidget::Register() {
+        auto ui = RE::UI::GetSingleton();
+        if (ui) {
+            ui->Register(AchievementWidget::MENU_NAME, Creator);
+            logger::debug("Registered {}", AchievementWidget::MENU_NAME);
+        }
+    }
 
-	RE::GPtr<AchievementWidget> AchievementWidget::GetAchievementWidget()
-	{
-		auto ui = RE::UI::GetSingleton();
-		return ui ? ui->GetMenu<AchievementWidget>(AchievementWidget::MENU_NAME) : nullptr;
-	}
+    void AchievementWidget::Show() {
+        auto ui = RE::UI::GetSingleton();
+        if (!ui || ui->IsMenuOpen(AchievementWidget::MENU_NAME)) {
+            return;
+        }
+        auto uiMessageQueue = RE::UIMessageQueue::GetSingleton();
+        if (uiMessageQueue) {
+            uiMessageQueue->AddMessage(AchievementWidget::MENU_NAME, RE::UI_MESSAGE_TYPE::kShow, nullptr);
+        }
+    }
 
-	void AchievementWidget::Register()
-	{
-		auto ui = RE::UI::GetSingleton();
-		if (ui) {
-			ui->Register(MENU_NAME, Creator);
-			logger::info("Menu Registered.");
-		}
-	}
+    void AchievementWidget::Hide() {
+        auto uiMessageQueue = RE::UIMessageQueue::GetSingleton();
+        if (uiMessageQueue) {
+            uiMessageQueue->AddMessage(AchievementWidget::MENU_NAME, RE::UI_MESSAGE_TYPE::kHide, nullptr);
+        }
+    }
 
-	void AchievementWidget::Show()
-	{
-		auto msgQ = RE::UIMessageQueue::GetSingleton();
-		if (msgQ) {
-			msgQ->AddMessage(AchievementWidget::MENU_NAME, RE::UI_MESSAGE_TYPE::kShow, nullptr);
-		}
-	}
+    void AchievementWidget::SetPosition() {
+        auto ui = RE::UI::GetSingleton();
+        if (!ui || !ui->IsMenuOpen(AchievementWidget::MENU_NAME)) {
+            logger::debug("Bestiary Widget not open, couldn't set position");
+            return;
+        }
+        RE::GFxValue widget;
+        std::array<RE::GFxValue, 2> posArgs;
+        std::array<RE::GFxValue, 1> scaleArgs;
+        //posArgs[0] = widgetX;
+        //posArgs[1] = widgetY;
+        //scaleArgs[0] = widgetScale;
+        ui->GetMenu(AchievementWidget::MENU_NAME)->uiMovie->GetVariable(&widget, "_root.BestiaryWidget_mc");
+        widget.Invoke("setPosition", nullptr, posArgs.data(), posArgs.size());
+        widget.Invoke("setScale", nullptr, scaleArgs.data(), scaleArgs.size());
 
-	void AchievementWidget::Hide()
-	{
-		auto msgQ = RE::UIMessageQueue::GetSingleton();
-		if (msgQ) {
-			msgQ->AddMessage(AchievementWidget::MENU_NAME, RE::UI_MESSAGE_TYPE::kHide, nullptr);
-		}
-	}
+        //logger::info("Set widget position to X {} and Y {}, scale to {}", widgetX, widgetY, widgetScale);
+    }
 
-	// pass the breath meter percents to the scaleform menu using invokes, and tell the menu when to show or hide itself (as in within the scaleform, not the IMenu kHide flag)
-	void AchievementWidget::Update()
-	{
+    void AchievementWidget::Accept(RE::FxDelegateHandler::CallbackProcessor* a_cbReg) {
+        a_cbReg->Process("PlaySound", PlaySound);
+    }
 
-	}
+    void AchievementWidget::PlaySound(const RE::FxDelegateArgs& a_params) {
+        assert(a_params.GetArgCount() == 1);
+        assert(a_params[0].IsString());
 
-	// Every time a new frame of the menu is rendered call the update function.
-	void AchievementWidget::AdvanceMovie(float a_interval, std::uint32_t a_currentTime)
-	{
-		AchievementWidget::Update();
-		RE::IMenu::AdvanceMovie(a_interval, a_currentTime);
-	}
+        RE::PlaySound(a_params[0].GetString());
+    }
 
-	RE::UI_MESSAGE_RESULTS AchievementWidget::ProcessMessage(RE::UIMessage& a_message)
-	{
-		using Type = RE::UI_MESSAGE_TYPE;
+    void AchievementWidget::DisplayEntry(std::string name, std::string description) {
+        auto ui = RE::UI::GetSingleton();
+        RE::GFxValue widget;
+        if (ui->GetMenu(AchievementWidget::MENU_NAME)->uiMovie->GetVariable(&widget, "_root.AchievementWidget_mc")) {
+            std::array<RE::GFxValue, 1> nameArgs;
+            std::array<RE::GFxValue, 1> descriptionArgs;
+            std::array<RE::GFxValue, 1> showArgs;
+            nameArgs[0] = name;
+            descriptionArgs[0] = description;
+            showArgs[0] = true;
+            logger::debug("Invoking ActionScript with parameters ({}, {})", name, description);
+            widget.Invoke("setName", nullptr, nameArgs.data(), nameArgs.size());
+            widget.Invoke("setDescription", nullptr, descriptionArgs.data(), descriptionArgs.size());
+            widget.Invoke("ShowNotification", nullptr, showArgs.data(), showArgs.size());
+            //RE::PlaySound("UISkillIncreaseSD");
+            std::jthread t(HideEntry);
+            t.detach();
+        }
+    }
 
-		switch (*a_message.type) {
-		case Type::kShow:
-			OnOpen();
-			return RE::IMenu::ProcessMessage(a_message);
-		case Type::kHide:
-			OnClose();
-			return RE::IMenu::ProcessMessage(a_message);
-		default:
-			return RE::IMenu::ProcessMessage(a_message);
-		}
-	}
-
-	bool AchievementWidget::IsOpen() const
-	{
-		return _bIsOpen;
-	}
-
-	void AchievementWidget::OnOpen()
-	{
-		// The advance movie process will handle showing the meter when appropriate
-		AchievementWidget::SetMenuVisibilityMode(AchievementWidget::MenuVisibilityMode::kHidden);
-		_bIsOpen = true;
-	}
-
-	void AchievementWidget::OnClose()
-	{
-		want_visible = false;
-		_bIsOpen = false;
-	}
-
-	void AchievementWidget::SetMenuVisibilityMode(MenuVisibilityMode a_mode)
-	{
-		auto menu = GetAchievementWidget();
-		if (menu) {
-			auto _view = menu->uiMovie;
-
-			if (_view) {
-				switch (a_mode) {
-				case MenuVisibilityMode::kHidden:
-					if (menu->_menuVisibilityMode == MenuVisibilityMode::kVisible) {
-						_view->SetVisible(false);
-						menu->_menuVisibilityMode = a_mode;
-					}
-					break;
-
-				case MenuVisibilityMode::kVisible:
-					if (menu->_menuVisibilityMode == MenuVisibilityMode::kHidden && want_visible) {
-						_view->SetVisible(true);
-						menu->_menuVisibilityMode = a_mode;
-					}
-					break;
-				}
-			}
-		}
-	}
-
+    void AchievementWidget::HideEntry() {
+        std::this_thread::sleep_for(std::chrono::seconds(3));
+        auto ui = RE::UI::GetSingleton();
+        RE::GFxValue widget;
+        if (ui->GetMenu(AchievementWidget::MENU_NAME)->uiMovie->GetVariable(&widget, "_root.AchievementWidget_mc")) {
+            std::array<RE::GFxValue, 1> hideArgs;
+            hideArgs[0] = false;
+            widget.Invoke("ShowNotification", nullptr, hideArgs.data(), hideArgs.size());
+        }
+    }
 }

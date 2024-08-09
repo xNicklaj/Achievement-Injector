@@ -9,6 +9,7 @@
 #include "AchievementWidget.h"
 #include "Conditions/Condition.h"
 #include "EventProcessor.h"
+#include "Windows.h"
 
 using json = nlohmann::json;
 namespace fs = std::filesystem;
@@ -107,12 +108,17 @@ SKSEPluginLoad(const SKSE::LoadInterface *skse) {
     SKSE::Init(skse);
 	Settings::GetSingleton()->LoadSettings();
 
-
     auto messaging = SKSE::GetMessagingInterface();
 	if (!messaging->RegisterListener("SKSE", MessageHandler)) {
 		return false;
 	}
 
+	if (Settings::GetSingleton()->GetUseDebugger()) {
+		while (!IsDebuggerPresent()) {
+			::Sleep(1000);;
+		};
+	}
+
 	//SKSE::GetPapyrusInterface()->Register(BindPapyrusFunctions); TODO REMOVE THIS SHIT
-    return true;
+	return true;
 }

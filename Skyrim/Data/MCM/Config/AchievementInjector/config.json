@@ -19,6 +19,24 @@
             }
         },
         {
+            "id": "bMute:Sound",
+            "type": "toggle",
+            "text": "Toggle Mute",
+            "help": "Set this to true if you want to mute all notification sounds.",
+            "valueOptions": {
+                "sourceType": "ModSettingBool"
+            }
+        },
+        {
+            "id": "bOverrideNotificationSounds:Sound",
+            "type": "toggle",
+            "text": "Override Notification Sounds",
+            "help": "Set this to true if you want to override the notification sounds provided by the authors with your choice.",
+            "valueOptions": {
+                "sourceType": "ModSettingBool"
+            }
+        },
+        {
             "type": "header",
             "text": "For developers"
         },
@@ -27,6 +45,15 @@
             "type": "toggle",
             "text": "Enable debug logs",
             "help": "Set this to true if you want logs to show all messages. This can be useful for developers.",
+            "valueOptions": {
+                "sourceType": "ModSettingBool"
+            }
+        },
+        {
+            "id": "bUseDebugger:Main",
+            "type": "toggle",
+            "text": "Enable debugger attachment",
+            "help": "Set this to true if you want skyrim to wait for a debugger attachment before loading. Only applies to next restart.",
             "valueOptions": {
                 "sourceType": "ModSettingBool"
             }

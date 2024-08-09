@@ -2,9 +2,7 @@
 
 #include <string>
 #include <vector>
-
-#include "RE/Skyrim.h"
-#include "log.h"
+#include "Utility.h"
 
 namespace Scaleform
 {

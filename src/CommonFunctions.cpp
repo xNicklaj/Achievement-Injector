@@ -39,7 +39,7 @@ RE::TESForm* GetForm(std::string FormID, std::string baseEsp = "Skyrim.esm") {
     converter >> std::hex >> actualFormID;
     const auto form = RE::TESDataHandler::GetSingleton()->LookupForm(actualFormID, baseEsp);
 	if (!form) {
-		logger::error("Failed to find form with Form ID {} and IntFormID {} in plugin {}", FormID, actualFormID, baseEsp);
+		//logger::error("Failed to find form with Form ID {} and IntFormID {} in plugin {}", FormID, actualFormID, baseEsp);
 		return nullptr;
 	}
 
