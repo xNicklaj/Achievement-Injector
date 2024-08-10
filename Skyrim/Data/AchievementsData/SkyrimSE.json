@@ -8,7 +8,7 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "03372B",
+                    "formID": "03372B",
                     "stage": 900
                 }
             ]
@@ -29,7 +29,7 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "0D0800",
+                    "formID": "0D0800",
                     "stage": 190
                 }
             ]
@@ -40,7 +40,7 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "0242BA",
+                    "formID": "0242BA",
                     "stage": 160
                 }
             ]
@@ -51,7 +51,7 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "035D5F",
+                    "formID": "035D5F",
                     "stage": 255
                 }
             ]
@@ -62,7 +62,7 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "036192",
+                    "formID": "036192",
                     "stage": 280
                 }
             ]
@@ -73,7 +73,7 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "02D516",
+                    "formID": "02D516",
                     "stage": 100
                 }
             ]
@@ -84,7 +84,7 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "044C56",
+                    "formID": "044C56",
                     "stage": 220
                 }
             ]
@@ -95,7 +95,7 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "046Ef2",
+                    "formID": "046EF2",
                     "stage": 220
                 }
             ]
@@ -106,7 +106,7 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "06E803",
+                    "formID": "06E803",
                     "stage": 100
                 }
             ]
@@ -117,7 +117,7 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "01CEf5",
+                    "formID": "01CEF5",
                     "stage": 25
                 }
             ]
@@ -128,7 +128,7 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "01CEf6",
+                    "formID": "01CEF6",
                     "stage": 200
                 }
             ]
@@ -139,7 +139,7 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "01F251",
+                    "formID": "01F251",
                     "stage": 40
                 }
             ]
@@ -150,7 +150,7 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "01F256",
+                    "formID": "01F256",
                     "stage": 200
                 }
             ]
@@ -161,7 +161,7 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "01F258",
+                    "formID": "01F258",
                     "stage": 200
                 }
             ]
@@ -172,7 +172,7 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "01F326",
+                    "formID": "01F326",
                     "stage": 200
                 }
             ]
@@ -183,7 +183,7 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "057F99",
+                    "formID": "057F99",
                     "stage": 200
                 }
             ]
@@ -201,7 +201,7 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "01EA51",
+                    "formID": "01EA51",
                     "stage": 200
                 }
             ]
@@ -212,7 +212,7 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "01EA54",
+                    "formID": "01EA54",
                     "stage": 200
                 }
             ]
@@ -223,7 +223,7 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "03CEDA",
+                    "formID": "03CEDA",
                     "stage": 200
                 }
             ]
@@ -235,12 +235,12 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "0D517A",
+                    "formID": "0D517A",
                     "stage": 200
                 },
                 {
                     "type": "QuestStageDone",
-                    "questID": "0E2D29",
+                    "formID": "0E2D29",
                     "stage": 200
                 }
             ]
@@ -251,7 +251,7 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "083042",
+                    "formID": "083042",
                     "stage": 9000
                 }
             ]
@@ -262,7 +262,7 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "096E71",
+                    "formID": "096E71",
                     "stage": 9000
                 }
             ]
@@ -432,7 +432,7 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "074793",
+                    "formID": "074793",
                     "stage": 30
                 }
             ]
@@ -444,7 +444,7 @@
         {
             "achievementName": "Master Criminal",
             "description": "Bounty of 1000 gold in all nine holds",
-            "conditionsJoinType": "AND",
+            "joinType": "AND",
             "conditions": [
                 {
                     "type": "PlayerCrime",
@@ -499,7 +499,7 @@
             "conditions": [
                 {
                     "type": "ItemInInventory",
-                    "itemFormID": "00000F",
+                    "formID": "00000F",
                     "quantity": 100000
                 }
             ]
@@ -518,7 +518,7 @@
         {
             "achievementName": "Skill Master",
             "description": "Get a skill to 100",
-            "conditionsJoinType": "OR",
+            "joinType": "OR",
             "conditions": [
                 {
                     "type": "SkillLevel",
@@ -629,7 +629,7 @@
         {
             "achievementName": "Daedric Influence",
             "description": "Acquire a Daedric Artifact",
-            "conditionsJoinType": "OR",
+            "joinType": "OR",
             "conditions": [
 
             ]
@@ -637,81 +637,81 @@
         {
             "achievementName": "Oblivion Walker",
             "description": "Collect 15 Daedric Artifacts",
-            "conditionsJoinType": "AND",
+            "joinType": "AND",
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "028AD6",
+                    "formID": "028AD6",
                     "stage": 100
                 },
                 {
                     "type": "QuestStageDone",
-                    "questID": "04D8D6",
+                    "formID": "04D8D6",
                     "stage": 31
                 },
                 {
                     "type": "QuestStageDone",
-                    "questID": "01BFC4",
+                    "formID": "01BFC4",
                     "stage": 200
                 },
                 {
                     "type": "QuestStageDone",
-                    "questID": "02D512",
+                    "formID": "02D512",
                     "stage": 100
                 },
                 {
                     "type": "QuestStageDone",
-                    "questID": "02A49A",
+                    "formID": "02A49A",
                     "stage": 100
                 },
                 {
                     "type": "QuestStageDone",
-                    "questID": "03B681",
+                    "formID": "03B681",
                     "stage": 200
                 },
                 {
                     "type": "QuestStageDone",
-                    "questID": "0240B8",
+                    "formID": "0240B8",
                     "stage": 100
                 },
                 {
                     "type": "QuestStageDone",
-                    "questID": "04A37B",
+                    "formID": "04A37B",
                     "stage": 50
                 },
                 {
                     "type": "QuestStageDone",
-                    "questID": "04E4E1",
+                    "formID": "04E4E1",
                     "stage": 410
                 },
                 {
                     "type": "QuestStageDone",
-                    "questID": "022F08",
+                    "formID": "022F08",
                     "stage": 200
                 },
                 {
                     "type": "QuestStageDone",
-                    "questID": "02C358",
+                    "formID": "02C358",
                     "stage": 100
                 },
                 {
                     "type": "QuestStageDone",
-                    "questID": "08998D",
+                    "formID": "08998D",
                     "stage": 100
                 },
                 {
                     "type": "QuestStageDone",
-                    "questID": "01BB9B",
+                    "formID": "01BB9B",
                     "stage": 100
                 },
                 {
                     "type": "QuestStageDone",
-                    "questID": "02AC68",
+                    "formID": "02AC68",
                     "stage": 200
                 },
                 {
                     "type": "QuestStageDone",
-                    "questID": "0242AF",
+                    "formID": "0242AF",
                     "stage": 200
                 }
             ]

@@ -39,7 +39,7 @@ Achievement::Achievement(json& jsonData, std::string plugin)
         if (type == "QuestStageDone") {
             QuestStageDoneConditionFactory* questStageDoneConditionFactory = new QuestStageDoneConditionFactory();
             a_condition = questStageDoneConditionFactory->createCondition();
-            a_condition->SetConditionParameters(condition["questID"].get<std::string>(), condition["stage"].get<int>());
+            a_condition->SetConditionParameters(condition["formID"].get<std::string>(), condition["stage"].get<int>());
         }
 		else if (type == "PlayerLevel") {
 			PlayerLevelConditionFactory* playerLevelConditionFactory = new PlayerLevelConditionFactory();
@@ -54,7 +54,7 @@ Achievement::Achievement(json& jsonData, std::string plugin)
         else if (type == "ItemInInventory") {
             ItemInInventoryConditionFactory* itemInInventoryConditionFactory = new ItemInInventoryConditionFactory();
             a_condition = itemInInventoryConditionFactory->createCondition();
-            a_condition->SetConditionParameters(condition["itemFormID"].get<std::string>(), condition["quantity"].get<int>());
+            a_condition->SetConditionParameters(condition["formID"].get<std::string>(), condition["quantity"].get<int>());
         }
         else if (type == "LocationDiscovery") {
             LocationDiscoveryConditionFactory* locationDiscoveryConditionFactory = new LocationDiscoveryConditionFactory();

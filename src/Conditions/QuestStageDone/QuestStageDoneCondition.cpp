@@ -3,8 +3,8 @@
 extern void RegisterPostLoadFunction(Condition* condition);
 
 QuestStageDoneCondition::QuestStageDoneCondition() : Condition(ConditionType::QuestStageDone) {}
-void QuestStageDoneCondition::SetConditionParameters(std::string questId, int stage) {
-    this->questId = questId;
+void QuestStageDoneCondition::SetConditionParameters(std::string formID, int stage) {
+    this->formID = formID;
     this->stage = stage;
 }
 void QuestStageDoneCondition::OnDataLoaded(void) {
@@ -20,7 +20,7 @@ void QuestStageDoneCondition::EnableListener(void)
     eventSourceHolder->AddEventSink(this);
 }
 RE::BSEventNotifyControl QuestStageDoneCondition::ProcessEvent(const RE::TESQuestStageEvent* event, RE::BSTEventSource<RE::TESQuestStageEvent>*) {
-    const auto quest = GetForm(this->questId, this->plugin);
+    const auto quest = GetForm(this->formID, this->plugin);
     if (!this->isMet && event->formID == quest->formID) {
         CheckCondition();
     }
@@ -28,8 +28,8 @@ RE::BSEventNotifyControl QuestStageDoneCondition::ProcessEvent(const RE::TESQues
     return RE::BSEventNotifyControl::kContinue;
 }
 bool QuestStageDoneCondition::CheckCondition() {
-    if (!this->isMet && CheckQuestStage(this->questId, this->plugin) >= stage) {
-        logger::info("Quest {} met condition stage {}", this->questId, this->stage);
+    if (!this->isMet && CheckQuestStage(this->formID, this->plugin) >= stage) {
+        logger::info("Quest {} met condition stage {}", this->formID, this->stage);
         this->isMet = true;
         this->eventManager->dispatch("ConditionMet");
         RE::ScriptEventSourceHolder::GetSingleton()->RemoveEventSink(this);
