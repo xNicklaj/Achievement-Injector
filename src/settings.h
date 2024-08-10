@@ -35,7 +35,7 @@ public:
 	}
 
 
-	static const enum NotificationSound_e {
+	const enum NotificationSound_e {
 		UISkillIncreaseSD,
 		UIQuestComplete,
 		UISkillsForward,

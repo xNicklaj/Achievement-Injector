@@ -1,9 +1,9 @@
 set(headers ${headers}
-	include/SKSEMenuFramework.h
 	src/Achievement.h
 	src/AchievementManager.h
 	src/AchievementWidget.h
 	src/CommonFunctions.h
+	src/Conditions/ActorDeath/ActorDeathCondition.h
 	src/Conditions/BookRead/BookReadCondition.h
 	src/Conditions/Condition.h
 	src/Conditions/DragonSoulAbsorbed/DragonSoulsAbsorbedCondition.h

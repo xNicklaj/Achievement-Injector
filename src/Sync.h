@@ -5,7 +5,7 @@
 #include <queue>
 #include <string>
 
-extern std::queue<std::string> entryQueue;
+extern std::queue<std::tuple<std::string, std::string>> entryQueue;
 extern bool isDisplayingEntry;
 extern std::mutex entryMutex;
 

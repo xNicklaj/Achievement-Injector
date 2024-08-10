@@ -5,6 +5,7 @@
 #include "ConditionsJoinType.h"
 #include "settings.h"
 #include "Serializer.h"
+#include "Utility.h"
 #include "AchievementWidget.h"
 
 #include "Conditions/DragonSoulAbsorbed/DragonSoulsAbsorbedCondition.h"
@@ -17,6 +18,7 @@
 #include "Conditions/PlayerFirstEnterCell/PlayerFirstEnterCellCondition.h"
 #include "Conditions/ItemCrafted/ItemCraftedCondition.h"
 #include "Conditions/BookRead/BookReadCondition.h"
+#include "Conditions/ActorDeath/ActorDeathCondition.h"
 
 Achievement::Achievement(json& jsonData, std::string plugin)
     : achievementName(jsonData["achievementName"].get<std::string>()),
@@ -83,6 +85,11 @@ Achievement::Achievement(json& jsonData, std::string plugin)
             BookReadConditionFactory* bookReadConditionFactory = new BookReadConditionFactory();
             a_condition = bookReadConditionFactory->createCondition();
             a_condition->SetConditionParameters(condition["bookID"].get<std::string>());
+        }
+        else if (type == "ActorDeath") {
+            ActorDeathConditionFactory* actorDeathConditionFactory = new ActorDeathConditionFactory();
+            a_condition = actorDeathConditionFactory->createCondition();
+            a_condition->SetConditionParameters(condition["formID"].get<std::string>());
         }
         else {
             logger::warn("Unknown condition type {} in {}.", type, this->achievementName);
@@ -153,7 +160,10 @@ void Achievement::OnConditionMet(void) {
     if (allConditionsMet) {
         unlocked = true;
         logger::info("Achievement {} unlocked", achievementName);
-        if(Settings::GetSingleton()->GetUsePopup()) Scaleform::AchievementWidget::DisplayEntry(achievementName, description);
+        if (Settings::GetSingleton()->GetUsePopup()) {
+            DisplayEntryWithWait(std::make_tuple(this->achievementName, this->description));
+            //Scaleform::AchievementWidget::DisplayEntry(achievementName, description);
+        }
     }
     Serializer::GetSingleton()->SerializeAchievementData(this);
 }

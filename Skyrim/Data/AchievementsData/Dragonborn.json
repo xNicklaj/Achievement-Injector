@@ -5,7 +5,7 @@
         {
             "achievementName": "Outlander",
             "description": "Arrive on Solstheim",
-            "joinType":  "OR",
+            "joinType": "OR",
             "conditions": [
                 {
                     "type": "FirstEnterCell",
@@ -51,7 +51,7 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "DLC2MQ02",
+                    "questID": "017F8F",
                     "stage": 200
                 }
             ]
@@ -62,7 +62,7 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "DLC2MQ04",
+                    "questID": "016E1F",
                     "stage": 550
                 }
             ]
@@ -73,7 +73,7 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "DLC2MQ06",
+                    "questID": "0179D7",
                     "stage": 550
                 }
             ]
@@ -93,7 +93,7 @@
         {
             "achievementName": "Stalhrim Crafter",
             "description": "Craft an item out of Stalhrim",
-            "joinCondition":  "OR",
+            "joinCondition": "OR",
             "conditions": [
                 {
                     "type": "ItemCrafted",

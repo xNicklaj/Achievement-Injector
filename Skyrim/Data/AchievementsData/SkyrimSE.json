@@ -8,8 +8,18 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "MQ101",
+                    "questID": "03372B",
                     "stage": 900
+                }
+            ]
+        },
+        {
+            "achievementName": "Death test",
+            "description": "Kill Adrianne Avenicci",
+            "conditions": [
+                {
+                    "type": "ActorDeath",
+                    "formID":  "01A67C"
                 }
             ]
         },
@@ -19,7 +29,7 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "MQ103",
+                    "questID": "0D0800",
                     "stage": 190
                 }
             ]
@@ -30,7 +40,7 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "MQ105",
+                    "questID": "0242BA",
                     "stage": 160
                 }
             ]
@@ -41,7 +51,7 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "MQ201",
+                    "questID": "035D5F",
                     "stage": 255
                 }
             ]
@@ -52,7 +62,7 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "MQ203",
+                    "questID": "036192",
                     "stage": 280
                 }
             ]
@@ -63,7 +73,7 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "MQ205",
+                    "questID": "02D516",
                     "stage": 100
                 }
             ]
@@ -74,7 +84,7 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "MQ301",
+                    "questID": "044C56",
                     "stage": 220
                 }
             ]
@@ -85,7 +95,7 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "MQ305",
+                    "questID": "046Ef2",
                     "stage": 220
                 }
             ]
@@ -96,7 +106,7 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "C01",
+                    "questID": "06E803",
                     "stage": 100
                 }
             ]
@@ -107,7 +117,7 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "C04",
+                    "questID": "01CEf5",
                     "stage": 25
                 }
             ]
@@ -118,7 +128,7 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "C06",
+                    "questID": "01CEf6",
                     "stage": 200
                 }
             ]
@@ -129,7 +139,7 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "MG01",
+                    "questID": "01F251",
                     "stage": 40
                 }
             ]
@@ -140,7 +150,7 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "MG06",
+                    "questID": "01F256",
                     "stage": 200
                 }
             ]
@@ -151,7 +161,7 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "MG08",
+                    "questID": "01F258",
                     "stage": 200
                 }
             ]
@@ -162,7 +172,7 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "TG01",
+                    "questID": "01F326",
                     "stage": 200
                 }
             ]
@@ -173,7 +183,7 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "TG08A",
+                    "questID": "057F99",
                     "stage": 200
                 }
             ]
@@ -191,7 +201,7 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "DB02",
+                    "questID": "01EA51",
                     "stage": 200
                 }
             ]
@@ -202,7 +212,7 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "DB05",
+                    "questID": "01EA54",
                     "stage": 200
                 }
             ]
@@ -213,7 +223,7 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "DB10",
+                    "questID": "03CEDA",
                     "stage": 200
                 }
             ]
@@ -221,15 +231,16 @@
         {
             "achievementName": "Taking Sides",
             "description": "Join the Stormcloaks or the Imperial Army",
+            "joinType":  "OR",
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "CW01A",
+                    "questID": "0D517A",
                     "stage": 200
                 },
                 {
                     "type": "QuestStageDone",
-                    "questID": "CW01B",
+                    "questID": "0E2D29",
                     "stage": 200
                 }
             ]
@@ -240,7 +251,7 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "CWFortSiegeFort",
+                    "questID": "083042",
                     "stage": 9000
                 }
             ]
@@ -251,7 +262,7 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "CWSiegeObj",
+                    "questID": "096E71",
                     "stage": 9000
                 }
             ]
@@ -421,7 +432,7 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "RelationshipMarriage",
+                    "questID": "074793",
                     "stage": 30
                 }
             ]
@@ -630,77 +641,77 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "DA01",
+                    "questID": "028AD6",
                     "stage": 100
                 },
                 {
                     "type": "QuestStageDone",
-                    "questID": "DA02",
+                    "questID": "04D8D6",
                     "stage": 31
                 },
                 {
                     "type": "QuestStageDone",
-                    "questID": "DA03",
+                    "questID": "01BFC4",
                     "stage": 200
                 },
                 {
                     "type": "QuestStageDone",
-                    "questID": "DA04",
+                    "questID": "02D512",
                     "stage": 100
                 },
                 {
                     "type": "QuestStageDone",
-                    "questID": "DA05",
+                    "questID": "02A49A",
                     "stage": 100
                 },
                 {
                     "type": "QuestStageDone",
-                    "questID": "DA06",
+                    "questID": "03B681",
                     "stage": 200
                 },
                 {
                     "type": "QuestStageDone",
-                    "questID": "DA07",
+                    "questID": "0240B8",
                     "stage": 100
                 },
                 {
                     "type": "QuestStageDone",
-                    "questID": "DA08",
+                    "questID": "04A37B",
                     "stage": 50
                 },
                 {
                     "type": "QuestStageDone",
-                    "questID": "DA09",
+                    "questID": "04E4E1",
                     "stage": 410
                 },
                 {
                     "type": "QuestStageDone",
-                    "questID": "DA10",
+                    "questID": "022F08",
                     "stage": 200
                 },
                 {
                     "type": "QuestStageDone",
-                    "questID": "DA11",
+                    "questID": "02C358",
                     "stage": 100
                 },
                 {
                     "type": "QuestStageDone",
-                    "questID": "DA13",
+                    "questID": "08998D",
                     "stage": 100
                 },
                 {
                     "type": "QuestStageDone",
-                    "questID": "DA14",
+                    "questID": "01BB9B",
                     "stage": 100
                 },
                 {
                     "type": "QuestStageDone",
-                    "questID": "DA15",
+                    "questID": "02AC68",
                     "stage": 200
                 },
                 {
                     "type": "QuestStageDone",
-                    "questID": "DA16",
+                    "questID": "0242AF",
                     "stage": 200
                 }
             ]
@@ -760,80 +771,6 @@
                 {
                     "type": "PlayerLevel",
                     "level": 25
-                }
-            ]
-        },
-        {
-            "achievementName": "Proud Parent",
-            "description": "Adopt a child"
-        },
-        {
-            "achievementName": "Landowner",
-            "description": "Buy a plot of land",
-            "conditionsJoinType": "OR",
-            "conditions": [
-                {
-                    "type": "QuestStageDone",
-                    "questID": "BYOHHouseFalkreath",
-                    "stage": 100
-                },
-                {
-                    "type": "QuestStageDone",
-                    "questID": "BYOHHouseHjaalmarch",
-                    "stage": 100
-                },
-                {
-                    "type": "QuestStageDone",
-                    "questID": "BYOHHousePale",
-                    "stage": 100
-                }
-            ]
-        },
-        {
-            "achievementName": "Architect",
-            "description": "Build three wings on a house"
-        },
-        {
-            "achievementName": "Land Baron",
-            "description": "Buy three plots of land",
-            "conditionsJoinType": "AND",
-            "conditions": [
-                {
-                    "type": "QuestStageDone",
-                    "questID": "BYOHHouseFalkreath",
-                    "stage": 100
-                },
-                {
-                    "type": "QuestStageDone",
-                    "questID": "BYOHHouseHjaalmarch",
-                    "stage": 100
-                },
-                {
-                    "type": "QuestStageDone",
-                    "questID": "BYOHHousePale",
-                    "stage": 100
-                }
-            ]
-        },
-        {
-            "achievementName": "Master Architect",
-            "description": "Build three houses",
-            "conditionsJoinType": "AND",
-            "conditions": [
-                {
-                    "type": "QuestStageDone",
-                    "questID": "BYOHHouseFalkreath",
-                    "stage": 120
-                },
-                {
-                    "type": "QuestStageDone",
-                    "questID": "BYOHHouseHjaalmarch",
-                    "stage": 120
-                },
-                {
-                    "type": "QuestStageDone",
-                    "questID": "BYOHHousePale",
-                    "stage": 120
                 }
             ]
         }

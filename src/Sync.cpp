@@ -1,10 +1,11 @@
 #include "Sync.h"
 #include "Scaleform.h"
+#include "AchievementWidget.h"
 #include <thread>
 #include <chrono>
 
 
-std::queue<std::string> entryQueue;
+std::queue<std::tuple<std::string, std::string>> entryQueue;
 bool isDisplayingEntry = false;
 std::mutex entryMutex;
 
@@ -14,14 +15,14 @@ void ProcessQueue() {
         auto ui = RE::UI::GetSingleton();
 
         if (!entryQueue.empty() && !isDisplayingEntry && !ui->GameIsPaused()) {
-            std::string variant = entryQueue.front();
+            std::tuple<std::string, std::string> args = entryQueue.front();
             entryQueue.pop();
 
             lock.unlock();
 
             isDisplayingEntry = true;
 
-            //Scaleform::HUDWidget::DisplayEntry(variant);
+            Scaleform::AchievementWidget::DisplayEntry(std::get<0>(args), std::get<1>(args));
 
             std::this_thread::sleep_for(std::chrono::seconds(4));
 

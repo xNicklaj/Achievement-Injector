@@ -1,24 +1,19 @@
 #include "log.h"
 #include "CommonFunctions.h"
+#include "Singleton.h"
 #include "Papyrus.h"
 
 namespace logger = SKSE::log;
 
 uint16_t CheckQuestStage(std::string FormID, std::string baseEsp) {
-    // Get the TESDataHandler instance
-    auto dataHandler = RE::TESDataHandler::GetSingleton();
-    if (!dataHandler) {
-        logger::error("Failed to get TESDataHandler instance.");
-        return -1;
-    }
-
     // TODO dynamic esp
     // Get the quest form using the Editor Form ID
-    const auto quest = RE::TESForm::LookupByEditorID<RE::TESQuest>(FormID);
-    if (!quest) {
-        logger::error("Failed to find quest with Editor Form ID: {}", FormID);
+    auto* target = GetForm(FormID, baseEsp);
+    if (!target) {
+        logger::error("Could not find quest with FormID {} in {}.", FormID, baseEsp);
         return -1;
     }
+    const auto quest = RE::TESForm::LookupByID<RE::TESQuest>(target->formID);
 
     // Get the current stage of the quest
     auto currentStage = quest->GetCurrentStageID();
@@ -91,4 +86,11 @@ void ReadJson(const std::string& filePath, json* jsonData) {
 bool BindPapyrusFunctions(RE::BSScript::IVirtualMachine* vm) {
     vm->RegisterFunction("OnPowerLearned", "NativePapyrusFunctions", NativePapyrus::OnPowerLearned);
     return true;
+}
+
+namespace PopupQueue {
+    typedef struct {
+        std::string name;
+        std::string description;
+    } ShowEntryPayload;
 }

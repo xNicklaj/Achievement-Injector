@@ -144,7 +144,7 @@ float GetGlobalVariableValue(const std::string& editorID) {
     return 0.0f;
 }
 
-void DisplayEntryWithWait(const std::string& variant) {
+void DisplayEntryWithWait(const std::tuple<std::string, std::string> achievement) {
     std::lock_guard<std::mutex> lock(entryMutex);
-    entryQueue.push(variant);
+    entryQueue.push(achievement);
 }

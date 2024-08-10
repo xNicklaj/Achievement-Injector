@@ -2,6 +2,7 @@ set(sources ${sources}
 	src/Achievement.cpp
 	src/AchievementWidget.cpp
 	src/CommonFunctions.cpp
+	src/Conditions/ActorDeath/ActorDeathCondition.cpp
 	src/Conditions/BookRead/BookReadCondition.cpp
 	src/Conditions/Condition.cpp
 	src/Conditions/DragonSoulAbsorbed/DragonSoulsAbsorbedCondition.cpp

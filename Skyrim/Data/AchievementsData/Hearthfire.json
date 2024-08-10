@@ -1,0 +1,80 @@
+{
+    "groupName": "Hearthfire",
+    "plugin": "HearthFires.esm",
+    "achievements": [
+        {
+            "achievementName": "Proud Parent",
+            "description": "Adopt a child"
+        },
+        {
+            "achievementName": "Landowner",
+            "description": "Buy a plot of land",
+            "conditionsJoinType": "OR",
+            "conditions": [
+                {
+                    "type": "QuestStageDone",
+                    "questID": "00305E",
+                    "stage": 100
+                },
+                {
+                    "type": "QuestStageDone",
+                    "questID": "00BE09",
+                    "stage": 100
+                },
+                {
+                    "type": "QuestStageDone",
+                    "questID": "010BEE",
+                    "stage": 100
+                }
+            ]
+        },
+        {
+            "achievementName": "Architect",
+            "description": "Build three wings on a house"
+        },
+        {
+            "achievementName": "Land Baron",
+            "description": "Buy three plots of land",
+            "conditionsJoinType": "AND",
+            "conditions": [
+                {
+                    "type": "QuestStageDone",
+                    "questID": "00305E",
+                    "stage": 100
+                },
+                {
+                    "type": "QuestStageDone",
+                    "questID": "00BE09",
+                    "stage": 100
+                },
+                {
+                    "type": "QuestStageDone",
+                    "questID": "010bEE",
+                    "stage": 100
+                }
+            ]
+        },
+        {
+            "achievementName": "Master Architect",
+            "description": "Build three houses",
+            "conditionsJoinType": "AND",
+            "conditions": [
+                {
+                    "type": "QuestStageDone",
+                    "questID": "00305E",
+                    "stage": 120
+                },
+                {
+                    "type": "QuestStageDone",
+                    "questID": "00BE09",
+                    "stage": 120
+                },
+                {
+                    "type": "QuestStageDone",
+                    "questID": "010BEE",
+                    "stage": 120
+                }
+            ]
+        }
+    ]
+}

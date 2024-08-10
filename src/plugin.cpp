@@ -1,16 +1,18 @@
-#include "log.h"
-#include "Serializer.h"
-#include "settings.h"
 #include <nlohmann/json.hpp>
 #include <filesystem>
 #include <functional>
+#include <Windows.h>
+
 #include "AchievementManager.h"
 #include "UIManager.h"
 #include "AchievementWidget.h"
 #include "Conditions/Condition.h"
 #include "EventProcessor.h"
 #include "Papyrus.h"
-#include "Windows.h"
+#include "Sync.h"
+#include "log.h"
+#include "Serializer.h"
+#include "settings.h"
 
 using json = nlohmann::json;
 namespace fs = std::filesystem;
@@ -117,11 +119,12 @@ SKSEPluginLoad(const SKSE::LoadInterface *skse) {
 	if (Settings::GetSingleton()->GetUseDebugger()) {
 		logger::debug("Waiting for debugger to attach...");
 		while (!IsDebuggerPresent()) {
-			::Sleep(1000);
+			::Sleep(1000);;
 		};
 		logger::debug("Debugger attached.");
 	}
 
 	SKSE::GetPapyrusInterface()->Register(NativePapyrus::Register);
+	std::thread(ProcessQueue).detach();
 	return true;
 }

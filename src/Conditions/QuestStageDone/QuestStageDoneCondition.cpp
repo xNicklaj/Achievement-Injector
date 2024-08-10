@@ -20,7 +20,7 @@ void QuestStageDoneCondition::EnableListener(void)
     eventSourceHolder->AddEventSink(this);
 }
 RE::BSEventNotifyControl QuestStageDoneCondition::ProcessEvent(const RE::TESQuestStageEvent* event, RE::BSTEventSource<RE::TESQuestStageEvent>*) {
-    const auto quest = RE::TESForm::LookupByEditorID<RE::TESQuest>(this->questId);
+    const auto quest = GetForm(this->questId, this->plugin);
     if (!this->isMet && event->formID == quest->formID) {
         CheckCondition();
     }
@@ -28,7 +28,7 @@ RE::BSEventNotifyControl QuestStageDoneCondition::ProcessEvent(const RE::TESQues
     return RE::BSEventNotifyControl::kContinue;
 }
 bool QuestStageDoneCondition::CheckCondition() {
-    if (!this->isMet && CheckQuestStage(this->questId, this->plugin) >= stage) { // TODO dynamic esp
+    if (!this->isMet && CheckQuestStage(this->questId, this->plugin) >= stage) {
         logger::info("Quest {} met condition stage {}", this->questId, this->stage);
         this->isMet = true;
         this->eventManager->dispatch("ConditionMet");
