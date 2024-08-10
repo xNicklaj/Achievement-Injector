@@ -38,6 +38,25 @@ void Settings::LoadMCMSettings() const
 		Settings::GetSingleton()->bUsePopup = ini.GetBoolValue("Main", "bUsePopup");
 
 		Settings::GetSingleton()->bMute = ini.GetBoolValue("Sound", "bMute");
+		switch (ini.GetLongValue("Sound", "iNotificationSound"))
+		{
+		case NotificationSound_e::UINewShoutLearned:
+				Settings::GetSingleton()->sNotificationSound = "UINewShoutLearned";
+				break;
+		case NotificationSound_e::UIQuestComplete:
+				Settings::GetSingleton()->sNotificationSound = "UIQuestComplete";
+				break;
+		case NotificationSound_e::UISkillsForward:
+			Settings::GetSingleton()->sNotificationSound = "UISkillsForward";
+			break;
+		case NotificationSound_e::UIStartNewGame:
+			Settings::GetSingleton()->sNotificationSound = "UIStartNewGame";
+			break;
+		case NotificationSound_e::UISkillIncreaseSD:
+		default:
+			Settings::GetSingleton()->sNotificationSound = "UISkillIncreaseSD";
+			break;
+		}
 	};
 	SerializeINI(defaultMCMPath, userMCMPath, load_mcm);
 }

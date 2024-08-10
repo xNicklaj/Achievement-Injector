@@ -34,11 +34,14 @@
             "id": "iNotificationSound:Sound",
             "type": "enum",
             "text": "Notification Sound",
-            "help": "Select the defaul sound to play when you unlock an achievement. Authors can define custom sounds per achievement.",
+            "help": "Select the default sound to play when you unlock an achievement. Authors can define custom sounds per achievement.",
             "valueOptions": {
                 "options": [
                     "UISkillIncreaseSD",
-                    "UIQuestComplete"
+                    "UIQuestComplete",
+                    "UISkillsForward",
+                    "UIStartNewGame",
+                    "UINewShoutLearned"
                 ],
                 "sourceType": "ModSettingInt",
                 "defaultValue": 0

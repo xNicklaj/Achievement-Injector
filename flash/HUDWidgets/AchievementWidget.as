@@ -10,6 +10,7 @@ class AchievementWidget extends MovieClip
   	var WidgetClip:MovieClip;
 	var achievementName;
 	var achievementDescription;
+	var notificationSound;
   
   
   /* INITIALIZATION */
@@ -64,13 +65,14 @@ class AchievementWidget extends MovieClip
 		achievementDescription = a_description;
 	}
 	
-	function ShowNotification(a_show, useAudio)
+	function ShowNotification(a_show, useAudio, notificationSound)
 	{
 		if (a_show == true)
 		{
 			if (useAudio)
 			{
-				GameDelegate.call("PlaySound",["UISkillIncreaseSD"]);
+				this.notificationSound = notificationSound;
+				//GameDelegate.call("PlaySound",["UISkillIncreaseSD"]);
 			}
 			this.gotoAndPlay("widgetShow");
 		}
