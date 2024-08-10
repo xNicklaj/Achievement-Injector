@@ -1,4 +1,5 @@
 set(headers ${headers}
+	include/ConsoleUtilSSE.h
 	src/Achievement.h
 	src/AchievementManager.h
 	src/AchievementWidget.h

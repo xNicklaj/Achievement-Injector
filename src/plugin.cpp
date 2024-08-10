@@ -9,6 +9,7 @@
 #include "Conditions/Condition.h"
 #include "EventProcessor.h"
 #include "Papyrus.h"
+#include "ConsoleUtilSSE.h"
 #include "Sync.h"
 #include "log.h"
 #include "Serializer.h"
@@ -96,7 +97,6 @@ void MessageHandler(SKSE::MessagingInterface::Message* a_msg)
 		}
 
 		Scaleform::AchievementWidget::Show();
-
         break;
 	case SKSE::MessagingInterface::kNewGame:
 		break;

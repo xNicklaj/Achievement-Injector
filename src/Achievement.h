@@ -34,6 +34,7 @@ public:
     std::vector<bool> conditionMet;
 private:
     ConditionsJoinType joinType;
+    std::vector<std::string> rewardCommandList;
 };
 
 #endif

@@ -7,6 +7,7 @@
 #include "Serializer.h"
 #include "Utility.h"
 #include "AchievementWidget.h"
+#include "../include/ConsoleUtilSSE.h"
 
 #include "Conditions/DragonSoulAbsorbed/DragonSoulsAbsorbedCondition.h"
 #include "Conditions/ItemInInventory/ItemInInventoryCondition.h"
@@ -39,7 +40,7 @@ Achievement::Achievement(json& jsonData, std::string plugin)
         if (type == "QuestStageDone") {
             QuestStageDoneConditionFactory* questStageDoneConditionFactory = new QuestStageDoneConditionFactory();
             a_condition = questStageDoneConditionFactory->createCondition();
-            a_condition->SetConditionParameters(condition["formID"].get<std::string>(), condition["stage"].get<int>());
+            a_condition->SetConditionParameters(condition["formID"].get<std::string>(), condition.value("OP", "GT"), condition["stage"].get<int>());
         }
 		else if (type == "PlayerLevel") {
 			PlayerLevelConditionFactory* playerLevelConditionFactory = new PlayerLevelConditionFactory();
@@ -79,7 +80,7 @@ Achievement::Achievement(json& jsonData, std::string plugin)
         else if (type == "ItemCrafted") {
 			ItemCraftedConditionFactory* itemCraftedConditionFactory = new ItemCraftedConditionFactory();
 			a_condition = itemCraftedConditionFactory->createCondition();
-			a_condition->SetConditionParameters(condition["itemID"].get<std::string>());
+			a_condition->SetConditionParameters(condition["formID"].get<std::string>());
 		}
         else if (type == "BookRead"){
             BookReadConditionFactory* bookReadConditionFactory = new BookReadConditionFactory();
@@ -97,6 +98,16 @@ Achievement::Achievement(json& jsonData, std::string plugin)
         if(a_condition) conditions.push_back(a_condition);
         conditionMet.push_back(false);
     }
+    try {
+        for (auto& func : jsonData["onUnlock"]) {
+            if (func["type"].get<std::string>() == "command") {
+                this->rewardCommandList.push_back(func["command"].get<std::string>());
+            }
+        }
+    }catch(std::exception& e) {
+		logger::error("Error in Achievement constructor: {}", e.what());
+	}
+
 }
 
 void Achievement::EnableListener(void) {
@@ -164,6 +175,10 @@ void Achievement::OnConditionMet(void) {
             DisplayEntryWithWait(std::make_tuple(this->achievementName, this->description));
             //Scaleform::AchievementWidget::DisplayEntry(achievementName, description);
         }
+
+        for(std::string command : rewardCommandList) {
+			Papyrus::ConsoleUtil::ExecuteCommand(NULL, command);
+		}
     }
     Serializer::GetSingleton()->SerializeAchievementData(this);
 }

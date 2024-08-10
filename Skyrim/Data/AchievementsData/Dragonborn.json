@@ -51,7 +51,7 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "017F8F",
+                    "formID": "017F8F",
                     "stage": 200
                 }
             ]
@@ -62,7 +62,7 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "016E1F",
+                    "formID": "016E1F",
                     "stage": 550
                 }
             ]
@@ -73,7 +73,7 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "questID": "0179D7",
+                    "formID": "0179D7",
                     "stage": 550
                 }
             ]
@@ -97,71 +97,71 @@
             "conditions": [
                 {
                     "type": "ItemCrafted",
-                    "itemID": "01CD9E"
+                    "formID": "01CD9E"
                 },
                 {
                     "type": "ItemCrafted",
-                    "itemID": "01CDA0"
+                    "formID": "01CDA0"
                 },
                 {
                     "type": "ItemCrafted",
-                    "itemID": "01CDA1"
+                    "formID": "01CDA1"
                 },
                 {
                     "type": "ItemCrafted",
-                    "itemID": "01CD7E"
+                    "formID": "01CD7E"
                 },
                 {
                     "type": "ItemCrafted",
-                    "itemID": "01CDA2"
+                    "formID": "01CDA2"
                 },
                 {
                     "type": "ItemCrafted",
-                    "itemID": "01CDA5"
+                    "formID": "01CDA5"
                 },
                 {
                     "type": "ItemCrafted",
-                    "itemID": "01CDA3"
+                    "formID": "01CDA3"
                 },
                 {
                     "type": "ItemCrafted",
-                    "itemID": "026237"
+                    "formID": "026237"
                 },
                 {
                     "type": "ItemCrafted",
-                    "itemID": "01CDB4"
+                    "formID": "01CDB4"
                 },
                 {
                     "type": "ItemCrafted",
-                    "itemID": "026231"
+                    "formID": "026231"
                 },
                 {
                     "type": "ItemCrafted",
-                    "itemID": "01CDB5"
+                    "formID": "01CDB5"
                 },
                 {
                     "type": "ItemCrafted",
-                    "itemID": "01CDB6"
+                    "formID": "01CDB6"
                 },
                 {
                     "type": "ItemCrafted",
-                    "itemID": "01CDB7"
+                    "formID": "01CDB7"
                 },
                 {
                     "type": "ItemCrafted",
-                    "itemID": "01CDB8"
+                    "formID": "01CDB8"
                 },
                 {
                     "type": "ItemCrafted",
-                    "itemID": "01CDB9"
+                    "formID": "01CDB9"
                 },
                 {
                     "type": "ItemCrafted",
-                    "itemID": "01CDBA"
+                    "formID": "01CDBA"
                 },
                 {
                     "type": "ItemCrafted",
-                    "itemID": "026239"
+                    "formID": "026239"
                 }
             ]
         },

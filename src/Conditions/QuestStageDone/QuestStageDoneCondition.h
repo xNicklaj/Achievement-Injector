@@ -6,11 +6,12 @@ public:
 
 	void OnDataLoaded(void) override;
 	void EnableListener(void) override;
-	void SetConditionParameters(std::string formID, int stage) override;
+	void SetConditionParameters(std::string formID, std::string, int stage) override;
 	bool CheckCondition() override;
 
 	std::string formID;
 	int stage = 200;
+	std::string OP;
 private:
 	RE::BSEventNotifyControl ProcessEvent(const RE::TESQuestStageEvent* a_event, RE::BSTEventSource<RE::TESQuestStageEvent>*) override;
 };
