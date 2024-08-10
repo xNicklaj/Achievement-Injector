@@ -19,6 +19,32 @@
             }
         },
         {
+            "id": "bUsePopup:Main",
+            "type": "toggle",
+            "text": "Enable popups on achievement completed",
+            "help": "Toggle whether you want a popup on the top-right of the screen to alert you when you unlock an achievement.",
+            "valueOptions": {
+                "sourceType": "ModSettingBool"
+            }
+        },
+        {
+            "type": "empty"
+        },
+        {
+            "id": "iNotificationSound:Sound",
+            "type": "enum",
+            "text": "Notification Sound",
+            "help": "Select the defaul sound to play when you unlock an achievement. Authors can define custom sounds per achievement.",
+            "valueOptions": {
+                "options": [
+                    "UISkillIncreaseSD",
+                    "UIQuestComplete"
+                ],
+                "sourceType": "ModSettingInt",
+                "defaultValue": 0
+            }
+        },
+        {
             "id": "bMute:Sound",
             "type": "toggle",
             "text": "Toggle Mute",
@@ -35,6 +61,12 @@
             "valueOptions": {
                 "sourceType": "ModSettingBool"
             }
+        },
+        {
+            "type": "empty"
+        },
+        {
+            "type": "empty"
         },
         {
             "type": "header",

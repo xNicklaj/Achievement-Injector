@@ -18,6 +18,5 @@ bool PowerLearnedCondition::CheckCondition() {
 };
 
 RE::BSEventNotifyControl PowerLearnedCondition::ProcessEvent(const RE::BGSNewVoicePowerEvent* a_event, RE::BSTEventSource<RE::BGSNewVoicePowerEvent>*) {
-	logger::debug("Ciaone");
 	return RE::BSEventNotifyControl::kContinue;
 }

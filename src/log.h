@@ -4,4 +4,4 @@
 
 namespace logger = SKSE::log;
 
-void SetupLog();
+void SetupLog(bool cleanFile = true);

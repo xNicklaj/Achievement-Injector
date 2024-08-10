@@ -13,7 +13,6 @@ RE::BSEventNotifyControl EventProcessor::ProcessEvent(const RE::MenuOpenCloseEve
     if (event->opening) {
         
     } else if (!event->opening && event->menuName == Scaleform::AchievementWidget::MENU_NAME) {
-        logger::debug("MenuOpenCloseEvent triggered.");
         Scaleform::AchievementWidget::Show();
     }
     return RE::BSEventNotifyControl::kContinue;
@@ -22,5 +21,5 @@ RE::BSEventNotifyControl EventProcessor::ProcessEvent(const RE::MenuOpenCloseEve
 void EventProcessor::Register() {
 auto ui = RE::UI::GetSingleton();
 	ui->AddEventSink<RE::MenuOpenCloseEvent>(GetSingleton());
-	logger::info("Registered {}"sv, typeid(RE::MenuOpenCloseEvent).name());
+	logger::debug("Registered event {}"sv, typeid(RE::MenuOpenCloseEvent).name());
 }

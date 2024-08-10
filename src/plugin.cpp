@@ -9,6 +9,7 @@
 #include "AchievementWidget.h"
 #include "Conditions/Condition.h"
 #include "EventProcessor.h"
+#include "Papyrus.h"
 #include "Windows.h"
 
 using json = nlohmann::json;
@@ -81,7 +82,6 @@ void MessageHandler(SKSE::MessagingInterface::Message* a_msg)
 		Serializer::GetSingleton()->CreateFileIfNotExists();
 
 		for (auto& achievementGroup : AchievementManager::GetSingleton()->achievementGroups) {
-			logger::debug("Achievement group {} has {} achievements", achievementGroup.name, achievementGroup.achievements.size());
 			for (auto& achievement : achievementGroup.achievements) {
 				achievement->EnableListener();
 			}
@@ -107,6 +107,7 @@ void MessageHandler(SKSE::MessagingInterface::Message* a_msg)
 SKSEPluginLoad(const SKSE::LoadInterface *skse) {
     SKSE::Init(skse);
 	Settings::GetSingleton()->LoadSettings();
+	SetupLog();
 
     auto messaging = SKSE::GetMessagingInterface();
 	if (!messaging->RegisterListener("SKSE", MessageHandler)) {
@@ -114,11 +115,13 @@ SKSEPluginLoad(const SKSE::LoadInterface *skse) {
 	}
 
 	if (Settings::GetSingleton()->GetUseDebugger()) {
+		logger::debug("Waiting for debugger to attach...");
 		while (!IsDebuggerPresent()) {
-			::Sleep(1000);;
+			::Sleep(1000);
 		};
+		logger::debug("Debugger attached.");
 	}
 
-	//SKSE::GetPapyrusInterface()->Register(BindPapyrusFunctions); TODO REMOVE THIS SHIT
+	SKSE::GetPapyrusInterface()->Register(NativePapyrus::Register);
 	return true;
 }

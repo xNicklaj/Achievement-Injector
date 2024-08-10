@@ -26,7 +26,6 @@ bool ItemCraftedCondition::CheckCondition(RE::FormID itemID) {
 	return false;
 }
 RE::BSEventNotifyControl ItemCraftedCondition::ProcessEvent(const RE::ItemCrafted::Event* a_event, RE::BSTEventSource<RE::ItemCrafted::Event>*) {
-	logger::debug("Created item {}", a_event->item->formID);
 	CheckCondition(a_event->item->formID);
 	return RE::BSEventNotifyControl::kContinue;
 }

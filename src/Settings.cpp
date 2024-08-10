@@ -1,4 +1,4 @@
-#include "Settings.h"
+#include "settings.h"
 #include "log.h"
 
 void Settings::SerializeINI(const wchar_t* a_path, const std::function<void(CSimpleIniA&)> a_func, bool a_generate)
@@ -11,8 +11,6 @@ void Settings::SerializeINI(const wchar_t* a_path, const std::function<void(CSim
 		return;
 	}
 
-
-	logger::info("Loaded ini file.");
 	a_func(ini);
 
 	(void)ini.SaveFile(a_path);
@@ -27,15 +25,19 @@ void Settings::SerializeINI(const wchar_t* a_defaultPath, const wchar_t* a_userP
 void Settings::LoadSettings()
 {
 	LoadMCMSettings();
-	SetupLog();
+	logger::info("Settings loaded.");
+	PrintSettings();
 }
 
 void Settings::LoadMCMSettings() const
 {
 	constexpr auto load_mcm = [](auto& ini) {
-		Settings::GetSingleton()->bDebug = ini.GetBoolValue("Main", "bDebug", false);
-		Settings::GetSingleton()->bUseDebugger = ini.GetBoolValue("Main", "bUseDebugger", false);
-		Settings::GetSingleton()->bGlobal = ini.GetBoolValue("Main", "bGlobal", false);
+		Settings::GetSingleton()->bDebug = ini.GetBoolValue("Main", "bDebug");
+		Settings::GetSingleton()->bUseDebugger = ini.GetBoolValue("Main", "bUseDebugger");
+		Settings::GetSingleton()->bGlobal = ini.GetBoolValue("Main", "bGlobal");
+		Settings::GetSingleton()->bUsePopup = ini.GetBoolValue("Main", "bUsePopup");
+
+		Settings::GetSingleton()->bMute = ini.GetBoolValue("Sound", "bMute");
 	};
 	SerializeINI(defaultMCMPath, userMCMPath, load_mcm);
 }

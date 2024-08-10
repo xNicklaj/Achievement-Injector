@@ -3,7 +3,7 @@
 #include <string>
 #include <memory>
 #include "ConditionsJoinType.h"
-#include "UIManager.h"
+#include "settings.h"
 #include "Serializer.h"
 #include "AchievementWidget.h"
 
@@ -153,8 +153,7 @@ void Achievement::OnConditionMet(void) {
     if (allConditionsMet) {
         unlocked = true;
         logger::info("Achievement {} unlocked", achievementName);
-        //UIManager::GetSingleton()->eventHandler.dispatch("AchievementUnlocked");
-        Scaleform::AchievementWidget::DisplayEntry(achievementName, description);
+        if(Settings::GetSingleton()->GetUsePopup()) Scaleform::AchievementWidget::DisplayEntry(achievementName, description);
     }
     Serializer::GetSingleton()->SerializeAchievementData(this);
 }

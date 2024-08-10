@@ -28,7 +28,7 @@ namespace Scaleform {
         auto ui = RE::UI::GetSingleton();
         if (ui) {
             ui->Register(AchievementWidget::MENU_NAME, Creator);
-            logger::debug("Registered {}", AchievementWidget::MENU_NAME);
+            logger::debug("Widget {} Registered.", AchievementWidget::MENU_NAME);
         }
     }
 
@@ -86,10 +86,11 @@ namespace Scaleform {
         if (ui->GetMenu(AchievementWidget::MENU_NAME)->uiMovie->GetVariable(&widget, "_root.AchievementWidget_mc")) {
             std::array<RE::GFxValue, 1> nameArgs;
             std::array<RE::GFxValue, 1> descriptionArgs;
-            std::array<RE::GFxValue, 1> showArgs;
+            std::array<RE::GFxValue, 2> showArgs;
             nameArgs[0] = name;
             descriptionArgs[0] = description;
             showArgs[0] = true;
+            showArgs[1] = !Settings::GetSingleton()->GetMute();
             logger::debug("Invoking ActionScript with parameters ({}, {})", name, description);
             widget.Invoke("setName", nullptr, nameArgs.data(), nameArgs.size());
             widget.Invoke("setDescription", nullptr, descriptionArgs.data(), descriptionArgs.size());
@@ -105,8 +106,9 @@ namespace Scaleform {
         auto ui = RE::UI::GetSingleton();
         RE::GFxValue widget;
         if (ui->GetMenu(AchievementWidget::MENU_NAME)->uiMovie->GetVariable(&widget, "_root.AchievementWidget_mc")) {
-            std::array<RE::GFxValue, 1> hideArgs;
+            std::array<RE::GFxValue, 2> hideArgs;
             hideArgs[0] = false;
+            hideArgs[1] = false;
             widget.Invoke("ShowNotification", nullptr, hideArgs.data(), hideArgs.size());
         }
     }
