@@ -631,7 +631,91 @@
             "description": "Acquire a Daedric Artifact",
             "joinType": "OR",
             "conditions": [
-
+                {
+                    "type": "ItemInInventory",
+                    "formID": "063B29",
+                    "quantity": 1
+                },
+                {
+                    "type": "ItemInInventory",
+                    "formID": "063B27",
+                    "quantity": 1
+                },
+                {
+                    "type": "ItemInInventory",
+                    "formID": "04E4EE",
+                    "quantity": 1
+                },
+                {
+                    "type": "ItemInInventory",
+                    "formID": "04A38F",
+                    "quantity": 1
+                },
+                {
+                    "type": "ItemInInventory",
+                    "formID": "052794",
+                    "quantity": 1
+                },
+                {
+                    "type": "ItemInInventory",
+                    "formID": "0233E3",
+                    "quantity": 1
+                },
+                {
+                    "type": "ItemInInventory",
+                    "formID": "0D2846",
+                    "quantity": 1
+                },
+                {
+                    "type": "ItemInInventory",
+                    "formID": "0240D2",
+                    "quantity": 1
+                },
+                {
+                    "type": "ItemInInventory",
+                    "formID": "O1A332",
+                    "quantity": 1
+                },
+                {
+                    "type": "ItemInInventory",
+                    "formID": "02C37B",
+                    "quantity": 1
+                },
+                {
+                    "type": "ItemInInventory",
+                    "formID": "01CB36",
+                    "quantity": 1
+                },
+                {
+                    "type": "ItemInInventory",
+                    "formID": "02AC61",
+                    "quantity": 1
+                },
+                {
+                    "type": "ItemInInventory",
+                    "formID": "02AC60",
+                    "quantity": 1
+                },
+                {
+                    "type": "ItemInInventory",
+                    "formID": "035066",
+                    "quantity": 1
+                },
+                {
+                    "type": "ItemInInventory",
+                    "formID": "045F96",
+                    "quantity": 1
+                },
+                {
+                    "type": "ItemInInventory",
+                    "formID": "02ACD2",
+                    "quantity": 1
+                },
+                {
+                    "type": "ItemInInventory",
+                    "formID": "02AC6F",
+                    "quantity": 1
+                }
             ]
         },
         {
