@@ -420,11 +420,34 @@
         },
         {
             "achievementName": "Citizen",
-            "description": "Buy a house"
+            "description": "Buy a house",
+            "join",
+            "conditions": [
+                {
+                    "type": "QuestStageDone",
+                    "formID": "0A2C9E",
+                    "stage": 15,
+                    "_notes":  "Breezehome"
+                },
+                {
+                    "type": "QuestStageDone",
+                    "formID": "0A7B33",
+                    "stage": 10,
+                    "_notes":  "General quest, might work?"
+                }
+            ]
         },
         {
             "achievementName": "Wanted",
-            "description": "Escape from jail"
+            "description": "Escape from jail",
+            "conditions":  [
+                {
+                    "type": "QuestStageDone",
+                    "formID": "0FCC2F",
+                    "stage": 10,
+                    "OP":  "GT"
+                }
+            ]
         },
         {
             "achievementName": "Married",

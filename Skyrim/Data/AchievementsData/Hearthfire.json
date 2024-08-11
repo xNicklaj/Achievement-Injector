@@ -4,7 +4,15 @@
     "achievements": [
         {
             "achievementName": "Proud Parent",
-            "description": "Adopt a child"
+            "description": "Adopt a child",
+            "conditions": [
+                {
+                    "type": "QuestStageDone",
+                    "formID": "0042B4",
+                    "stage": 10,
+                    "OP": "GT"
+                }
+            ]
         },
         {
             "achievementName": "Landowner",

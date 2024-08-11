@@ -175,6 +175,11 @@
             "achievementName": "Raven Rock Owner",
             "description": "Own a house in Raven Rock",
             "conditions": [
+                {
+                    "type": "QuestStageDone",
+                    "formID": "018B14",
+                    "stage": 200
+                }
             ]
         },
         {
