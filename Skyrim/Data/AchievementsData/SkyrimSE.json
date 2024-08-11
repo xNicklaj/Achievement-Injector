@@ -421,19 +421,49 @@
         {
             "achievementName": "Citizen",
             "description": "Buy a house",
-            "join",
+            "joinType": "OR",
             "conditions": [
                 {
                     "type": "QuestStageDone",
                     "formID": "0A2C9E",
                     "stage": 15,
-                    "_notes":  "Breezehome"
+                    "_notes": "Breezehome - Whiterun"
+                },
+                {
+                    "type": "QuestStageDone",
+                    "formID": "0A2CA6",
+                    "stage": 15,
+                    "_notes": "Hjerim - Windhelm"
+                },
+                {
+                    "type": "QuestStageDone",
+                    "formID": "0A2C9B",
+                    "stage": 15,
+                    "_notes": "Produspire Manor - Solitude"
+                },
+                {
+                    "type": "QuestStageDone",
+                    "formID": "0A2C86",
+                    "stage": 15,
+                    "_notes": "Vlinder Hall - Markarth"
+                },
+                {
+                    "type": "QuestStageDone",
+                    "formID": "0A2C86",
+                    "stage": 15,
+                    "_notes": "Vlinder Hall - Markarth"
+                },
+                {
+                    "type": "QuestStageDone",
+                    "formID": "065BDF",
+                    "stage": 15,
+                    "_notes": "Honeyside - Riften"
                 },
                 {
                     "type": "QuestStageDone",
                     "formID": "0A7B33",
                     "stage": 10,
-                    "_notes":  "General quest, might work?"
+                    "_notes": "General quest, might work?"
                 }
             ]
         },
