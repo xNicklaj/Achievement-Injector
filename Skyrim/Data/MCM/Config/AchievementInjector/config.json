@@ -57,7 +57,7 @@
             }
         },
         {
-            "id": "bOverrideNotificationSounds:Sound",
+            "id": "bOverrideNotificationSound:Sound",
             "type": "toggle",
             "text": "Override Notification Sounds",
             "help": "Set this to true if you want to override the notification sounds provided by the authors with your choice.",

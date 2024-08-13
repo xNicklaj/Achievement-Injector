@@ -1,12 +1,14 @@
 set(sources ${sources}
 	src/Achievement.cpp
 	src/AchievementWidget.cpp
+	src/AchievementMenu.cpp
 	src/CommonFunctions.cpp
 	src/Conditions/ActorDeath/ActorDeathCondition.cpp
 	src/Conditions/BookRead/BookReadCondition.cpp
 	src/Conditions/Condition.cpp
 	src/Conditions/DragonSoulAbsorbed/DragonSoulsAbsorbedCondition.cpp
 	src/Conditions/DungeonCleared/DungeonClearedCondition.cpp
+	src/Conditions/GlobalVariableState/GlobalVariableStateCondition.cpp
 	src/Conditions/ItemCrafted/ItemCraftedCondition.cpp
 	src/Conditions/ItemInInventory/ItemInInventoryCondition.cpp
 	src/Conditions/LocationDiscovery/LocationDiscoveryCondition.cpp
@@ -18,6 +20,7 @@ set(sources ${sources}
 	src/Conditions/SkillLevel/SkillLevelCondition.cpp
 	src/EventProcessor.cpp
 	src/Papyrus.cpp
+	src/Runnable.cpp
 	src/Serializer.cpp
 	src/Settings.cpp
 	src/Sync.cpp

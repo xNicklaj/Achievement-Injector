@@ -20,15 +20,19 @@
 #include "Conditions/ItemCrafted/ItemCraftedCondition.h"
 #include "Conditions/BookRead/BookReadCondition.h"
 #include "Conditions/ActorDeath/ActorDeathCondition.h"
+#include "Conditions/GlobalVariableState/GlobalVariableStateCondition.h"
 
 Achievement::Achievement(json& jsonData, std::string plugin)
-    : achievementName(jsonData["achievementName"].get<std::string>()),
+    : Runnable(jsonData.value("onUnlock", json::array())), achievementName(jsonData["achievementName"].get<std::string>()),
     description(jsonData["description"].get<std::string>()),
     unlocked(false) {  // Initialize joinType and unlocked
 
     this->plugin = plugin;
     if (jsonData.value("joinType", "OR") == "OR") this->joinType = ConditionsJoinType::OR;
     else this->joinType = ConditionsJoinType::AND;
+    
+    this->showPopup = jsonData.value("showPopup", true);
+    this->notificationSound = jsonData.value("notificationSound", "");
 
     this->eventHandler.appendListener("ConditionMet", [this]() {
         this->OnConditionMet();
@@ -92,10 +96,18 @@ Achievement::Achievement(json& jsonData, std::string plugin)
             a_condition = actorDeathConditionFactory->createCondition();
             a_condition->SetConditionParameters(condition["formID"].get<std::string>());
         }
+        else if (type == "GlobalVariableState") {
+            GlobalVariableStateConditionFactory* globalVariableStateConditionFactory = new GlobalVariableStateConditionFactory();
+			a_condition = globalVariableStateConditionFactory->createCondition();
+			a_condition->SetConditionParameters(condition["formID"].get<std::string>(), condition["value"].get<float>());
+        }
         else {
             logger::warn("Unknown condition type {} in {}.", type, this->achievementName);
         }
-        if(a_condition) conditions.push_back(a_condition);
+        if (a_condition) {
+            if (condition.value("pluginOverride", "") != "") a_condition->SetPlugin(condition["pluginOverride"].get<std::string>());
+            conditions.push_back(a_condition);
+        };
         conditionMet.push_back(false);
     }
     try {
@@ -171,14 +183,15 @@ void Achievement::OnConditionMet(void) {
     if (allConditionsMet) {
         unlocked = true;
         logger::info("Achievement {} unlocked", achievementName);
-        if (Settings::GetSingleton()->GetUsePopup()) {
-            DisplayEntryWithWait(std::make_tuple(this->achievementName, this->description));
+        if (this->showPopup && Settings::GetSingleton()->GetUsePopup()) {
+            DisplayEntryWithWait(std::make_tuple(this->achievementName, this->description, this->notificationSound));
             //Scaleform::AchievementWidget::DisplayEntry(achievementName, description);
         }
+        this->RunAll();
 
-        for(std::string command : rewardCommandList) {
-			Papyrus::ConsoleUtil::ExecuteCommand(NULL, command);
-		}
+  //      for(std::string command : rewardCommandList) {
+  //          Papyrus::ConsoleUtil::ExecuteCommand(NULL, command);;
+		//}
     }
     Serializer::GetSingleton()->SerializeAchievementData(this);
 }

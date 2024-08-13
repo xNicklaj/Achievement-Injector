@@ -8,6 +8,7 @@
 #include "log.h"
 #include "CommonFunctions.h"
 #include "Conditions/Condition.h"
+#include "Runnable.h"
 
 #ifndef ACHIEVEMENT_H
 #define ACHIEVEMENT_H
@@ -16,7 +17,7 @@ namespace logger = SKSE::log;
 
 using json = nlohmann::json;
 
-class Achievement {
+class Achievement : Runnable {
 public:
     // Constructor that initializes the Achievement from a JSON object
     Achievement(json& jsonData, std::string plugin);
@@ -29,8 +30,10 @@ public:
     std::string description;
     std::vector<Condition*> conditions;
     std::string plugin;
+    std::string notificationSound = "";
     bool unlocked;
     bool hooked = false;
+    bool showPopup = true;
     std::vector<bool> conditionMet;
 private:
     ConditionsJoinType joinType;
