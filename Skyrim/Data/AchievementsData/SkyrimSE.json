@@ -263,7 +263,14 @@
         },
         {
             "achievementName": "Sideways",
-            "description": "Complete 10 side quests"
+            "description": "Complete 10 side quests",
+            "conditions": [
+                {
+                    "type": "GlobalVariableState",
+                    "formID": "0FC85C",
+                    "value": 10.0
+                }
+            ]
         },
         {
             "achievementName": "Hero of the People",
@@ -271,7 +278,14 @@
         },
         {
             "achievementName": "Hard Worker",
-            "description": "Chop wood, mine ore, and cook food"
+            "description": "Chop wood, mine ore, and cook food",
+            "conditions": [
+                {
+                    "type": "QuestStageDone",
+                    "formID": "0FDE7D",
+                    "stage": 200
+                }
+            ]
         },
         {
             "achievementName": "Thief",

@@ -16,7 +16,7 @@ void GlobalVariableStateCondition::SetConditionParameters(std::string formID, fl
 };
 bool GlobalVariableStateCondition::CheckCondition() {
 	float globValue = GetGlobalVariableValue(GetForm(this->formID, this->plugin)->formID);
-	if(globValue == this->value) {
+	if(globValue >= this->value) {
 		this->isMet = true;
 		this->eventManager->dispatch("ConditionMet");
 		return true;
