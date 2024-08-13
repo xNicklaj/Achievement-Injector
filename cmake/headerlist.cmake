@@ -2,6 +2,7 @@ set(headers ${headers}
 	include/ConsoleUtilSSE.h
 	src/Achievement.h
 	src/AchievementManager.h
+	src/AchievementMenu.h
 	src/AchievementWidget.h
 	src/CommonFunctions.h
 	src/Conditions/ActorDeath/ActorDeathCondition.h
@@ -9,6 +10,7 @@ set(headers ${headers}
 	src/Conditions/Condition.h
 	src/Conditions/DragonSoulAbsorbed/DragonSoulsAbsorbedCondition.h
 	src/Conditions/DungeonCleared/DungeonClearedCondition.h
+	src/Conditions/GlobalVariableState/GlobalVariableStateCondition.h
 	src/Conditions/ItemCrafted/ItemCraftedCondition.h
 	src/Conditions/ItemInInventory/ItemInInventoryCondition.h
 	src/Conditions/LocationDiscovery/LocationDiscoveryCondition.h
@@ -23,6 +25,7 @@ set(headers ${headers}
 	src/KeyMapping.h
 	src/PCH.h
 	src/Papyrus.h
+	src/Runnable.h
 	src/Scaleform.h
 	src/Serializer.h
 	src/Singleton.h
