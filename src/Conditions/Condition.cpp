@@ -20,6 +20,7 @@ void Condition::SetConditionParameters(int) {}
 void Condition::SetConditionParameters(std::string, std::string, int) {}
 void Condition::SetConditionParameters(std::string) {}
 void Condition::SetConditionParameters(std::string, std::string) {}
+void Condition::SetConditionParameters(std::string, float) {}
 bool Condition::CheckCondition() { return false; }
 void Condition::SetEventManager(eventpp::EventDispatcher<std::string, void()>* eventManager) {
 	this->eventManager = eventManager;

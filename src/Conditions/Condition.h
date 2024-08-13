@@ -29,7 +29,8 @@ enum ConditionType {
 	FirstEnterCell, // Done
 	BookRead, // Done
 	PowerLearned, 
-	GlobalVariableState,
+	GlobalVariableState, // Done
+	QueryStatValue, // Done
 	ActorDeath, // Done, only for references
 	NotSet // Done
 };
@@ -46,6 +47,7 @@ public:
 	virtual void SetConditionParameters(std::string, std::string, int);
 	virtual void SetConditionParameters(std::string);
 	virtual void SetConditionParameters(std::string, std::string);
+	virtual void SetConditionParameters(std::string, float);
 	virtual bool CheckCondition();
 	
 	void SetEventManager(eventpp::EventDispatcher<std::string, void()>* eventManager);

@@ -6,20 +6,20 @@
 class GlobalVariableStateCondition : public Condition {
 public:
     GlobalVariableStateCondition();
-    void OnDataLoaded();
-    void EnableListener();
-    void SetConditionParameters(std::string formID, float value);
+    void OnDataLoaded() override;
+    void EnableListener() override;
+    void SetConditionParameters(std::string formID, float value) override;
     bool CheckCondition();
 
 private:
-    std::string formID;
-    float value;
+    std::string formID = "";
+    float value = -1;
 };
 
 class GlobalVariableStateConditionFactory : public ConditionFactory {
 public:
 	GlobalVariableStateConditionFactory();
-	Condition* createCondition();
+	Condition* createCondition() override;
 };
 
 #endif // GLOBAL_VARIABLE_STATE_CONDITION_H

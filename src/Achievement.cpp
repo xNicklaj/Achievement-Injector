@@ -19,6 +19,7 @@
 #include "Conditions/PlayerFirstEnterCell/PlayerFirstEnterCellCondition.h"
 #include "Conditions/ItemCrafted/ItemCraftedCondition.h"
 #include "Conditions/BookRead/BookReadCondition.h"
+#include "Conditions/QueryStatValue/QueryStatValueCondition.h"
 #include "Conditions/ActorDeath/ActorDeathCondition.h"
 #include "Conditions/GlobalVariableState/GlobalVariableStateCondition.h"
 
@@ -101,11 +102,17 @@ Achievement::Achievement(json& jsonData, std::string plugin)
 			a_condition = globalVariableStateConditionFactory->createCondition();
 			a_condition->SetConditionParameters(condition["formID"].get<std::string>(), condition["value"].get<float>());
         }
+        else if (type == "QueryStatValue") {
+			QueryStatValueConditionFactory* queryStatValueConditionFactory = new QueryStatValueConditionFactory();
+			a_condition = queryStatValueConditionFactory->createCondition();
+			a_condition->SetConditionParameters(condition["stat"].get<std::string>(), condition["value"].get<float>());
+		}
         else {
             logger::warn("Unknown condition type {} in {}.", type, this->achievementName);
         }
         if (a_condition) {
             if (condition.value("pluginOverride", "") != "") a_condition->SetPlugin(condition["pluginOverride"].get<std::string>());
+            else a_condition->SetPlugin(this->plugin);
             conditions.push_back(a_condition);
         };
         conditionMet.push_back(false);
@@ -142,8 +149,11 @@ void Achievement::EnableListener(void) {
     int i = 0;
     for (Condition* condition : conditions) {
         if (conditionMet[i]) continue;
+        if (!CheckIfModIsLoaded(condition->plugin)) {
+            logger::warn("Plugin {} not loaded. Skipping condition.", condition->plugin);
+            continue;
+        }
         condition->SetEventManager(&eventHandler);
-        condition->SetPlugin(this->plugin);
 		condition->EnableListener();
 	}
     this->hooked = true;

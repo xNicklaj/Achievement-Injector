@@ -274,7 +274,14 @@
         },
         {
             "achievementName": "Hero of the People",
-            "description": "Complete 50 Misc Objectives"
+            "description": "Complete 50 Misc Objectives",
+            "conditions": [
+                {
+                    "type": "GlobalVariableState",
+                    "formID": "0FC85C",
+                    "value": 50.0
+                }
+            ]
         },
         {
             "achievementName": "Hard Worker",
@@ -289,11 +296,42 @@
         },
         {
             "achievementName": "Thief",
-            "description": "Pick 50 locks and 50 pockets"
+            "description": "Pick 50 locks and 50 pockets",
+            "joinType": "AND",
+            "conditions": [
+                {
+                    "type": "QueryStatValue",
+                    "stat": "Locks Picked",
+                    "value": 50
+                },
+                {
+                    "type": "QueryStatValue",
+                    "stat": "Pockets Picked",
+                    "value": 50
+                }
+            ]
         },
         {
             "achievementName": "Snake Tongue",
-            "description": "Successfully persuade, bribe, and intimidate"
+            "description": "Successfully persuade, bribe, and intimidate",
+            "joinType": "AND",
+            "conditions": [
+                {
+                    "type": "QueryStatValue",
+                    "stat": "Persuasions",
+                    "value": 1
+                },
+                {
+                    "type": "QueryStatValue",
+                    "stat": "Bribes",
+                    "value": 1
+                },
+                {
+                    "type": "QueryStatValue",
+                    "stat": "Intimidations",
+                    "value": 1
+                }
+            ]
         },
         {
             "achievementName": "Blessed",
@@ -500,7 +538,15 @@
         },
         {
             "achievementName": "Artificer",
-            "description": "Make a smithed item, an enchanted item, and a potion"
+            "description": "Make a smithed item, an enchanted item, and a potion",
+            "joinType": "AND",
+            "conditions": [
+                {
+                    "type": "QueryStatValue",
+                    "stat": "Potions Mixed",
+                    "value": 1
+                }
+            ]
         },
         {
             "achievementName": "Master Criminal",
@@ -570,9 +616,9 @@
             "description": "Clear 50 dungeons",
             "conditions": [
                 {
-                    "type": "DungeonCleared",
-                    "dungeonID": "*",
-                    "count": 50
+                    "type": "QueryStatValue",
+                    "stat": "Dungeons Cleared",
+                    "value": 50
                 }
             ]
         },
@@ -678,8 +724,9 @@
             "description": "Discover 100 Locations",
             "conditions": [
                 {
-                    "type": "LocationDiscover",
-                    "locationID": "*"
+                    "type": "QueryStatValue",
+                    "stat": "Locations Discovered",
+                    "value": 100
                 }
             ]
         },

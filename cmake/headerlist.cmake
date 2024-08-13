@@ -18,9 +18,11 @@ set(headers ${headers}
 	src/Conditions/PlayerCrime/PlayerCrimeCondition.h
 	src/Conditions/PlayerFirstEnterCell/PlayerFirstEnterCellCondition.h
 	src/Conditions/PlayerLevel/PlayerLevelCondition.h
+	src/Conditions/QueryStatValue/QueryStatValueCondition.h
 	src/Conditions/QuestStageDone/QuestStageDoneCondition.h
 	src/Conditions/SkillLevel/SkillLevelCondition.h
 	src/ConditionsJoinType.h
+	src/CustomRE.h
 	src/EventProcessor.h
 	src/KeyMapping.h
 	src/PCH.h

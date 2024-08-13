@@ -1,5 +1,6 @@
 #include "ActorDeathCondition.h"
 
+
 extern void RegisterPostLoadFunction(Condition* condition);
 
 ActorDeathCondition::ActorDeathCondition() : Condition(ConditionType::ActorDeath){};

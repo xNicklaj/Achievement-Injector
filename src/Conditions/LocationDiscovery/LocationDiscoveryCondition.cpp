@@ -2,9 +2,54 @@
 
 extern void RegisterPostLoadFunction(Condition* condition);
 
+// --- Exergist Code ---
+// Retrieve all map markers in the game
+RE::BSTArray<RE::ObjectRefHandle>* GetPlayerMapMarkers() {
+    RE::PlayerCharacter* player = RE::PlayerCharacter::GetSingleton();
+    std::uint32_t offset = 0;
+    if (REL::Module::IsAE())
+        offset = 0x500;
+    else if (REL::Module::IsSE())
+        offset = 0x4F8;
+    else
+        offset = 0xAE8;
+    return reinterpret_cast<RE::BSTArray<RE::ObjectRefHandle>*>((uintptr_t)player + offset);
+}
+
+// Check if targetLocation is known (map marker visible and enabled)
+bool CheckKnownLocation(std::string targetLocation) {
+    auto* playerMapMarkers = GetPlayerMapMarkers();
+    for (auto playerMapMarker : *playerMapMarkers) {
+        const auto refr = playerMapMarker.get().get();
+        if (refr->IsDisabled() == false) { // Check if map marker is NOT disabled
+            const auto marker = refr ? refr->extraList.GetByType<RE::ExtraMapMarker>() : nullptr;
+            if (marker && marker->mapData) {
+                if (marker->mapData->flags.any(RE::MapMarkerData::Flag::kCanTravelTo) == true) { // Check if map marker is visible
+                    auto markerName = marker->mapData->locationName.GetFullName();
+                    //logger::debug("Known Location Name = {}", markerName);
+                    if (markerName == targetLocation) {
+                        //std::string result = targetLocation + " location is known!";
+                        //RE::DebugNotification(result.c_str());
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+    std::string result = targetLocation + " location is not known!";
+    RE::DebugNotification(result.c_str());
+    return false;
+}
+// --- Exergist Code ---
+
 LocationDiscoveryCondition::LocationDiscoveryCondition() : Condition(ConditionType::LocationDiscovery) {}
 void LocationDiscoveryCondition::OnDataLoaded(void) {
-
+    if (CheckKnownLocation(this->locationName)) {
+        logger::info("Player met condition found {} in {}.", this->locationName, this->worldspaceID);
+        this->isMet = true;
+        this->eventManager->dispatch("ConditionMet");
+        RE::LocationDiscovery::GetEventSource()->RemoveEventSink(this);
+    };
 }
 void LocationDiscoveryCondition::EnableListener() {
     RegisterPostLoadFunction(this);

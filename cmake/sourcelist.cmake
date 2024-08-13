@@ -16,8 +16,10 @@ set(sources ${sources}
 	src/Conditions/PlayerCrime/PlayerCrimeCondition.cpp
 	src/Conditions/PlayerFirstEnterCell/PlayerFirstEnterCellCondition.cpp
 	src/Conditions/PlayerLevel/PlayerLevelCondition.cpp
+	src/Conditions/QueryStatValue/QueryStatValueCondition.cpp
 	src/Conditions/QuestStageDone/QuestStageDoneCondition.cpp
 	src/Conditions/SkillLevel/SkillLevelCondition.cpp
+	src/CustomRE.cpp
 	src/EventProcessor.cpp
 	src/Papyrus.cpp
 	src/Runnable.cpp

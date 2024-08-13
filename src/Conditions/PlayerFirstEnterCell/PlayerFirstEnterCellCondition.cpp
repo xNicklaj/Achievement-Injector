@@ -18,7 +18,7 @@ void PlayerFirstEnterCellCondition::EnableListener(void)
     RE::PlayerCharacter::GetSingleton()->AsBGSActorCellEventSource()->AddEventSink(this);
 }
 RE::BSEventNotifyControl PlayerFirstEnterCellCondition::ProcessEvent(const RE::BGSActorCellEvent* event, RE::BSTEventSource<RE::BGSActorCellEvent>*) {
-    logger::debug("Player entered cell {}", event->cellID);
+    //logger::debug("Player entered cell {}", event->cellID);
     RE::TESForm* target = GetForm(this->cellID, this->plugin);
     if (target == NULL) return RE::BSEventNotifyControl::kContinue;
     if (event->cellID == target->formID) {

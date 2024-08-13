@@ -88,6 +88,14 @@ bool BindPapyrusFunctions(RE::BSScript::IVirtualMachine* vm) {
     return true;
 }
 
+std::string GetPlayerName() {
+    RE::PlayerCharacter* pc = RE::PlayerCharacter::GetSingleton();
+    if (pc) {
+        return pc->GetName();
+    }
+    return "";
+}
+
 namespace PopupQueue {
     typedef struct {
         std::string name;

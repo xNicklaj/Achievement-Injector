@@ -5,4 +5,7 @@ namespace NativePapyrus {
 	bool Register(RE::BSScript::IVirtualMachine* a_vm);
 
 	std::string OnPowerLearned(RE::StaticFunctionTag*);
+	float QueryStat(std::string);
 }
+
+	

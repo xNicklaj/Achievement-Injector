@@ -13,6 +13,7 @@
 #include "Sync.h"
 #include "log.h"
 #include "Serializer.h"
+#include "CustomRE.h"
 #include "settings.h"
 
 using json = nlohmann::json;
@@ -59,6 +60,7 @@ void OnDataLoaded()
 void MessageHandler(SKSE::MessagingInterface::Message* a_msg)
 {
 	auto eventProcessor = EventProcessor::GetSingleton();
+	int test = -1;
 	switch (a_msg->type) {
 	case SKSE::MessagingInterface::kDataLoaded:
 		ReadAchievementFiles(&(AchievementManager::GetSingleton()->achievementFiles));
@@ -84,19 +86,24 @@ void MessageHandler(SKSE::MessagingInterface::Message* a_msg)
 	case SKSE::MessagingInterface::kPostLoadGame:
 		Serializer::GetSingleton()->CreateFileIfNotExists();
 
-		for (auto& achievementGroup : AchievementManager::GetSingleton()->achievementGroups) {
-			for (auto& achievement : achievementGroup.achievements) {
-				achievement->EnableListener();
+		if (GetPlayerName() != AchievementManager::GetSingleton()->lastUsedPlayerName) {
+			AchievementManager::GetSingleton()->lastUsedPlayerName = GetPlayerName();
+
+			for (auto& achievementGroup : AchievementManager::GetSingleton()->achievementGroups) {
+				for (auto& achievement : achievementGroup.achievements) {
+					achievement->EnableListener();
+				}
+			}
+
+			logger::info("Data loaded. Executing {} functions.", postLoadConditionRegistry.size());
+			for (auto& condition : postLoadConditionRegistry) {
+				condition->OnDataLoaded();
 			}
 		}
 
-
-		logger::info("Data loaded. Executing {} functions.", postLoadConditionRegistry.size());
-		for (auto& condition : postLoadConditionRegistry) {
-			condition->OnDataLoaded();
-		}
-
 		Scaleform::AchievementWidget::Show();
+		test = RE::QueryStat("Locations Discovered");
+		logger::debug("TEST Locations Discovered {}", test);
         break;
 	case SKSE::MessagingInterface::kNewGame:
 		break;
@@ -126,5 +133,6 @@ SKSEPluginLoad(const SKSE::LoadInterface *skse) {
 
 	SKSE::GetPapyrusInterface()->Register(NativePapyrus::Register);
 	std::thread(ProcessQueue).detach();
+
 	return true;
 }

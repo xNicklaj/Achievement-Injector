@@ -23,4 +23,5 @@ class AchievementManager : public ISingleton<AchievementManager> {
 public:
 	std::vector<AchievementFile> achievementFiles;
 	std::vector<AchievementGroup> achievementGroups;
+	std::string lastUsedPlayerName = "";
 };

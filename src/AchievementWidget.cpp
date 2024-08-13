@@ -92,11 +92,11 @@ namespace Scaleform {
             showArgs[0] = true;
             showArgs[1] = !Settings::GetSingleton()->GetMute();
             showArgs[2] = Settings::GetSingleton()->GetNotificationSound();
-            logger::debug("Invoking ActionScript with parameters ({}, {})", name, description);
+           // logger::debug("Invoking ActionScript with parameters ({}, {})", name, description);
             widget.Invoke("setName", nullptr, nameArgs.data(), nameArgs.size());
             widget.Invoke("setDescription", nullptr, descriptionArgs.data(), descriptionArgs.size());
             widget.Invoke("ShowNotification", nullptr, showArgs.data(), showArgs.size());
-            logger::debug("Sound: {}, override: {}", sound, Settings::GetSingleton()->GetOverrideNotificationSound());
+            // logger::debug("Sound: {}, override: {}", sound, Settings::GetSingleton()->GetOverrideNotificationSound());
             if (!Settings::GetSingleton()->GetMute()) {
                 if (sound != "" && !Settings::GetSingleton()->GetOverrideNotificationSound()) {
                     RE::PlaySound(sound.c_str());
