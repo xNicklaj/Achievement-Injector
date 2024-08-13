@@ -94,3 +94,20 @@ namespace PopupQueue {
         std::string description;
     } ShowEntryPayload;
 }
+
+float GetGlobalVariableValue(RE::FormID formid) {
+    auto dataHandler = RE::TESDataHandler::GetSingleton();
+    if (!dataHandler) {
+        logger::warn("TESDataHandler not found.");
+        return 0.0f;
+    }
+
+    for (auto& global : dataHandler->GetFormArray<RE::TESGlobal>()) {
+        if (global->GetFormID() == formid) {
+            return global->value;
+        }
+    }
+
+    logger::warn("Global variable with formid %s not found.", formid);
+    return 0.0f;
+}

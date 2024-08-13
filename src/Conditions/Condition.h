@@ -29,6 +29,7 @@ enum ConditionType {
 	FirstEnterCell, // Done
 	BookRead, // Done
 	PowerLearned, 
+	GlobalVariableState,
 	ActorDeath, // Done, only for references
 	NotSet // Done
 };

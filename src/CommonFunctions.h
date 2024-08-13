@@ -15,3 +15,4 @@ std::string FormIDToString(RE::FormID formID);
 void ReadJson(const std::string& filePath, json* jsonData);
 RE::TESForm* GetForm(std::string FormID, std::string baseEsp);
 bool BindPapyrusFunctions(RE::BSScript::IVirtualMachine* vm);
+float GetGlobalVariableValue(RE::FormID formid);

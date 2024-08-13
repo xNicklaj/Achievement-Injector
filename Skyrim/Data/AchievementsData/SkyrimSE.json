@@ -14,16 +14,6 @@
             ]
         },
         {
-            "achievementName": "Death test",
-            "description": "Kill Adrianne Avenicci",
-            "conditions": [
-                {
-                    "type": "ActorDeath",
-                    "formID":  "01A67C"
-                }
-            ]
-        },
-        {
             "achievementName": "Bleak Falls Barrow",
             "description": "Complete \"Bleak Falls Barrow\"",
             "conditions": [
