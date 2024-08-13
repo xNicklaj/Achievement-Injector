@@ -192,7 +192,11 @@
             "achievementName": "One with the Shadows",
             "description": "Returned the Thieves Guild to its former glory",
             "conditions": [
-
+                {
+                    "type": "QuestStageDone",
+                    "formID": "0D7D69",
+                    "stage": 200
+                }
             ]
         },
         {

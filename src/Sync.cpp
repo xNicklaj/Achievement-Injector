@@ -5,7 +5,7 @@
 #include <chrono>
 
 
-std::queue<std::tuple<std::string, std::string>> entryQueue;
+std::queue<std::tuple<std::string, std::string, std::string>> entryQueue;
 bool isDisplayingEntry = false;
 std::mutex entryMutex;
 
@@ -15,14 +15,14 @@ void ProcessQueue() {
         auto ui = RE::UI::GetSingleton();
 
         if (!entryQueue.empty() && !isDisplayingEntry && !ui->GameIsPaused()) {
-            std::tuple<std::string, std::string> args = entryQueue.front();
+            std::tuple<std::string, std::string, std::string> args = entryQueue.front();
             entryQueue.pop();
 
             lock.unlock();
 
             isDisplayingEntry = true;
 
-            Scaleform::AchievementWidget::DisplayEntry(std::get<0>(args), std::get<1>(args));
+            Scaleform::AchievementWidget::DisplayEntry(std::get<0>(args), std::get<1>(args), std::get<2>(args));
 
             std::this_thread::sleep_for(std::chrono::seconds(4));
 

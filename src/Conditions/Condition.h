@@ -5,12 +5,16 @@
 #include <eventpp/eventdispatcher.h>
 #include "../CommonFunctions.h"
 #include "../log.h"
+#include "../Runnable.h"
 #include <SKSE/SKSE.h>
 #include <RE/Skyrim.h>
+#include <nlohmann/json.hpp>
 #include <functional>
 
 #ifndef CONDITION_H
 #define CONDITION_H
+
+using json = nlohmann::json;
 
 enum ConditionType {
 	QuestStageDone, // Done
@@ -29,9 +33,10 @@ enum ConditionType {
 	NotSet // Done
 };
 
-class Condition {
+class Condition : Runnable {
 public:
 	Condition(ConditionType type);
+	Condition(ConditionType type, json jsonData);
 
 	virtual void EnableListener(void);
 	virtual void OnDataLoaded(void);

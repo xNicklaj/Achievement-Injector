@@ -37,7 +37,7 @@ void LoadDataFromINI();
 std::string GetKeyNameFromScanCode(int scanCode);
 void AddMenuOption();
 float GetGlobalVariableValue(const std::string& editorID);
-void DisplayEntryWithWait(const std::tuple<std::string, std::string> achievement);
+void DisplayEntryWithWait(const std::tuple<std::string, std::string, std::string> achievement);
 bool CheckIfModIsLoaded(RE::BSFixedString a_modname);
 
 #endif  // UTILITY_H

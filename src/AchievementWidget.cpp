@@ -80,7 +80,7 @@ namespace Scaleform {
         RE::PlaySound(a_params[0].GetString());
     }
 
-    void AchievementWidget::DisplayEntry(std::string name, std::string description) {
+    void AchievementWidget::DisplayEntry(std::string name, std::string description, std::string sound = "") {
         auto ui = RE::UI::GetSingleton();
         RE::GFxValue widget;
         if (ui->GetMenu(AchievementWidget::MENU_NAME)->uiMovie->GetVariable(&widget, "_root.AchievementWidget_mc")) {
@@ -96,7 +96,15 @@ namespace Scaleform {
             widget.Invoke("setName", nullptr, nameArgs.data(), nameArgs.size());
             widget.Invoke("setDescription", nullptr, descriptionArgs.data(), descriptionArgs.size());
             widget.Invoke("ShowNotification", nullptr, showArgs.data(), showArgs.size());
-            if(!Settings::GetSingleton()->GetMute()) RE::PlaySound(Settings::GetSingleton()->GetNotificationSound().c_str());
+            logger::debug("Sound: {}, override: {}", sound, Settings::GetSingleton()->GetOverrideNotificationSound());
+            if (!Settings::GetSingleton()->GetMute()) {
+                if (sound != "" && !Settings::GetSingleton()->GetOverrideNotificationSound()) {
+                    RE::PlaySound(sound.c_str());
+                }
+                else {
+                    RE::PlaySound(Settings::GetSingleton()->GetNotificationSound().c_str());
+                }
+            }
             std::jthread t(HideEntry);
             t.detach();
         }

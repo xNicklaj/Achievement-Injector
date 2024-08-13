@@ -36,12 +36,13 @@ void Settings::LoadMCMSettings() const
 		Settings::GetSingleton()->bUseDebugger = ini.GetBoolValue("Main", "bUseDebugger");
 		Settings::GetSingleton()->bGlobal = ini.GetBoolValue("Main", "bGlobal");
 		Settings::GetSingleton()->bUsePopup = ini.GetBoolValue("Main", "bUsePopup");
+		Settings::GetSingleton()->bOverrideNotificationSound = ini.GetBoolValue("Sound", "bOverrideNotificationSound");
 
 		Settings::GetSingleton()->bMute = ini.GetBoolValue("Sound", "bMute");
 		switch (ini.GetLongValue("Sound", "iNotificationSound"))
 		{
 		case NotificationSound_e::UINewShoutLearned:
-				Settings::GetSingleton()->sNotificationSound = "UINewShoutLearned";
+				Settings::GetSingleton()->sNotificationSound = "UINewShoutLearned";;
 				break;
 		case NotificationSound_e::UIQuestComplete:
 				Settings::GetSingleton()->sNotificationSound = "UIQuestComplete";

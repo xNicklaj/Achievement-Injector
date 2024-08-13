@@ -2,7 +2,10 @@
 
 
 
-Condition::Condition(ConditionType type) {
+Condition::Condition(ConditionType type, json jsonData) : Runnable(jsonData.value("onUnlock", json::array())) {
+    this->type = type;
+}
+Condition::Condition(ConditionType type) : Runnable(json::array()) {
     this->type = type;
 }
 void Condition::SetPlugin(std::string plugin) {

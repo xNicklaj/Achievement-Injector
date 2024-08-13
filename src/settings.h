@@ -21,6 +21,7 @@ public:
 	bool GetUseDebugger() const { return bUseDebugger; }
 	bool GetUsePopup() const { return bUsePopup; }
 	bool GetMute() const { return bMute; }
+	bool GetOverrideNotificationSound() const { return bOverrideNotificationSound; }
 	std::string GetNotificationSound() const { return sNotificationSound; }
 
 	void SetDebug(bool a_val) { bDebug = a_val; }
@@ -29,6 +30,7 @@ public:
 	void SetUsePopup(bool a_val) { bUsePopup = a_val; }
 	void SetMute(bool a_val) { bMute = a_val; }
 	void SetNotificationSound(std::string a_val) { sNotificationSound = a_val; }
+	void SetOverrideNotificationSounds(bool a_val) { bOverrideNotificationSound = a_val; }
 
 	void PrintSettings() const {
 		logger::debug("bDebug: {}, bGlobal: {}, bUseDebugger: {}, bUsePopup: {}, bMute: {}, iNotificationSound: {}", bDebug, bGlobal, bUseDebugger, bUsePopup, bMute, sNotificationSound);
@@ -55,5 +57,6 @@ private:
 	bool bUseDebugger{ false };
 	bool bUsePopup{ true };
 	bool bMute{ false };
+	bool bOverrideNotificationSound{ false };
 	std::string sNotificationSound{ "UISkillIncreaseSD" };
 };

@@ -18,7 +18,7 @@ namespace Scaleform {
         static void Register();
         static void Show();
         static void Hide();
-        static void DisplayEntry(std::string, std::string);
+        static void DisplayEntry(std::string, std::string, std::string);
         static void HideEntry();
         static void SetPosition();
 
