@@ -2,6 +2,8 @@
 #include "CommonFunctions.h"
 #include "Singleton.h"
 #include "Papyrus.h"
+#include <string>
+#include <cctype>
 
 namespace logger = SKSE::log;
 
@@ -18,6 +20,28 @@ uint16_t CheckQuestStage(std::string FormID, std::string baseEsp) {
     // Get the current stage of the quest
     auto currentStage = quest->GetCurrentStageID();
     return currentStage;
+}
+
+template <typename T>
+RE::TESForm* GetFormOfType(std::string FormID, std::string baseEsp = "Skyrim.esm") {
+    // Get the TESDataHandler instance
+    auto dataHandler = RE::TESDataHandler::GetSingleton();
+    if (!dataHandler) {
+        logger::error("Failed to get TESDataHandler instance.");
+        return nullptr;
+    }
+
+    // Get the quest form using the Editor Form ID
+    RE::FormID actualFormID;
+    std::istringstream converter(FormID);
+    converter >> std::hex >> actualFormID;
+    const auto form = RE::TESDataHandler::GetSingleton()->LookupForm<T>(actualFormID, baseEsp);
+    if (!form) {
+        //logger::error("Failed to find form with Form ID {} and IntFormID {} in plugin {}", FormID, actualFormID, baseEsp);
+        return nullptr;
+    }
+
+    return form;
 }
 
 RE::TESForm* GetForm(std::string FormID, std::string baseEsp = "Skyrim.esm") {
@@ -118,4 +142,21 @@ float GetGlobalVariableValue(RE::FormID formid) {
 
     logger::warn("Global variable with formid %s not found.", formid);
     return 0.0f;
+}
+
+bool isHex(const std::string& str) {
+    // Check if the string is empty
+    if (str.empty()) {
+        return false;
+    }
+
+    // Iterate through each character in the string
+    for (char c : str) {
+        // Check if the character is not a digit and not a valid hex letter
+        if (!std::isdigit(c) && !((c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))) {
+            return false;
+        }
+    }
+
+    return true;
 }

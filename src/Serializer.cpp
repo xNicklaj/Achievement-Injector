@@ -50,7 +50,7 @@ void Serializer::SerializeAchievementData(Achievement* achievement) {
 		{"AchievementName", achievement->achievementName},
 		{"Unlocked", achievement->unlocked},
 		{"UnlockDatetime", now_ms},
-		{"ConditionsMet", achievement->conditionMet}
+		{"ConditionsState", achievement->GetConditionsState()}
 	});
 	Save();
 }
@@ -69,7 +69,7 @@ struct SerializedAchievement Serializer::DeserializeAchievementData(std::string 
 				achievement["AchievementName"],
 				achievement["Unlocked"],
 				achievement["UnlockDatetime"],
-				achievement["ConditionsMet"]
+				achievement["ConditionsState"]
 			});
 		}
 	}

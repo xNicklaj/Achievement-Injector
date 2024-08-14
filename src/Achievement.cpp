@@ -22,6 +22,7 @@
 #include "Conditions/QueryStatValue/QueryStatValueCondition.h"
 #include "Conditions/ActorDeath/ActorDeathCondition.h"
 #include "Conditions/GlobalVariableState/GlobalVariableStateCondition.h"
+#include "Conditions/BaseActorDeath/BaseActorDeathCondition.h"
 
 Achievement::Achievement(json& jsonData, std::string plugin)
     : Runnable(jsonData.value("onUnlock", json::array())), achievementName(jsonData["achievementName"].get<std::string>()),
@@ -37,6 +38,9 @@ Achievement::Achievement(json& jsonData, std::string plugin)
 
     this->eventHandler.appendListener("ConditionMet", [this]() {
         this->OnConditionMet();
+    });
+    this->eventHandler.appendListener("SerializationRequested", [this]() {
+        this->OnSerializationRequested();
     });
 
     for (json condition : jsonData["conditions"]) {
@@ -107,6 +111,13 @@ Achievement::Achievement(json& jsonData, std::string plugin)
 			a_condition = queryStatValueConditionFactory->createCondition();
 			a_condition->SetConditionParameters(condition["stat"].get<std::string>(), condition["value"].get<float>());
 		}
+        else if (type == "BaseActorDeath") {
+            BaseActorDeathConditionFactory* baseActorDeathConditionFactory = new BaseActorDeathConditionFactory();
+			a_condition = baseActorDeathConditionFactory->createCondition();
+            std::string id = condition.value("formID", "");
+            if(id == "") id = condition.value("name", "");
+			a_condition->SetConditionParameters(id, condition["quantity"].get<int>());
+        }
         else {
             logger::warn("Unknown condition type {} in {}.", type, this->achievementName);
         }
@@ -141,22 +152,27 @@ void Achievement::EnableListener(void) {
         logger::info("Achievement {} has already been unlocked.", this->achievementName);
         return;
     }
-    else {
-        if(sa.conditionsMet.size() > 0) this->conditionMet = sa.conditionsMet;
-    }
 
     if (hooked) return;
     int i = 0;
     for (Condition* condition : conditions) {
-        if (conditionMet[i]) continue;
         if (!CheckIfModIsLoaded(condition->plugin)) {
             logger::warn("Plugin {} not loaded. Skipping condition.", condition->plugin);
             continue;
         }
+        if (sa.conditionsState.size() > 0 && (this->conditionMet[i] = condition->Deserialize(sa.conditionsState[i]))) {
+            condition->isMet = true;
+            // Conditions is already fulfilled
+            return;
+        };
         condition->SetEventManager(&eventHandler);
 		condition->EnableListener();
 	}
     this->hooked = true;
+}
+
+void Achievement::OnSerializationRequested() {
+    Serializer::GetSingleton()->SerializeAchievementData(this);
 }
 
 void Achievement::OnConditionMet(void) {
@@ -204,4 +220,12 @@ void Achievement::OnConditionMet(void) {
 		//}
     }
     Serializer::GetSingleton()->SerializeAchievementData(this);
+}
+
+std::vector<int> Achievement::GetConditionsState(void) {
+    std::vector<int> v;
+    for (Condition* condition : this->conditions) {
+        v.push_back(condition->Serialize());
+    }
+    return v;
 }

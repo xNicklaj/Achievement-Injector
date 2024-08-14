@@ -26,6 +26,14 @@ void Condition::SetEventManager(eventpp::EventDispatcher<std::string, void()>* e
 	this->eventManager = eventManager;
 }
 
+int Condition::Serialize() {
+    return static_cast<int>(this->isMet);
+}
+bool Condition::Deserialize(int value) {
+	this->isMet = static_cast<bool>(value);
+    return this->isMet;
+}
+
 // QuestStageDoneCondition - V
 
 

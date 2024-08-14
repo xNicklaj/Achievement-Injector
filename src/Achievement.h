@@ -23,6 +23,8 @@ public:
     Achievement(json& jsonData, std::string plugin);
     void EnableListener(void);
     void OnConditionMet(void);
+    void OnSerializationRequested(void);
+    std::vector<int> GetConditionsState(void);
 
     eventpp::EventDispatcher<std::string, void()> eventHandler;
 

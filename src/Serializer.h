@@ -15,7 +15,7 @@ struct SerializedAchievement {
 	std::string achievementName;
 	bool unlocked;
 	int64_t unlockDatetime;
-	std::vector<bool> conditionsMet;
+	std::vector<int> conditionsState;
 };
 
 class Serializer : public ISingleton<Serializer> {

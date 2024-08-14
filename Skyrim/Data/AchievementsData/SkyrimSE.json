@@ -504,12 +504,6 @@
                     "formID": "065BDF",
                     "stage": 15,
                     "_notes": "Honeyside - Riften"
-                },
-                {
-                    "type": "QuestStageDone",
-                    "formID": "0A7B33",
-                    "stage": 10,
-                    "_notes": "General quest, might work?"
                 }
             ]
         },

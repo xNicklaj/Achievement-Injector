@@ -4,6 +4,7 @@ set(sources ${sources}
 	src/AchievementMenu.cpp
 	src/CommonFunctions.cpp
 	src/Conditions/ActorDeath/ActorDeathCondition.cpp
+	src/Conditions/BaseActorDeath/BaseActorDeathCondition.cpp
 	src/Conditions/BookRead/BookReadCondition.cpp
 	src/Conditions/Condition.cpp
 	src/Conditions/DragonSoulAbsorbed/DragonSoulsAbsorbedCondition.cpp

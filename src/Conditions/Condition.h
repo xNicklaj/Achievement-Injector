@@ -32,6 +32,7 @@ enum ConditionType {
 	GlobalVariableState, // Done
 	QueryStatValue, // Done
 	ActorDeath, // Done, only for references
+	BaseActorDeath,
 	NotSet // Done
 };
 
@@ -49,6 +50,9 @@ public:
 	virtual void SetConditionParameters(std::string, std::string);
 	virtual void SetConditionParameters(std::string, float);
 	virtual bool CheckCondition();
+
+	virtual int Serialize(void);
+	virtual bool Deserialize(int); // Returns true if condition is met
 	
 	void SetEventManager(eventpp::EventDispatcher<std::string, void()>* eventManager);
 	void SetPlugin(std::string plugin);
