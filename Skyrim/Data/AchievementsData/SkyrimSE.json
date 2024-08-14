@@ -732,7 +732,14 @@
         },
         {
             "achievementName": "Reader",
-            "description": "Read 50 Skill Books"
+            "description": "Read 50 Skill Books",
+            "conditions": [
+                {
+                    "type": "QueryStatValue",
+                    "stat": "Skill Books Read",
+                    "value": 50
+                }
+            ]
         },
         {
             "achievementName": "Daedric Influence",
