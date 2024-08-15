@@ -15,6 +15,7 @@
 #include "Serializer.h"
 #include "CustomRE.h"
 #include "settings.h"
+#include "AchievementMenu.h"
 
 using json = nlohmann::json;
 namespace fs = std::filesystem;
@@ -78,6 +79,9 @@ void MessageHandler(SKSE::MessagingInterface::Message* a_msg)
 		EventProcessor::GetSingleton()->Register();
 		Scaleform::AchievementWidget::Register();
 		Scaleform::AchievementWidget::Show();
+
+		Scaleform::AchievementMenu::Register();
+		Scaleform::AchievementMenu::Show();
 		break;
 	case SKSE::MessagingInterface::kPostLoad:
 		break;
@@ -95,6 +99,8 @@ void MessageHandler(SKSE::MessagingInterface::Message* a_msg)
 				}
 			}
 
+			
+
 			logger::info("Data loaded. Executing {} functions.", postLoadConditionRegistry.size());
 			for (auto& condition : postLoadConditionRegistry) {
 				condition->OnDataLoaded();
@@ -102,8 +108,6 @@ void MessageHandler(SKSE::MessagingInterface::Message* a_msg)
 		}
 
 		Scaleform::AchievementWidget::Show();
-		test = RE::QueryStat("Locations Discovered");
-		logger::debug("TEST Locations Discovered {}", test);
         break;
 	case SKSE::MessagingInterface::kNewGame:
 		break;

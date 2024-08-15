@@ -31,8 +31,9 @@ enum ConditionType {
 	PowerLearned, 
 	GlobalVariableState, // Done
 	QueryStatValue, // Done
-	ActorDeath, // Done, only for references
-	BaseActorDeath,
+	ActorDeath, // Done
+	BaseActorDeath, // Done
+	SpellLearned, // Done
 	NotSet // Done
 };
 

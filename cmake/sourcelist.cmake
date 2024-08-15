@@ -20,6 +20,7 @@ set(sources ${sources}
 	src/Conditions/QueryStatValue/QueryStatValueCondition.cpp
 	src/Conditions/QuestStageDone/QuestStageDoneCondition.cpp
 	src/Conditions/SkillLevel/SkillLevelCondition.cpp
+	src/Conditions/SpellLearned/SpellLearnedCondition.cpp
 	src/CustomRE.cpp
 	src/EventProcessor.cpp
 	src/Papyrus.cpp

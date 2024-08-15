@@ -23,6 +23,7 @@
 #include "Conditions/ActorDeath/ActorDeathCondition.h"
 #include "Conditions/GlobalVariableState/GlobalVariableStateCondition.h"
 #include "Conditions/BaseActorDeath/BaseActorDeathCondition.h"
+#include "Conditions/SpellLearned/SpellLearnedCondition.h"
 
 Achievement::Achievement(json& jsonData, std::string plugin)
     : Runnable(jsonData.value("onUnlock", json::array())), achievementName(jsonData["achievementName"].get<std::string>()),
@@ -117,6 +118,11 @@ Achievement::Achievement(json& jsonData, std::string plugin)
             std::string id = condition.value("formID", "");
             if(id == "") id = condition.value("name", "");
 			a_condition->SetConditionParameters(id, condition["quantity"].get<int>());
+        }
+        else if (type == "SpellLearned") {
+            SpellLearnedConditionFactory* spellLearnedConditionFactory = new SpellLearnedConditionFactory();
+			a_condition = spellLearnedConditionFactory->createCondition();
+			a_condition->SetConditionParameters(condition["formID"].get<std::string>());
         }
         else {
             logger::warn("Unknown condition type {} in {}.", type, this->achievementName);

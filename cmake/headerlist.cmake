@@ -22,6 +22,7 @@ set(headers ${headers}
 	src/Conditions/QueryStatValue/QueryStatValueCondition.h
 	src/Conditions/QuestStageDone/QuestStageDoneCondition.h
 	src/Conditions/SkillLevel/SkillLevelCondition.h
+	src/Conditions/SpellLearned/SpellLearnedCondition.h
 	src/ConditionsJoinType.h
 	src/CustomRE.h
 	src/EventProcessor.h
