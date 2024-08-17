@@ -25,6 +25,7 @@ enum ConditionType {
 	ItemCrafted, // Done
 	ItemInInventory, // Done
 	LocationDiscovery, // Done
+	LocationCleared, // Done
 	PlayerActivation, // Done
 	DragonSoulAbsorbed, // Done
 	FirstEnterCell, // Done

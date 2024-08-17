@@ -6,11 +6,10 @@ public:
 
 	void OnDataLoaded(void) override;
 	void EnableListener(void) override;
-	void SetConditionParameters(std::string formid, int quantity) override;
-	bool CheckCondition() override;
+	void SetConditionParameters(std::string formid) override;
+	bool CheckCondition();
 
 	std::string formid;
-	int quantity = 1;
 private:
 	RE::BSEventNotifyControl ProcessEvent(const RE::TESTrackedStatsEvent* a_event, RE::BSTEventSource<RE::TESTrackedStatsEvent>*) override;
 };

@@ -1,6 +1,7 @@
 #include "AchievementMenu.h"
 #include "Scaleform.h"
 #include "Utility.h"
+#include "AchievementManager.h"
 
 namespace Scaleform {
     AchievementMenu::AchievementMenu() {
@@ -64,5 +65,25 @@ namespace Scaleform {
         assert(a_params[0].IsString());
 
         RE::PlaySound(a_params[0].GetString());
+    }
+
+    void AchievementMenu::UpdateAchievementList() {
+        std::vector<AchievementGroupScaleformObject> achievements;
+        for (AchievementGroup ag : AchievementManager::GetSingleton()->achievementGroups) {
+			AchievementGroupScaleformObject agso = ag.GetScaleformObject();
+			if (agso.achievements.size() > 0) {
+				achievements.push_back(agso);
+			}
+		}
+
+        auto ui = RE::UI::GetSingleton();
+        RE::GFxValue widget;
+        if (ui->GetMenu(AchievementMenu::MENU_NAME)->uiMovie->GetVariable(&widget, "_root.AchievementMenu_mc")) {
+            std::array<RE::GFxValue, 1> functionArgs;
+            //functionArgs[0] = achievements;
+            // logger::debug("Invoking ActionScript with parameters ({}, {})", name, description);
+            widget.Invoke("UpdateAchievementList", nullptr, functionArgs.data(), functionArgs.size());
+            // logger::debug("Sound: {}, override: {}", sound, Settings::GetSingleton()->GetOverrideNotificationSound());
+        }
     }
 }

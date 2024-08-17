@@ -21,6 +21,7 @@ namespace Scaleform {
         static void Register();
         static void Show();
         static void Hide();
+        static void UpdateAchievementList();
 
         static constexpr std::string_view Name();
 

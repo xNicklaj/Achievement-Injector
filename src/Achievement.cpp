@@ -26,6 +26,7 @@
 #include "Conditions/GlobalVariableState/GlobalVariableStateCondition.h"
 #include "Conditions/BaseActorDeath/BaseActorDeathCondition.h"
 #include "Conditions/SpellLearned/SpellLearnedCondition.h"
+#include "Conditions/DungeonCleared/DungeonClearedCondition.h"
 
 Achievement::Achievement(json& jsonData, std::string plugin, std::string groupName)
     : Runnable(jsonData.value("onUnlock", json::array())), achievementName(jsonData["achievementName"].get<std::string>()),
@@ -128,6 +129,11 @@ Achievement::Achievement(json& jsonData, std::string plugin, std::string groupNa
             SpellLearnedConditionFactory* spellLearnedConditionFactory = new SpellLearnedConditionFactory();
 			a_condition = spellLearnedConditionFactory->createCondition();
 			a_condition->SetConditionParameters(condition["formID"].get<std::string>());
+        }
+        else if (type == "LocationCleared") {
+            DungeonClearedConditionFactory* dungeonClearedConditionFactory = new DungeonClearedConditionFactory();
+            a_condition = dungeonClearedConditionFactory->createCondition();
+            a_condition->SetConditionParameters(condition["formID"].get<std::string>());
         }
         else {
             logger::warn("Unknown condition type {} in {}.", type, this->achievementName);
