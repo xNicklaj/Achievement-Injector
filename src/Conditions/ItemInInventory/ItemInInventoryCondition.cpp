@@ -36,8 +36,7 @@ bool ItemInInventoryCondition::CheckCondition() {
     }
     if (quantity >= this->quantity) {
         logger::info("Player met condition item {} quantity {}", this->formid, this->quantity);
-        this->isMet = true;
-        this->eventManager->dispatch("ConditionMet");
+        this->UnlockNotify();
         RE::ScriptEventSourceHolder::GetSingleton()->RemoveEventSink(this);
         return true;
     }

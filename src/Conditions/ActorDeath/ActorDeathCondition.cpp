@@ -10,8 +10,7 @@ void ActorDeathCondition::OnDataLoaded(void) {
 	if (target == NULL) return;
 	RE::TESObjectREFR* targetREFR = RE::TESObjectREFR::LookupByID<RE::TESObjectREFR>(target->formID);
 	if(targetREFR && targetREFR->IsDead()) {
-		this->isMet = true;
-		this->eventManager->dispatch("ConditionMet");
+		this->UnlockNotify();
 		RE::ScriptEventSourceHolder::GetSingleton()->RemoveEventSink(this);
 	}
 }
@@ -35,8 +34,7 @@ RE::BSEventNotifyControl ActorDeathCondition::ProcessEvent(const RE::TESDeathEve
 	}
 	if (a_event->actorDying->formID == target->formID) {
 		logger::info("Player met condition actor {} dead.", this->formID);
-		this->isMet = true;
-		this->eventManager->dispatch("ConditionMet");
+		this->UnlockNotify();
 		RE::ScriptEventSourceHolder::GetSingleton()->RemoveEventSink(this);
 	}
 	return RE::BSEventNotifyControl::kContinue;

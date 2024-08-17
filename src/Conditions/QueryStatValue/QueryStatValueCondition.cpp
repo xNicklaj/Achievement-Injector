@@ -16,10 +16,8 @@ void QueryStatValueCondition::SetConditionParameters(std::string stat, float val
 };
 bool QueryStatValueCondition::CheckCondition() {
 	float globValue = RE::QueryStat(this->stat.c_str());
-	logger::debug("Stat {} value {}", this->stat, globValue);
 	if (globValue >= this->value) {
-		this->isMet = true;
-		this->eventManager->dispatch("ConditionMet");
+		this->UnlockNotify();
 		return true;
 	}
 	return false;

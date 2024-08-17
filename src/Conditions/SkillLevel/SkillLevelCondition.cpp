@@ -24,8 +24,7 @@ bool PlayerSkillLevelCondition::CheckCondition() {
     float skillLevel = RE::PlayerCharacter::GetSingleton()->AsActorValueOwner()->GetActorValue(skill);
     if (!this->isMet && skillLevel >= this->level) {
         logger::info("Skill {} met condition level {}", this->skill, skillLevel);
-        this->isMet = true;
-        this->eventManager->dispatch("ConditionMet");
+        this->UnlockNotify();
         RE::SkillIncrease::GetEventSource()->RemoveEventSink(this);
         return true;
     }

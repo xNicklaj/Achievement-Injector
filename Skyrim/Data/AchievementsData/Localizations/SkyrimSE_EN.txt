@@ -1,0 +1,13 @@
+$Guardian Stones	The Guardian Stones
+$Apprentice Stone	The Apprentice Stone
+$Atronach Stone		The Atronach Stone
+$Lady Stone			The Lady Stone
+$Lord Stone			The Lord Stone
+$Lover Stone		The Lover Stone
+$Mage Stone			The Mage Stone
+$Ritual Stone		The Ritual Stone
+$Serpent Stone		The Serpent Stone
+$Shadow Stone		The Shadow Stone
+$Steed Stone		The Steed Stone
+$Thief Stone		The Thief Stone
+$Tower Stone		The Tower Stone

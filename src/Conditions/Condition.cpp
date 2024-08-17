@@ -35,6 +35,12 @@ bool Condition::Deserialize(int value) {
     return this->isMet;
 }
 
+void Condition::UnlockNotify() {
+    this->isMet = true;
+    this->eventManager->dispatch("ConditionMet");
+    this->RunAll();
+}
+
 // QuestStageDoneCondition - V
 
 

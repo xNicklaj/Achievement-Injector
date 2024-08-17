@@ -42,7 +42,7 @@ void Settings::LoadMCMSettings() const
 		switch (ini.GetLongValue("Sound", "iNotificationSound"))
 		{
 		case NotificationSound_e::UINewShoutLearned:
-				Settings::GetSingleton()->sNotificationSound = "UINewShoutLearned";;
+				Settings::GetSingleton()->sNotificationSound = "UINewShoutLearned";
 				break;
 		case NotificationSound_e::UIQuestComplete:
 				Settings::GetSingleton()->sNotificationSound = "UIQuestComplete";

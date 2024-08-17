@@ -24,8 +24,7 @@ RE::BSEventNotifyControl BookReadCondition::ProcessEvent(const RE::BooksRead::Ev
 	if (targetName == this->bookName)
 	{
         logger::info("Player met condition read book {}.", this->bookName);
-        this->isMet = true;
-        this->eventManager->dispatch("ConditionMet");
+        this->UnlockNotify();
         RE::BooksRead::GetEventSource()->RemoveEventSink(this);
 	}
 	return RE::BSEventNotifyControl::kContinue;

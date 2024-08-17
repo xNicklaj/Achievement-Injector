@@ -18,8 +18,7 @@ bool ItemCraftedCondition::CheckCondition(RE::FormID itemID) {
 	if(target == NULL) return false;
 	if (itemID == target->formID) {
 		logger::info("Player met condition crafted {}.", this->itemID);
-		this->isMet = true;
-		this->eventManager->dispatch("ConditionMet");
+		this->UnlockNotify();
 		RE::ItemCrafted::GetEventSource()->RemoveEventSink(this);
 		return true;
 	}

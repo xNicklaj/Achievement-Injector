@@ -18,10 +18,8 @@ bool GlobalVariableStateCondition::CheckCondition() {
 	RE::TESForm* target = GetForm(this->formID, this->plugin);
 	if (!target) return false;
 	float globValue = GetGlobalVariableValue(target->formID);
-	logger::debug("Variable {} state {}", this->formID, globValue);
 	if(globValue >= this->value) {
-		this->isMet = true;
-		this->eventManager->dispatch("ConditionMet");
+		this->UnlockNotify();
 		return true;
 	}
 	return false;

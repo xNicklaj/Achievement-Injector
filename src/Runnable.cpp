@@ -3,10 +3,16 @@
 #include "../include/ConsoleUtilSSE.h"
 #include "CommonFunctions.h"
 
+Runnable::Runnable() {}
+
 Runnable::Runnable(json jsonData) {
+	this->push_back(jsonData);
+}
+
+void Runnable::push_back(json jsonData) {
 	for (auto& element : jsonData) {
 		Runnable_t runnable;
-		
+
 		if (element["type"] == "command") {
 			runnable.type = kConsoleCommand;
 			runnable.arg01 = element["command"];
@@ -19,17 +25,19 @@ Runnable::Runnable(json jsonData) {
 		}
 		else {
 			logger::warn("Found runnable with unknown type. Skipping.");
-		
+
 		}
 
 		m_runnables.push_back(runnable);
 	}
 }
+
 void Runnable::push_back(Runnable_t runnable) {
 	m_runnables.push_back(runnable);
 }
 int Runnable::RunAll() {
 	int i = 0;
+	logger::debug("Running {} runnables", m_runnables.size());
 	for (auto& runnable : m_runnables) {
 		if (runnable.type == kConsoleCommand) {
 			logger::info("Running console command: {}", runnable.arg01);

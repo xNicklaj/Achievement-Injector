@@ -46,8 +46,7 @@ LocationDiscoveryCondition::LocationDiscoveryCondition() : Condition(ConditionTy
 void LocationDiscoveryCondition::OnDataLoaded(void) {
     if (CheckKnownLocation(this->locationName)) {
         logger::info("Player met condition found {} in {}.", this->locationName, this->worldspaceID);
-        this->isMet = true;
-        this->eventManager->dispatch("ConditionMet");
+        this->UnlockNotify();
         RE::LocationDiscovery::GetEventSource()->RemoveEventSink(this);
     };
 }
@@ -66,8 +65,7 @@ void LocationDiscoveryCondition::SetConditionParameters(std::string locationName
 bool LocationDiscoveryCondition::CheckCondition(std::string locationName, std::string worldspaceID) {
     if (locationName == this->locationName && worldspaceID == this->worldspaceID) {
         logger::info("Player met condition found {} in {}.", this->locationName, this->worldspaceID);
-        this->isMet = true;
-        this->eventManager->dispatch("ConditionMet");
+        this->UnlockNotify();
         RE::LocationDiscovery::GetEventSource()->RemoveEventSink(this);
         return true;
     }

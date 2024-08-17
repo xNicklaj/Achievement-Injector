@@ -32,15 +32,13 @@ bool QuestStageDoneCondition::CheckCondition() {
     if (this->isMet) return true;
     if (this->OP == "GT" && CheckQuestStage(this->formID, this->plugin) >= stage) {
         logger::info("Quest {} met condition stage {}", this->formID, this->stage);
-        this->isMet = true;
-        this->eventManager->dispatch("ConditionMet");
+        this->UnlockNotify();
         RE::ScriptEventSourceHolder::GetSingleton()->RemoveEventSink(this);
         return true;
     }
     else if (this->OP == "EQ" && CheckQuestStage(this->formID, this->plugin) == stage) {
         logger::info("Quest {} met condition stage {}", this->formID, this->stage);
-        this->isMet = true;
-        this->eventManager->dispatch("ConditionMet");
+        this->UnlockNotify();
         RE::ScriptEventSourceHolder::GetSingleton()->RemoveEventSink(this);
         return true;
     }

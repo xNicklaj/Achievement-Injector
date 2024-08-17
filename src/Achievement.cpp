@@ -59,7 +59,7 @@ Achievement::Achievement(json& jsonData, std::string plugin, std::string groupNa
         }
 		else if (type == "PlayerLevel") {
 			PlayerLevelConditionFactory* playerLevelConditionFactory = new PlayerLevelConditionFactory();
-            a_condition = playerLevelConditionFactory->createCondition();;
+            a_condition = playerLevelConditionFactory->createCondition();
             a_condition->SetConditionParameters(condition["level"].get<int>());
 		}
         else if (type == "SkillLevel") {
@@ -136,6 +136,7 @@ Achievement::Achievement(json& jsonData, std::string plugin, std::string groupNa
             if (condition.value("pluginOverride", "") != "") a_condition->SetPlugin(condition["pluginOverride"].get<std::string>());
             else a_condition->SetPlugin(this->plugin);
             a_condition->Localize(this->groupName);
+            a_condition->push_back(condition.value("onUnlock", json::array()));
             conditions.push_back(a_condition);
         };
         conditionMet.push_back(false);
@@ -212,7 +213,7 @@ void Achievement::OnConditionMet(void) {
         for (bool condition : conditionMet) {
             if (condition == false) {
                 allConditionsMet = false;
-                break;;
+                break;
             }
         }
         break;
@@ -228,7 +229,7 @@ void Achievement::OnConditionMet(void) {
         this->RunAll();
 
   //      for(std::string command : rewardCommandList) {
-  //          Papyrus::ConsoleUtil::ExecuteCommand(NULL, command);;
+  //          Papyrus::ConsoleUtil::ExecuteCommand(NULL, command);
 		//}
     }
     Serializer::GetSingleton()->SerializeAchievementData(this);
@@ -251,5 +252,5 @@ void Achievement::Localize() {
 
 ScaleformAchievementObject Achievement::GetScaleformObject() {
     auto datetime = Serializer::GetSingleton()->DeserializeAchievementData(this->achievementName).unlockDatetime;
-    return ScaleformAchievementObject{ this->achievementName, this->description, datetime };;
+    return ScaleformAchievementObject{ this->achievementName, this->description, datetime };
 }

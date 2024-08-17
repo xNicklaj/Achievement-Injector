@@ -38,7 +38,7 @@ enum ConditionType {
 	NotSet // Done
 };
 
-class Condition : Runnable {
+class Condition : public Runnable {
 public:
 	Condition(ConditionType type);
 	Condition(ConditionType type, json jsonData);
@@ -53,12 +53,12 @@ public:
 	virtual void SetConditionParameters(std::string, float);
 	virtual bool CheckCondition();
 	virtual void Localize(std::string);
-
 	virtual int Serialize(void);
 	virtual bool Deserialize(int); // Returns true if condition is met
 	
 	void SetEventManager(eventpp::EventDispatcher<std::string, void()>* eventManager);
 	void SetPlugin(std::string plugin);
+	void UnlockNotify();
 	
 	ConditionType type;
 	bool isMet = false;

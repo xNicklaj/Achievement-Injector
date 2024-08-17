@@ -20,8 +20,7 @@ void BaseActorDeathCondition::SetConditionParameters(std::string identifier, int
 bool BaseActorDeathCondition::CheckCondition() {
 	if (this->currQuantity >= this->quantity) {
 		logger::info("Player met condition actor {} dead.", this->identifier);
-		this->isMet = true;
-		this->eventManager->dispatch("ConditionMet");
+		this->UnlockNotify();
 		RE::ScriptEventSourceHolder::GetSingleton()->RemoveEventSink(this);
 	}
 	return false;

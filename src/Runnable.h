@@ -20,11 +20,13 @@ struct Runnable_t {
 
 class Runnable {
 public:
+	Runnable();
 	Runnable(json jsonData);
 	int RunAll();
+	void push_back(json jsonData);
 	void push_back(Runnable_t runnable);
 protected:
-	std::vector<Runnable_t> m_runnables;;
+	std::vector<Runnable_t> m_runnables;
 };
 
 #endif

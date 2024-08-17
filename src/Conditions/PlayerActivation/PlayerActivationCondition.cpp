@@ -20,8 +20,7 @@ RE::BSEventNotifyControl PlayerActivationCondition::ProcessEvent(const RE::TESAc
 	if (target == NULL) return RE::BSEventNotifyControl::kContinue;
 	if (a_event->objectActivated->GetFormID() == target->formID) {
 		logger::info("Player met condition activation {}", this->formid);
-		this->isMet = true;
-		this->eventManager->dispatch("ConditionMet");
+		this->UnlockNotify();
 	}
 	return RE::BSEventNotifyControl::kContinue;
 };

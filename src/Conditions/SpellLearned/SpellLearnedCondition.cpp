@@ -24,8 +24,7 @@ bool SpellLearnedCondition::CheckCondition() {
     RE::SpellItem* target = static_cast<RE::SpellItem*>(GetForm(this->FormID, this->plugin));
     if (RE::PlayerCharacter::GetSingleton()->HasSpell(target)) {
         logger::info("Player met condition learned {}:{}", target->fullName.c_str(), FormIDToString(target->formID));
-        this->isMet = true;
-        this->eventManager->dispatch("ConditionMet");
+        this->UnlockNotify();
         RE::SpellsLearned::GetEventSource()->RemoveEventSink(this);
     }
     return false;

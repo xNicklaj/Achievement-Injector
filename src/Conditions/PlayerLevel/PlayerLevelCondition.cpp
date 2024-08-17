@@ -17,15 +17,13 @@ void PlayerLevelCondition::SetConditionParameters(int level) {
 RE::BSEventNotifyControl PlayerLevelCondition::ProcessEvent(const RE::LevelIncrease::Event* a_event, RE::BSTEventSource<RE::LevelIncrease::Event>*) {
     if (!this->isMet && a_event->newLevel >= this->level) {
         logger::info("Player met condition level {}", this->level);
-        this->isMet = true;
-        this->eventManager->dispatch("ConditionMet");
+        this->UnlockNotify();
     }
     return RE::BSEventNotifyControl::kContinue;
 }
 bool PlayerLevelCondition::CheckCondition() {
     if (!this->isMet && RE::PlayerCharacter::GetSingleton()->GetLevel() >= level) {
-        this->isMet = true;
-        this->eventManager->dispatch("ConditionMet");
+        this->UnlockNotify();
         RE::LevelIncrease::GetEventSource()->RemoveEventSink(this);
         return true;
     }

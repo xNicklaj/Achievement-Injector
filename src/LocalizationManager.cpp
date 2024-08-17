@@ -10,7 +10,7 @@ LocalizationManager::LocalizationManager() {
 
 void LocalizationManager::LoadLocalizations() {
     for (auto& innermap : localizations) {
-        innermap.second.clear();;
+        innermap.second.clear();
     }
     localizations.clear();
 
@@ -19,8 +19,6 @@ void LocalizationManager::LoadLocalizations() {
 		std::string filename = entry.path().filename().string();
 		std::string locale = StripExtension(filename.substr(filename.find_last_of('_') + 1));
 		std::string groupName = filename.substr(0, filename.find_last_of('_'));
-
-        logger::debug("{} {} {}", filename, groupName, locale);
 
 		// TODO Maybe read only my locale
 		localizations[std::tuple<std::string, std::string>(groupName, locale)] = LocalizationManager::ReadLocalizationFile(LOCALIZATION_PATH + filename);
@@ -58,7 +56,7 @@ std::map<std::string, std::string> LocalizationManager::ReadLocalizationFile(con
 std::string LocalizationManager::GetLocalizedText(std::string group, std::string locale, std::string key) {
 
 	try {
-        return this->localizations[std::tuple<std::string, std::string>(group, locale)][key];;
+        return this->localizations[std::tuple<std::string, std::string>(group, locale)][key];
 	}
 	catch (const std::out_of_range& e) {
 		logger::error("Localization not found for group: {}, locale: {}, key: {}", group, locale, key);

@@ -18,8 +18,7 @@ bool DragonSoulAbsorbedCondition::CheckCondition() {
     short totalAbsorbed = absorbed->value;
     if (totalAbsorbed >= quantity) {
         logger::info("Player met condition absorbed souls {}", this->quantity);
-        this->isMet = true;
-        this->eventManager->dispatch("ConditionMet");
+        this->UnlockNotify();
         RE::DragonSoulsGained::GetEventSource()->RemoveEventSink(this);
         return true;
     }

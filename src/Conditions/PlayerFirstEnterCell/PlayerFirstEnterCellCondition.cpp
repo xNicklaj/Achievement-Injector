@@ -23,8 +23,7 @@ RE::BSEventNotifyControl PlayerFirstEnterCellCondition::ProcessEvent(const RE::B
     if (target == NULL) return RE::BSEventNotifyControl::kContinue;
     if (event->cellID == target->formID) {
         logger::info("Player met condition entered cell {}.", this->cellID);
-        this->isMet = true;
-        this->eventManager->dispatch("ConditionMet");
+        this->UnlockNotify();
         RE::PlayerCharacter::GetSingleton()->AsBGSActorCellEventSource()->RemoveEventSink(this);
     }
     return RE::BSEventNotifyControl::kContinue;

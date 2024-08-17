@@ -134,7 +134,7 @@ SKSEPluginLoad(const SKSE::LoadInterface *skse) {
 	if (Settings::GetSingleton()->GetUseDebugger()) {
 		logger::debug("Waiting for debugger to attach...");
 		while (!IsDebuggerPresent()) {
-			::Sleep(1000);;
+			::Sleep(1000);
 		};
 		logger::debug("Debugger attached.");
 	}
