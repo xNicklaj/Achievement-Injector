@@ -17,22 +17,31 @@ namespace logger = SKSE::log;
 
 using json = nlohmann::json;
 
+struct ScaleformAchievementObject {
+    std::string name;
+    std::string description;
+    long long unlockDatetime;
+};
+
 class Achievement : Runnable {
 public:
     // Constructor that initializes the Achievement from a JSON object
-    Achievement(json& jsonData, std::string plugin);
+    Achievement(json& jsonData, std::string plugin, std::string localizationPath);
     void EnableListener(void);
     void OnConditionMet(void);
     void OnSerializationRequested(void);
     std::vector<int> GetConditionsState(void);
+    ScaleformAchievementObject GetScaleformObject();
+    void Localize();
 
     eventpp::EventDispatcher<std::string, void()> eventHandler;
-
     std::string achievementName;
     std::string description;
     std::vector<Condition*> conditions;
     std::string plugin;
     std::string notificationSound = "";
+    std::string groupName = "";
+
     bool unlocked;
     bool hooked = false;
     bool showPopup = true;

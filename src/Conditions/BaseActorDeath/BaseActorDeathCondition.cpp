@@ -54,6 +54,11 @@ int BaseActorDeathCondition::Serialize() {
 	return currQuantity;
 }
 
+void BaseActorDeathCondition::Localize(std::string path) {
+	if (!this->isFormID && this->identifier[0] == '$')
+		this->identifier = LocalizationManager::GetSingleton()->GetLocalizedText(path, LocalizationManager::GetSingleton()->CurrentLocale(), this->identifier);
+}
+
 BaseActorDeathConditionFactory::BaseActorDeathConditionFactory() : ConditionFactory() {};
 Condition* BaseActorDeathConditionFactory::createCondition() {
 	return new BaseActorDeathCondition();

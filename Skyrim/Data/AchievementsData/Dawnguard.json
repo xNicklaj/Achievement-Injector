@@ -94,8 +94,8 @@
             "description": "Defeat a Legendary Dragon",
             "conditions": [
                 {
-                    "type": "EnemySlain",
-                    "enemyType": "TODO: Legendary Dragon",
+                    "type": "BaseActorDeath",
+                    "name": "$Legendary Dragon",
                     "quantity": 1
                 }
             ]

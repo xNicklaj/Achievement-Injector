@@ -7,6 +7,7 @@ public:
 	void EnableListener(void) override;
 	void SetConditionParameters(std::string formid) override;
 	bool CheckCondition() override;
+	void Localize(std::string path) override;
 
 	std::string bookName;
 private:

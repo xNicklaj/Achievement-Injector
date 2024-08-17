@@ -14,6 +14,10 @@ void BookReadCondition::EnableListener() {
 void BookReadCondition::SetConditionParameters(std::string bookName) {
     this->bookName = bookName;
 }
+void BookReadCondition::Localize(std::string path) {
+    if(this->bookName[0] == '$')
+		this->bookName = LocalizationManager::GetSingleton()->GetLocalizedText(path, LocalizationManager::GetSingleton()->CurrentLocale(), this->bookName);
+}
 bool BookReadCondition::CheckCondition() { return false; }
 RE::BSEventNotifyControl BookReadCondition::ProcessEvent(const RE::BooksRead::Event* a_event, RE::BSTEventSource<RE::BooksRead::Event>*) {
 	std::string targetName = a_event->book->GetFullName();

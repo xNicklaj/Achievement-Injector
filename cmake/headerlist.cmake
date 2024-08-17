@@ -26,6 +26,7 @@ set(headers ${headers}
 	src/ConditionsJoinType.h
 	src/CustomRE.h
 	src/EventProcessor.h
+	src/LocalizationManager.h
 	src/KeyMapping.h
 	src/PCH.h
 	src/Papyrus.h

@@ -1,6 +1,7 @@
 set(sources ${sources}
 	src/Achievement.cpp
 	src/AchievementWidget.cpp
+	src/AchievementManager.cpp
 	src/AchievementMenu.cpp
 	src/CommonFunctions.cpp
 	src/Conditions/ActorDeath/ActorDeathCondition.cpp
@@ -23,6 +24,7 @@ set(sources ${sources}
 	src/Conditions/SpellLearned/SpellLearnedCondition.cpp
 	src/CustomRE.cpp
 	src/EventProcessor.cpp
+	src/LocalizationManager.cpp
 	src/Papyrus.cpp
 	src/Runnable.cpp
 	src/Serializer.cpp

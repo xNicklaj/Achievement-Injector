@@ -6,8 +6,10 @@
 #include "settings.h"
 #include "Serializer.h"
 #include "Utility.h"
+#include <fmt/core.h>
 #include "AchievementWidget.h"
 #include "../include/ConsoleUtilSSE.h"
+#include "LocalizationManager.h"
 
 #include "Conditions/DragonSoulAbsorbed/DragonSoulsAbsorbedCondition.h"
 #include "Conditions/ItemInInventory/ItemInInventoryCondition.h"
@@ -25,11 +27,12 @@
 #include "Conditions/BaseActorDeath/BaseActorDeathCondition.h"
 #include "Conditions/SpellLearned/SpellLearnedCondition.h"
 
-Achievement::Achievement(json& jsonData, std::string plugin)
+Achievement::Achievement(json& jsonData, std::string plugin, std::string groupName)
     : Runnable(jsonData.value("onUnlock", json::array())), achievementName(jsonData["achievementName"].get<std::string>()),
     description(jsonData["description"].get<std::string>()),
     unlocked(false) {  // Initialize joinType and unlocked
 
+    this->groupName = groupName;
     this->plugin = plugin;
     if (jsonData.value("joinType", "OR") == "OR") this->joinType = ConditionsJoinType::OR;
     else this->joinType = ConditionsJoinType::AND;
@@ -44,6 +47,8 @@ Achievement::Achievement(json& jsonData, std::string plugin)
         this->OnSerializationRequested();
     });
 
+    this->Localize();
+
     for (json condition : jsonData["conditions"]) {
         Condition* a_condition = nullptr;
         std::string type = condition["type"].get<std::string>();
@@ -54,7 +59,7 @@ Achievement::Achievement(json& jsonData, std::string plugin)
         }
 		else if (type == "PlayerLevel") {
 			PlayerLevelConditionFactory* playerLevelConditionFactory = new PlayerLevelConditionFactory();
-            a_condition = playerLevelConditionFactory->createCondition();
+            a_condition = playerLevelConditionFactory->createCondition();;
             a_condition->SetConditionParameters(condition["level"].get<int>());
 		}
         else if (type == "SkillLevel") {
@@ -130,6 +135,7 @@ Achievement::Achievement(json& jsonData, std::string plugin)
         if (a_condition) {
             if (condition.value("pluginOverride", "") != "") a_condition->SetPlugin(condition["pluginOverride"].get<std::string>());
             else a_condition->SetPlugin(this->plugin);
+            a_condition->Localize(this->groupName);
             conditions.push_back(a_condition);
         };
         conditionMet.push_back(false);
@@ -206,7 +212,7 @@ void Achievement::OnConditionMet(void) {
         for (bool condition : conditionMet) {
             if (condition == false) {
                 allConditionsMet = false;
-                break;
+                break;;
             }
         }
         break;
@@ -234,4 +240,16 @@ std::vector<int> Achievement::GetConditionsState(void) {
         v.push_back(condition->Serialize());
     }
     return v;
+}
+
+void Achievement::Localize() {
+    if (achievementName[0] == '$') 
+        this->achievementName = LocalizationManager::GetSingleton()->GetLocalizedText(this->groupName, LocalizationManager::GetSingleton()->CurrentLocale(), achievementName);
+    if (description[0] == '$') 
+        this->description = LocalizationManager::GetSingleton()->GetLocalizedText(this->groupName, LocalizationManager::GetSingleton()->CurrentLocale(), description);
+}
+
+ScaleformAchievementObject Achievement::GetScaleformObject() {
+    auto datetime = Serializer::GetSingleton()->DeserializeAchievementData(this->achievementName).unlockDatetime;
+    return ScaleformAchievementObject{ this->achievementName, this->description, datetime };;
 }

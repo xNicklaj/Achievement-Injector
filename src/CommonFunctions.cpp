@@ -160,3 +160,11 @@ bool isHex(const std::string& str) {
 
     return true;
 }
+
+std::string StripExtension(const std::string& filename) {
+    size_t pos = filename.find_last_of('.');
+    if (pos != std::string::npos) {
+        return filename.substr(0, pos);
+    }
+    return filename; // Return the original string if no dot is found
+}

@@ -4,6 +4,8 @@
 #include <queue>
 #include <thread>
 #include <mutex>
+#include <map>
+#include <fstream>
 #include <condition_variable>
 
 using json = nlohmann::json;
@@ -20,3 +22,4 @@ bool BindPapyrusFunctions(RE::BSScript::IVirtualMachine* vm);
 float GetGlobalVariableValue(RE::FormID formid);
 std::string GetPlayerName();
 bool isHex(const std::string& str);
+std::string StripExtension(const std::string& filename);

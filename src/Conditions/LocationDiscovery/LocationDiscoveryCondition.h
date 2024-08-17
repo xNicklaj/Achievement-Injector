@@ -10,6 +10,8 @@ public:
 	void SetConditionParameters(std::string locationName, std::string worldspaceID) override;
 	bool CheckCondition(std::string locationName, std::string worldspaceID);
 
+	void Localize(std::string path) override;
+
 	std::string locationName;
 	std::string worldspaceID;
 private:

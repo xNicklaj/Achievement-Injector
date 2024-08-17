@@ -9,6 +9,7 @@
 #include <SKSE/SKSE.h>
 #include <RE/Skyrim.h>
 #include <nlohmann/json.hpp>
+#include "../LocalizationManager.h"
 #include <functional>
 
 #ifndef CONDITION_H
@@ -51,6 +52,7 @@ public:
 	virtual void SetConditionParameters(std::string, std::string);
 	virtual void SetConditionParameters(std::string, float);
 	virtual bool CheckCondition();
+	virtual void Localize(std::string);
 
 	virtual int Serialize(void);
 	virtual bool Deserialize(int); // Returns true if condition is met

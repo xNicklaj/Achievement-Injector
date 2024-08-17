@@ -6,19 +6,6 @@
     "cursorFillMode": "topToBottom",
     "content": [
         {
-            "text": "OPEN ACHIEVEMENTS MENU",
-            "type": "text",
-            "action": {
-                "type": "CallGlobalFunction",
-                "script": "Debug",
-                "function": "MessageBox",
-                "params": [ "Hello world!" ]
-            }
-        },
-        {
-            "type": "empty"
-        },
-        {
             "type": "header",
             "text": "For players"
         },

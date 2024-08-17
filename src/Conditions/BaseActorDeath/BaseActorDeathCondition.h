@@ -11,6 +11,8 @@ public:
 	int Serialize() override;
 	bool Deserialize(int value) override;
 
+	void Localize(std::string path) override;
+
 	std::string identifier = "";
 	std::string name = "";
 	int quantity = 0;

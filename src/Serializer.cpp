@@ -54,6 +54,7 @@ void Serializer::SerializeAchievementData(Achievement* achievement) {
 	});
 	Save();
 }
+
 struct SerializedAchievement Serializer::DeserializeAchievementData(std::string name) {
 	try {
 		std::ifstream inFile(GetFilename());
@@ -79,6 +80,17 @@ struct SerializedAchievement Serializer::DeserializeAchievementData(std::string 
 
 void Serializer::Save() {
 	std::string filename = this->GetFilename();
+	try {
+		std::ofstream outFile(filename);
+		outFile << jsonData.dump(4);
+		outFile.close();
+	}
+	catch (const fs::filesystem_error& e) {
+		logger::error("Filesystem error: {}", e.what());
+	}
+}
+void Serializer::Save(bool Global) {
+	std::string filename = Global ? "GLOBAL" : this->GetFilename();
 	try {
 		std::ofstream outFile(filename);
 		outFile << jsonData.dump(4);

@@ -25,6 +25,7 @@ bool Condition::CheckCondition() { return false; }
 void Condition::SetEventManager(eventpp::EventDispatcher<std::string, void()>* eventManager) {
 	this->eventManager = eventManager;
 }
+void Condition::Localize(std::string) {}
 
 int Condition::Serialize() {
     return static_cast<int>(this->isMet);

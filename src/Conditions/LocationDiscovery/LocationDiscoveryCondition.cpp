@@ -51,6 +51,10 @@ void LocationDiscoveryCondition::OnDataLoaded(void) {
         RE::LocationDiscovery::GetEventSource()->RemoveEventSink(this);
     };
 }
+void LocationDiscoveryCondition::Localize(std::string path) {
+    if(this->locationName[0] == '$')
+		this->locationName = LocalizationManager::GetSingleton()->GetLocalizedText(path, LocalizationManager::GetSingleton()->CurrentLocale(), this->locationName);
+}
 void LocationDiscoveryCondition::EnableListener() {
     RegisterPostLoadFunction(this);
     RE::LocationDiscovery::GetEventSource()->AddEventSink(this);

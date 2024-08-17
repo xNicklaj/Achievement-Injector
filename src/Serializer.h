@@ -10,6 +10,7 @@
 
 #define DIRECTORY_PATH "Data/SKSE/Plugins/AchievementInjector/"
 #define FILENAME "UnlockedAchievements_{}.json"
+#define GLOBALFILENAME "UnlockedAchievements_GLOBAL.json"
 
 struct SerializedAchievement {
 	std::string achievementName;
@@ -22,6 +23,7 @@ class Serializer : public ISingleton<Serializer> {
 public:
 	Serializer();
 	void Save();
+	void Save(bool);
 	void SerializeAchievementData(Achievement* achievement);
 	struct SerializedAchievement DeserializeAchievementData(std::string name);
 	void CreateFileIfNotExists();

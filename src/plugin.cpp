@@ -15,6 +15,7 @@
 #include "Serializer.h"
 #include "CustomRE.h"
 #include "settings.h"
+#include "LocalizationManager.h"
 #include "AchievementMenu.h"
 
 using json = nlohmann::json;
@@ -35,11 +36,13 @@ void ReadAchievementFiles(std::vector<AchievementFile>* achievementFiles) {
 	try {
 		if (fs::exists(directoryPath) && fs::is_directory(directoryPath)) {
 			for (const auto& entry : fs::directory_iterator(directoryPath)) {
+				if(fs::is_directory(entry.path().string())) continue;
 				struct AchievementFile achievementFile;
 				// Read JSON file
 				ReadJson(entry.path().string(), &tmp);
 				achievementFile.FileData = tmp["achievements"];
 				achievementFile.groupName = tmp["groupName"];
+				achievementFile.path = entry.path().filename().string();
 				achievementFile.plugin = tmp["plugin"];
 				(*achievementFiles).push_back(achievementFile);
 			}
@@ -68,7 +71,7 @@ void MessageHandler(SKSE::MessagingInterface::Message* a_msg)
 		for (auto& achievementFile : (AchievementManager::GetSingleton()->achievementFiles)) {
 			AchievementGroup ag(achievementFile.groupName, achievementFile.plugin);
 			for (json achievement : achievementFile.FileData) {
-				ag.achievements.push_back(new Achievement(achievement, ag.plugin));
+				ag.achievements.push_back(new Achievement(achievement, ag.plugin, StripExtension(achievementFile.path)));
 			}
 			AchievementManager::GetSingleton()->achievementGroups.push_back(ag);
 		}
@@ -121,6 +124,7 @@ SKSEPluginLoad(const SKSE::LoadInterface *skse) {
     SKSE::Init(skse);
 	Settings::GetSingleton()->LoadSettings();
 	SetupLog();
+	LocalizationManager::GetSingleton(); // Load localizations
 
     auto messaging = SKSE::GetMessagingInterface();
 	if (!messaging->RegisterListener("SKSE", MessageHandler)) {
