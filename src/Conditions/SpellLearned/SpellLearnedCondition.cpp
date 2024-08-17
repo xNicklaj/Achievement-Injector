@@ -20,9 +20,26 @@ RE::BSEventNotifyControl SpellLearnedCondition::ProcessEvent(const RE::SpellsLea
     
     return RE::BSEventNotifyControl::kContinue;
 }
+
 bool SpellLearnedCondition::CheckCondition() {
+    bool found = false;
     RE::SpellItem* target = static_cast<RE::SpellItem*>(GetForm(this->FormID, this->plugin));
-    if (RE::PlayerCharacter::GetSingleton()->HasSpell(target)) {
+    RE::TESNPC* player = RE::TESNPC::LookupByID<RE::TESNPC>(GetForm("000007", "Skyrim.esm")->formID);
+    
+    if (RE::PlayerCharacter::GetSingleton()->HasSpell(target))
+        found = true;
+
+    if (!found) {
+        for (int i = 0; i < player->GetSpellList()->numSpells; i++) {
+            RE::SpellItem* spell = player->GetSpellList()->spells[i];
+            if (spell && spell->formID == target->formID) {
+                found = true;
+                break;
+            }
+        }
+    }
+    
+    if (found) {
         logger::info("Player met condition learned {}:{}", target->fullName.c_str(), FormIDToString(target->formID));
         this->UnlockNotify();
         RE::SpellsLearned::GetEventSource()->RemoveEventSink(this);

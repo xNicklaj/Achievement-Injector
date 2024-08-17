@@ -22,6 +22,7 @@ set(sources ${sources}
 	src/Conditions/QuestStageDone/QuestStageDoneCondition.cpp
 	src/Conditions/SkillLevel/SkillLevelCondition.cpp
 	src/Conditions/SpellLearned/SpellLearnedCondition.cpp
+	src/Conditions/ShoutLearned/ShoutLearnedCondition.cpp
 	src/CustomRE.cpp
 	src/EventProcessor.cpp
 	src/LocalizationManager.cpp

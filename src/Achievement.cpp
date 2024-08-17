@@ -26,6 +26,7 @@
 #include "Conditions/GlobalVariableState/GlobalVariableStateCondition.h"
 #include "Conditions/BaseActorDeath/BaseActorDeathCondition.h"
 #include "Conditions/SpellLearned/SpellLearnedCondition.h"
+#include "Conditions/ShoutLearned/ShoutLearnedCondition.h"
 #include "Conditions/DungeonCleared/DungeonClearedCondition.h"
 
 Achievement::Achievement(json& jsonData, std::string plugin, std::string groupName)
@@ -134,6 +135,11 @@ Achievement::Achievement(json& jsonData, std::string plugin, std::string groupNa
             DungeonClearedConditionFactory* dungeonClearedConditionFactory = new DungeonClearedConditionFactory();
             a_condition = dungeonClearedConditionFactory->createCondition();
             a_condition->SetConditionParameters(condition["formID"].get<std::string>());
+        }
+        else if (type == "ShoutLearned") {
+            ShoutLearnedConditionFactory* shoutLearnedConditionFactory = new ShoutLearnedConditionFactory();
+            a_condition = shoutLearnedConditionFactory->createCondition();
+            a_condition->SetConditionParameters(condition["formID"].get<std::string>(), condition["words"].get<int>());
         }
         else {
             logger::warn("Unknown condition type {} in {}.", type, this->achievementName);

@@ -30,7 +30,7 @@ enum ConditionType {
 	DragonSoulAbsorbed, // Done
 	FirstEnterCell, // Done
 	BookRead, // Done
-	PowerLearned, 
+	ShoutLearned, 
 	GlobalVariableState, // Done
 	QueryStatValue, // Done
 	ActorDeath, // Done

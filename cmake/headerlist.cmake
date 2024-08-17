@@ -23,6 +23,7 @@ set(headers ${headers}
 	src/Conditions/QuestStageDone/QuestStageDoneCondition.h
 	src/Conditions/SkillLevel/SkillLevelCondition.h
 	src/Conditions/SpellLearned/SpellLearnedCondition.h
+	src/Conditions/ShoutLearned/ShoutLearnedCondition.cpp
 	src/ConditionsJoinType.h
 	src/CustomRE.h
 	src/EventProcessor.h

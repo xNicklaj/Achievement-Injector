@@ -11,7 +11,6 @@ void DungeonClearedCondition::OnDataLoaded(void) {
 void DungeonClearedCondition::EnableListener() {
     RegisterPostLoadFunction(this);
     RE::ScriptEventSourceHolder::GetSingleton()->AddEventSink(this);
-    logger::debug("Registered AAAA");
 }
 void DungeonClearedCondition::SetConditionParameters(std::string formid) {
     this->formid = formid;
