@@ -931,11 +931,259 @@
         },
         {
             "achievementName": "Words of Power",
-            "description": "Learn all three words of a shout"
+            "description": "Learn all three words of a shout",
+            "joinType": "OR",
+            "conditions": [
+                {
+                    "type": "ShoutLearned",
+                    "formID": "05FC77",
+                    "words": 3
+                },
+                {
+                    "type": "ShoutLearned",
+                    "formID": "07097B",
+                    "words": 3
+                },
+                {
+                    "type": "ShoutLearned",
+                    "formID": "032920",
+                    "words": 3
+                },
+                {
+                    "type": "ShoutLearned",
+                    "formID": "046B8C",
+                    "words": 3
+                },
+                {
+                    "type": "ShoutLearned",
+                    "formID": "05196A",
+                    "words": 3
+                },
+                {
+                    "type": "ShoutLearned",
+                    "formID": "03CD34",
+                    "words": 3
+                },
+                {
+                    "type": "ShoutLearned",
+                    "formID": "070981",
+                    "words": 3
+                },
+                {
+                    "type": "ShoutLearned",
+                    "formID": "02395A",
+                    "words": 3
+                },
+                {
+                    "type": "ShoutLearned",
+                    "formID": "044250",
+                    "words": 3
+                },
+                {
+                    "type": "ShoutLearned",
+                    "formID": "032921",
+                    "words": 3
+                },
+                {
+                    "type": "ShoutLearned",
+                    "formID": "03F9EA",
+                    "words": 3
+                },
+                {
+                    "type": "ShoutLearned",
+                    "formID": "05D16B",
+                    "words": 3
+                },
+                {
+                    "type": "ShoutLearned",
+                    "formID": "070980",
+                    "words": 3
+                },
+                {
+                    "type": "ShoutLearned",
+                    "formID": "07097E",
+                    "words": 3
+                },
+                {
+                    "type": "ShoutLearned",
+                    "formID": "07097C",
+                    "words": 3
+                },
+                {
+                    "type": "ShoutLearned",
+                    "formID": "048AC9",
+                    "words": 3
+                },
+                {
+                    "type": "ShoutLearned",
+                    "formID": "07097D",
+                    "words": 3
+                },
+                {
+                    "type": "ShoutLearned",
+                    "formID": "07097F",
+                    "words": 3
+                },
+                {
+                    "type": "ShoutLearned",
+                    "formID": "013E07",
+                    "words": 3
+                },
+                {
+                    "type": "ShoutLearned",
+                    "formID": "02F7BA",
+                    "words": 3
+                },
+                {
+                    "type": "ShoutLearned",
+                    "formID": "008A62",
+                    "words": 3,
+                    "pluginOverride": "Dawnguard.esm"
+                },
+                {
+                    "type": "ShoutLearned",
+                    "formID": "007CB6",
+                    "words": 3,
+                    "pluginOverride": "Dawnguard.esm"
+                },
+                {
+                    "type": "ShoutLearned",
+                    "formID": "0030D2",
+                    "words": 3,
+                    "pluginOverride": "Dawnguard.esm"
+                },
+                {
+                    "type": "ShoutLearned",
+                    "formID": "02AD09",
+                    "words": 3,
+                    "pluginOverride": "Dragonborn.esm"
+                },
+                {
+                    "type": "ShoutLearned",
+                    "formID": "0179D8",
+                    "words": 3,
+                    "pluginOverride": "Dragonborn.esm"
+                },
+                {
+                    "type": "ShoutLearned",
+                    "formID": "0200C0",
+                    "words": 3,
+                    "pluginOverride": "Dragonborn.esm"
+                },
+                {
+                    "type": "ShoutLearned",
+                    "formID": "01DF92",
+                    "words": 3,
+                    "pluginOverride": "Dragonborn.esm"
+                }
+            ]
         },
         {
             "achievementName": "Thu'um Master",
-            "description": "Learn 20 shouts"
+            "description": "Learn 20 shouts",
+            "joinCondition": "AND",
+            "conditions": [
+                {
+                    "type": "ShoutLearned",
+                    "formID": "05FC77",
+                    "words": 3
+                },
+                {
+                    "type": "ShoutLearned",
+                    "formID": "07097B",
+                    "words": 3
+                },
+                {
+                    "type": "ShoutLearned",
+                    "formID": "032920",
+                    "words": 3
+                },
+                {
+                    "type": "ShoutLearned",
+                    "formID": "046B8C",
+                    "words": 3
+                },
+                {
+                    "type": "ShoutLearned",
+                    "formID": "05196A",
+                    "words": 3
+                },
+                {
+                    "type": "ShoutLearned",
+                    "formID": "03CD34",
+                    "words": 3
+                },
+                {
+                    "type": "ShoutLearned",
+                    "formID": "070981",
+                    "words": 3
+                },
+                {
+                    "type": "ShoutLearned",
+                    "formID": "02395A",
+                    "words": 3
+                },
+                {
+                    "type": "ShoutLearned",
+                    "formID": "044250",
+                    "words": 3
+                },
+                {
+                    "type": "ShoutLearned",
+                    "formID": "032921",
+                    "words": 3
+                },
+                {
+                    "type": "ShoutLearned",
+                    "formID": "03F9EA",
+                    "words": 3
+                },
+                {
+                    "type": "ShoutLearned",
+                    "formID": "05D16B",
+                    "words": 3
+                },
+                {
+                    "type": "ShoutLearned",
+                    "formID": "070980",
+                    "words": 3
+                },
+                {
+                    "type": "ShoutLearned",
+                    "formID": "07097E",
+                    "words": 3
+                },
+                {
+                    "type": "ShoutLearned",
+                    "formID": "07097C",
+                    "words": 3
+                },
+                {
+                    "type": "ShoutLearned",
+                    "formID": "048AC9",
+                    "words": 3
+                },
+                {
+                    "type": "ShoutLearned",
+                    "formID": "07097D",
+                    "words": 3
+                },
+                {
+                    "type": "ShoutLearned",
+                    "formID": "07097F",
+                    "words": 3
+                },
+                {
+                    "type": "ShoutLearned",
+                    "formID": "013E07",
+                    "words": 3
+                },
+                {
+                    "type": "ShoutLearned",
+                    "formID": "02F7BA",
+                    "words": 3
+                }
+            ]
         },
         {
             "achievementName": "Apprentice",

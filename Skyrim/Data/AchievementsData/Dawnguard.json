@@ -49,7 +49,13 @@
         {
             "achievementName": "Soul Tear",
             "description": "Learn all three words of Soul Tear",
-            "conditions": []
+            "conditions": [
+                {
+                    "type": "ShoutLearned",
+                    "formID": "007CB6",
+                    "words": 3
+                }
+            ]
         },
         {
             "achievementName": "Auriel's Bow",

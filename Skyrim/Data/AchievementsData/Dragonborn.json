@@ -82,6 +82,11 @@
             "achievementName": "Dragon Aspect",
             "description": "Learn all 3 words of Dragon Aspect",
             "conditions": [
+                {
+                    "type": "ShoutLearned",
+                    "formID": "01DF92",
+                    "words": 3
+                }
             ]
         },
         {
@@ -169,6 +174,7 @@
             "achievementName": "Dragonrider",
             "description": "Tame and ride 5 dragons",
             "conditions": [
+
             ]
         },
         {
@@ -186,12 +192,7 @@
             "achievementName": "Solstheim Explorer",
             "description": "Discover 30 locations on the island of Solstheim",
             "conditions": [
-                {
-                    "type": "LocationDiscover",
-                    "locationID": "*",
-                    "restrict": "TODO: Solstheim",
-                    "quantity": 30
-                }
+
             ]
         }
     ]
