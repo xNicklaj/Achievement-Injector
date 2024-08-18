@@ -20,12 +20,12 @@
 			"conditions": [
 				{
 					"type": "BaseActorDeath",
-					"formid": "00434B",
+					"formID": "00434B",
 					"quantity": 1
 				},
 				{
 					"type": "BaseActorDeath",
-					"formid": "00434E",
+					"formID": "00434E",
 					"quantity": 1
 				}
 			]
@@ -37,27 +37,27 @@
 			"conditions": [
 				{
 					"type": "BaseActorDeath",
-					"formid": "004349",
+					"formID": "004349",
 					"quantity": 1
 				},
 				{
 					"type": "BaseActorDeath",
-					"formid": "000D62",
+					"formID": "000D62",
 					"quantity": 1
 				},
 				{
 					"type": "BaseActorDeath",
-					"formid": "00434A",
+					"formID": "00434A",
 					"quantity": 1
 				},
 				{
 					"type": "BaseActorDeath",
-					"formid": "0012C6",
+					"formID": "0012C6",
 					"quantity": 1
 				},
 				{
 					"type": "BaseActorDeath",
-					"formid": "0012C5",
+					"formID": "0012C5",
 					"quantity": 1
 				}
 			]
