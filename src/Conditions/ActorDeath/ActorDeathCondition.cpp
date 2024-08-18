@@ -27,7 +27,7 @@ bool ActorDeathCondition::CheckCondition(RE::FormID formid) {
 RE::BSEventNotifyControl ActorDeathCondition::ProcessEvent(const RE::TESDeathEvent* a_event, RE::BSTEventSource<RE::TESDeathEvent>*) {
 	// 013BB9
 	auto* target = GetForm(this->formID, this->plugin);
-	
+
 	if (target == NULL) {
 		logger::error("Form {} not found.", this->formID);
 		return RE::BSEventNotifyControl::kContinue;

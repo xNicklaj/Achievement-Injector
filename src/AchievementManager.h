@@ -11,12 +11,6 @@ struct AchievementFile {
 	json FileData;
 };
 
-struct AchievementGroupScaleformObject {
-	std::string name;
-	std::string iconPath;
-	std::vector<ScaleformAchievementObject> achievements;
-};
-
 class AchievementGroup
 {
 public:
@@ -24,8 +18,8 @@ public:
 	std::string plugin;
 	std::vector<Achievement*> achievements;
 
-	AchievementGroupScaleformObject GetScaleformObject();
 	AchievementGroup(std::string name, std::string plugin) : name(name), plugin(plugin) {}
+	void ToGFxValue(RE::GFxValue* gfxValue);
 };
 
 class AchievementManager : public ISingleton<AchievementManager> {

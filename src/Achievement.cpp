@@ -262,7 +262,16 @@ void Achievement::Localize() {
         this->description = LocalizationManager::GetSingleton()->GetLocalizedText(this->groupName, LocalizationManager::GetSingleton()->CurrentLocale(), description);
 }
 
-ScaleformAchievementObject Achievement::GetScaleformObject() {
-    auto datetime = Serializer::GetSingleton()->DeserializeAchievementData(this->achievementName).unlockDatetime;
-    return ScaleformAchievementObject{ this->achievementName, this->description, datetime };
+void Achievement::ToGFxValue(RE::GFxValue* gfxValue) {
+    // Create GFxValues for each member
+    RE::GFxValue nameVal, descriptionVal, unlockDatetimeVal;
+
+    nameVal.SetString(this->achievementName.c_str());               // GFxValue for name
+    descriptionVal.SetString(this->description.c_str()); // GFxValue for description
+    unlockDatetimeVal.SetNumber(static_cast<double>(Serializer::GetSingleton()->DeserializeAchievementData(this->achievementName).unlockDatetime)); // GFxValue for unlockDatetime
+
+    // Add these values to the gfxValue object
+    gfxValue->SetMember("name", &nameVal);
+    gfxValue->SetMember("description", &descriptionVal);
+    gfxValue->SetMember("unlockDatetime", &unlockDatetimeVal);
 }

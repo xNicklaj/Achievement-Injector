@@ -68,22 +68,19 @@ namespace Scaleform {
     }
 
     void AchievementMenu::UpdateAchievementList() {
-        std::vector<AchievementGroupScaleformObject> achievements;
-        for (AchievementGroup ag : AchievementManager::GetSingleton()->achievementGroups) {
-			AchievementGroupScaleformObject agso = ag.GetScaleformObject();
-			if (agso.achievements.size() > 0) {
-				achievements.push_back(agso);
-			}
-		}
-
         auto ui = RE::UI::GetSingleton();
         RE::GFxValue widget;
+        // Check if menu is found
         if (ui->GetMenu(AchievementMenu::MENU_NAME)->uiMovie->GetVariable(&widget, "_root.AchievementMenu_mc")) {
             std::array<RE::GFxValue, 1> functionArgs;
-            //functionArgs[0] = achievements;
-            // logger::debug("Invoking ActionScript with parameters ({}, {})", name, description);
+            functionArgs[0] = RE::GFxValue(); // This will be an implicit array
+            // Loop through all achievement groups and push them to the function arguments
+            for (auto& achievementGroup : AchievementManager::GetSingleton()->achievementGroups) {
+                RE::GFxValue gfxAchievementGroup;
+                achievementGroup.ToGFxValue(&gfxAchievementGroup);
+                functionArgs[0].PushBack(&gfxAchievementGroup);
+            }
             widget.Invoke("UpdateAchievementList", nullptr, functionArgs.data(), functionArgs.size());
-            // logger::debug("Sound: {}, override: {}", sound, Settings::GetSingleton()->GetOverrideNotificationSound());
         }
     }
 }

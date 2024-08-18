@@ -26,12 +26,11 @@ bool BaseActorDeathCondition::CheckCondition() {
 	return false;
 };
 RE::BSEventNotifyControl BaseActorDeathCondition::ProcessEvent(const RE::TESDeathEvent* a_event, RE::BSTEventSource<RE::TESDeathEvent>*) {
-	
 	if (!this->isFormID && a_event->actorDying->GetName() == this->identifier && a_event->dead) {
 		currQuantity++;
 	}
 	else {
-		auto* target = GetForm(this->identifier, this->plugin);
+		RE::TESNPC* target = static_cast<RE::TESNPC*>(GetForm(this->identifier, this->plugin));
 		if (target == NULL) {
 			logger::error("Form {} not found.", this->identifier);
 			return RE::BSEventNotifyControl::kContinue;

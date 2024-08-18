@@ -17,12 +17,6 @@ namespace logger = SKSE::log;
 
 using json = nlohmann::json;
 
-struct ScaleformAchievementObject {
-    std::string name;
-    std::string description;
-    long long unlockDatetime;
-};
-
 class Achievement : Runnable {
 public:
     // Constructor that initializes the Achievement from a JSON object
@@ -31,8 +25,8 @@ public:
     void OnConditionMet(void);
     void OnSerializationRequested(void);
     std::vector<int> GetConditionsState(void);
-    ScaleformAchievementObject GetScaleformObject();
     void Localize();
+    void ToGFxValue(RE::GFxValue* gfxValue);
 
     eventpp::EventDispatcher<std::string, void()> eventHandler;
     std::string achievementName;

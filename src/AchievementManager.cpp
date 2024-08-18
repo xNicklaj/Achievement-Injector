@@ -1,9 +1,16 @@
 #include "AchievementManager.h"
 
-AchievementGroupScaleformObject AchievementGroup::GetScaleformObject() {
-	std::vector<ScaleformAchievementObject> achievements;
-	for (Achievement* achievement : this->achievements) {
-		achievements.push_back(achievement->GetScaleformObject());
-	}
-	return AchievementGroupScaleformObject{name, "", achievements};
+
+void AchievementGroup::ToGFxValue(RE::GFxValue* gfxValue) {
+
+    RE::GFxValue gfxName;
+    gfxValue->SetMember("name", gfxName);
+
+    RE::GFxValue gfxAchievements;
+    for (const auto& achievement : this->achievements) {
+        RE::GFxValue gfxAchievement;
+        achievement->ToGFxValue(&gfxAchievement);
+        gfxAchievements.PushBack(&gfxAchievement);
+    }
+    gfxValue->SetMember("achievements", gfxAchievements);
 }
