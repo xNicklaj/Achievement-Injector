@@ -81,10 +81,8 @@ void MessageHandler(SKSE::MessagingInterface::Message* a_msg)
 		}
 		EventProcessor::GetSingleton()->Register();
 		Scaleform::AchievementWidget::Register();
-		Scaleform::AchievementWidget::Show();
-
+		Scaleform::AchievementMenuInjector::Register();
 		Scaleform::AchievementMenu::Register();
-		Scaleform::AchievementMenu::Show();
 		break;
 	case SKSE::MessagingInterface::kPostLoad:
 		break;
