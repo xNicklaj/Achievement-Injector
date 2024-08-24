@@ -23,7 +23,7 @@ namespace Scaleform {
 
         inputContext = Context::kMenuMode;
         depthPriority = 3;
-        RE::UIBlurManager::GetSingleton()->blurCount = 0;
+        //RE::UIBlurManager::GetSingleton()->blurCount = 0;
         menuFlags.set(RE::UI_MENU_FLAGS::kPausesGame, RE::UI_MENU_FLAGS::kDisablePauseMenu,
              RE::UI_MENU_FLAGS::kModal,
             RE::UI_MENU_FLAGS::kUsesMenuContext, RE::UI_MENU_FLAGS::kTopmostRenderedMenu,
@@ -67,7 +67,7 @@ namespace Scaleform {
         if (uiMessageQueue) {
             uiMessageQueue->AddMessage(AchievementMenu::MENU_NAME, RE::UI_MESSAGE_TYPE::kHide, nullptr);
             RE::UIBlurManager::GetSingleton()->DecrementBlurCount();
-            RE::UIBlurManager::GetSingleton()->blurCount = 0;
+            //RE::UIBlurManager::GetSingleton()->blurCount = 0;
         }
     }
 
@@ -112,16 +112,6 @@ namespace Scaleform {
             if (a_event->menuName == Scaleform::AchievementMenu::MENU_NAME) {
                 auto* ui = RE::UI::GetSingleton();
                 if (ui != nullptr && ui->GetMenu(Scaleform::AchievementMenu::MENU_NAME) != nullptr) {
-                    logger::debug("Eureka!");
-                    std::string filePath = "Data/SampleGroups.json";
-                    std::ifstream fileStream(filePath);
-                    if (!fileStream.is_open()) {
-                        throw std::runtime_error("Could not open file: " + filePath);
-                    }
-
-
-                    std::stringstream buffer;
-                    buffer << fileStream.rdbuf();
                     AchievementMenu::UpdateAchievementList(AchievementManager::GetSingleton()->ToJson().dump());
                 }
             }

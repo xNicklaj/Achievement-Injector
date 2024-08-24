@@ -50,7 +50,7 @@ void ReadAchievementFiles(std::vector<AchievementFile>* achievementFiles) {
 				else
 					achievementFile.iconPath = "Default.dds";
 				achievementFile.plugin = tmp["plugin"];
-				(*achievementFiles).push_back(achievementFile);//
+				(*achievementFiles).push_back(achievementFile);
 			}
 		}
 		else {

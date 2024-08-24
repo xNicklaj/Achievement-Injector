@@ -21,7 +21,7 @@ namespace Scaleform {
         inputContext = Context::kNone;
         depthPriority = 0;
         menuFlags.set(RE::UI_MENU_FLAGS::kAllowSaving, RE::UI_MENU_FLAGS::kCustomRendering,
-            RE::UI_MENU_FLAGS::kAssignCursorToRenderer);
+            RE::UI_MENU_FLAGS::kAssignCursorToRenderer, RE::UI_MENU_FLAGS::kTopmostRenderedMenu);
     }
 
     void AchievementWidget::Register() {
