@@ -67,7 +67,7 @@ class AchievementMenu extends MovieClip {
     }
 
     function closeMenu() {
-        skse.SendModEvent( 'AchievementMenu_Close' );
+        skse.CloseMenu('CustomMenu');
     }
 
     function setFocusTo(nextIndex:Number) {

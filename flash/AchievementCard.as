@@ -15,7 +15,7 @@
         if ( data.Unlocked === true ) {
             var date:Date = new Date(data.UnlockDatetime),
                 unlockText = AchievementUtils.get_i18n('$ACH_UNLOCK'),
-                day = date.getDay(),
+                day = date.getDate(),
                 hour = date.getHours(),
                 minutes = date.getMinutes();
             if ( day < 10 ) {
