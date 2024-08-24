@@ -41,7 +41,7 @@ class AchievementMenu extends MovieClip {
     }
 
     function loadGroup(index) {
-        heading_tf.text = data[ index ].groupName;
+        AchievementUtils.setText( heading_tf, data[ index ].groupName );
         AchievementList_mc.render( index );
         calculateProgress( index );
     }
@@ -59,7 +59,7 @@ class AchievementMenu extends MovieClip {
         progressText = AchievementUtils.str_replace( '<completed>', completed, progressText );
         progressText = AchievementUtils.str_replace( '<all>', achievements.length, progressText );
         progressText = AchievementUtils.str_replace( '<percent>', percent, progressText );
-        progress_tf.text = progressText;
+        AchievementUtils.setText( progress_tf, progressText );
     }
 
     function getAchievements( index:Number ) {

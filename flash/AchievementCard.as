@@ -11,7 +11,7 @@
     }
 
     function setData( data:Object ) {
-        title_tf.text = data.AchievementName;
+        AchievementUtils.setText( title_tf, data.AchievementName );
         if ( data.Unlocked === true ) {
             var date:Date = new Date(data.UnlockDatetime),
                 unlockText = AchievementUtils.get_i18n('$ACH_UNLOCK'),
@@ -32,11 +32,11 @@
             unlockText = AchievementUtils.str_replace( '<year>', date.getFullYear(), unlockText );
             unlockText = AchievementUtils.str_replace( '<hour>', hour, unlockText );
             unlockText = AchievementUtils.str_replace( '<minute>', minutes, unlockText );
-            date_tf.text = unlockText;
+            AchievementUtils.setText( date_tf, unlockText );
         } else {
-            date_tf.text = '$ACH_LOCKED';
+            AchievementUtils.setText( date_tf, '$ACH_LOCKED' );
         }
-        desc_tf.text = data.Description;
+        AchievementUtils.setText( desc_tf, data.Description );
     }
 
     function onRelease() {

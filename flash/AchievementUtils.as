@@ -26,4 +26,11 @@ class AchievementUtils {
 
         return temp + subject.substring(startIndex);
     }
+
+    public static function setText( input:TextField, text:String ) {
+        var textFormat:TextFormat = input.getTextFormat();
+        textFormat.font = '$EverywhereMediumFont';
+        input.text = text;
+        input.setTextFormat( textFormat );
+    }
 }

@@ -18,7 +18,7 @@
         title_tf.background = true;
         title_tf.backgroundColor = 0x000000;
         title_tf.autoSize = 'left';
-        title_tf.text = title;
+        AchievementUtils.setText( title_tf, title );
         imagePlaceholder_mc.loadMovie( "../AchievementsData/Icons/" + imagePath );
         index = a_index;
         Menu_mc = a_Menu_mc;
