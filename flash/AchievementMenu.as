@@ -22,7 +22,7 @@ class AchievementMenu extends MovieClip {
     }
 
 	function InitExtensions(): Void {
-        skse.SendModEvent( 'AchievementMenu_Init' ); /* signal we're ready to load */
+        skse.SendModEvent( 'AchievementMenu_Init', '', 0, 0 ); /* signal we're ready to load */
 	}
 
 	function SetPlatform(aiPlatformIndex: Number, abPS3Switch: Boolean): Void {
@@ -67,7 +67,7 @@ class AchievementMenu extends MovieClip {
     }
 
     function closeMenu() {
-        skse.CloseMenu('CustomMenu');
+        skse.SendModEvent( 'AchievementMenu_Close', '', 0, 0 );
     }
 
     function setFocusTo(nextIndex:Number) {
