@@ -1,6 +1,7 @@
 {
     "groupName": "Skyrim",
     "plugin": "Skyrim.esm",
+    "iconPath": "SkyrimSE.dds",
     "achievements": [
         {
             "achievementName": "Unbound",
@@ -225,7 +226,7 @@
         {
             "achievementName": "Taking Sides",
             "description": "Join the Stormcloaks or the Imperial Army",
-            "joinType":  "OR",
+            "joinType": "OR",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -510,12 +511,12 @@
         {
             "achievementName": "Wanted",
             "description": "Escape from jail",
-            "conditions":  [
+            "conditions": [
                 {
                     "type": "QuestStageDone",
                     "formID": "0FCC2F",
                     "stage": 10,
-                    "OP":  "GT"
+                    "OP": "GT"
                 }
             ]
         },

@@ -27,6 +27,7 @@ public:
     std::vector<int> GetConditionsState(void);
     void Localize();
     void ToGFxValue(RE::GFxValue* gfxValue);
+    json ToJson();
 
     eventpp::EventDispatcher<std::string, void()> eventHandler;
     std::string achievementName;

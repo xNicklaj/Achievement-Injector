@@ -1,5 +1,5 @@
-#ifndef BESTIARY_MENU_H
-#define BESTIARY_MENU_H
+#ifndef ACHIEVEMENT_MENU_H
+#define ACHIEVEMENT_MENU_H
 
 #include "PCH.h"
 #include "RE/Skyrim.h"
@@ -11,7 +11,7 @@
 
 namespace Scaleform {
 
-    class AchievementMenu : RE::IMenu, public RE::BSTEventSink<SKSE::ModCallbackEvent> {
+    class AchievementMenu : RE::IMenu, public RE::BSTEventSink<SKSE::ModCallbackEvent>, public RE::BSTEventSink<RE::MenuOpenCloseEvent>, public RE::BSTEventSink<RE::InputEvent*> {
     public:
         static constexpr const char* MENU_PATH = "achievementmenu";
         static constexpr const char* MENU_NAME = "AchievementMenu";
@@ -25,6 +25,8 @@ namespace Scaleform {
         static void UpdateAchievementList(std::string data);
 
         virtual RE::BSEventNotifyControl ProcessEvent(const SKSE::ModCallbackEvent* a_event, RE::BSTEventSource<SKSE::ModCallbackEvent>* a_eventSource);
+        virtual RE::BSEventNotifyControl ProcessEvent(const RE::MenuOpenCloseEvent* a_event, RE::BSTEventSource<RE::MenuOpenCloseEvent>* a_eventSource);
+        virtual RE::BSEventNotifyControl ProcessEvent(RE::InputEvent* const* a_event, RE::BSTEventSource<RE::InputEvent*>* a_eventSource);
 
         static constexpr std::string_view Name();
 
@@ -53,4 +55,4 @@ namespace Scaleform {
 
 }
 
-#endif  // BESTIARY_MENU_H
+#endif  // ACHIEVEMENT_MENU_H

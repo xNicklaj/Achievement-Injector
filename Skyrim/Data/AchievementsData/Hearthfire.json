@@ -1,6 +1,7 @@
 {
     "groupName": "Hearthfire",
     "plugin": "HearthFires.esm",
+    "iconPath": "1.dds",
     "achievements": [
         {
             "achievementName": "Proud Parent",

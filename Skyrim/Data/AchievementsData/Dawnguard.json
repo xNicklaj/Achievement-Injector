@@ -1,6 +1,7 @@
 {
     "groupName": "Dawnguard",
     "plugin": "Dawnguard.esm",
+    "iconPath": "1.dds",
     "achievements": [
         {
             "achievementName": "Awakening",

@@ -7,7 +7,7 @@
 
 #include "Utility.h"
 
-class EventProcessor : public RE::BSTEventSink<RE::MenuOpenCloseEvent>{
+class EventProcessor : public RE::BSTEventSink<RE::MenuOpenCloseEvent>, public RE::BSTEventSink<RE::InputEvent*>{
 public:
     static EventProcessor* GetSingleton() {
         static EventProcessor instance;
@@ -17,6 +17,8 @@ public:
     void Register();
     RE::BSEventNotifyControl ProcessEvent(const RE::MenuOpenCloseEvent* event,
                                           RE::BSTEventSource<RE::MenuOpenCloseEvent>*) override;
+    RE::BSEventNotifyControl ProcessEvent(RE::InputEvent* const* a_event, 
+                                                 RE::BSTEventSource<RE::InputEvent*>*) override;
 };
 
 #endif  // EVENT_PROCESSOR_H

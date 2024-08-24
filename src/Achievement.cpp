@@ -275,3 +275,12 @@ void Achievement::ToGFxValue(RE::GFxValue* gfxValue) {
     gfxValue->SetMember("description", &descriptionVal);
     gfxValue->SetMember("unlockDatetime", &unlockDatetimeVal);
 }
+
+json Achievement::ToJson() {
+    json data = json::object();
+    data["AchievementName"] = this->achievementName;
+    data["Description"] = this->description;
+    data["UnlockDatetime"] = Serializer::GetSingleton()->DeserializeAchievementData(this->achievementName).unlockDatetime;
+    data["Unlocked"] = this->unlocked;
+    return data;
+}

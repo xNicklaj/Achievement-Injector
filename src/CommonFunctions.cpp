@@ -2,6 +2,7 @@
 #include "CommonFunctions.h"
 #include "Singleton.h"
 #include "Papyrus.h"
+#include "KeyMapping.h"
 #include <string>
 #include <cctype>
 

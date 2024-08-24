@@ -1,6 +1,7 @@
 {
 	"groupName": "The Sinister Seven",
 	"plugin": "The_Sinister_Seven.esp",
+	"iconPath": "1.dds",
 	"achievements": [
 		{
 			"achievementName": "The last one standing",

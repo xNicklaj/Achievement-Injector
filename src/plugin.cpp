@@ -43,12 +43,18 @@ void ReadAchievementFiles(std::vector<AchievementFile>* achievementFiles) {
 				achievementFile.FileData = tmp["achievements"];
 				achievementFile.groupName = tmp["groupName"];
 				achievementFile.path = entry.path().filename().string();
+				std::string iconPath = StripExtension(entry.path().filename().string()) + ".dds";
+				std::ifstream file("Data/AchievementsData/Icons/"+iconPath);
+				if(file.good())
+					achievementFile.iconPath = iconPath;
+				else
+					achievementFile.iconPath = "Default.dds";
 				achievementFile.plugin = tmp["plugin"];
-				(*achievementFiles).push_back(achievementFile);
+				(*achievementFiles).push_back(achievementFile);//
 			}
 		}
 		else {
-			logger::error("Path does not exist or is not a directory.");
+			logger::error("Path does not exist or is not a directory."); 
 		}
 	}
 	catch (const fs::filesystem_error& e) {
@@ -69,7 +75,7 @@ void MessageHandler(SKSE::MessagingInterface::Message* a_msg)
 	case SKSE::MessagingInterface::kDataLoaded:
 		ReadAchievementFiles(&(AchievementManager::GetSingleton()->achievementFiles));
 		for (auto& achievementFile : (AchievementManager::GetSingleton()->achievementFiles)) {
-			AchievementGroup ag(achievementFile.groupName, achievementFile.plugin);
+			AchievementGroup ag(achievementFile.groupName, achievementFile.plugin, achievementFile.iconPath);
 			for (json achievement : achievementFile.FileData) {
 				ag.achievements.push_back(new Achievement(achievement, ag.plugin, StripExtension(achievementFile.path)));
 			}

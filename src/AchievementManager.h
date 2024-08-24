@@ -8,6 +8,7 @@ struct AchievementFile {
 	std::string groupName;
 	std::string plugin;
 	std::string path;
+	std::string iconPath;
 	json FileData;
 };
 
@@ -17,9 +18,12 @@ public:
 	std::string name;
 	std::string plugin;
 	std::vector<Achievement*> achievements;
+	std::string iconPath = "";
 
 	AchievementGroup(std::string name, std::string plugin) : name(name), plugin(plugin) {}
+	AchievementGroup(std::string name, std::string plugin, std::string iconPath) : name(name), plugin(plugin), iconPath(iconPath) {}
 	void ToGFxValue(RE::GFxValue* gfxValue);
+	json ToJson();
 };
 
 class AchievementManager : public ISingleton<AchievementManager> {
@@ -27,4 +31,6 @@ public:
 	std::vector<AchievementFile> achievementFiles;
 	std::vector<AchievementGroup> achievementGroups;
 	std::string lastUsedPlayerName = "";
+
+	json ToJson();
 };
