@@ -49,11 +49,12 @@
         currentIndex = index;
         scrollEnabled = list[ index ]._height > ListMask_mc._height;
 
-        scrollbar._visible = scrollEnabled;
+        scrollbar.thumb.visible = scrollEnabled;
+        scrollbar.track.disabled = scrollEnabled;
         if ( scrollEnabled ) {
             scrollbar.position = 0;
             scrollbar.height = ListMask_mc._height + 25;
-            maxScroll = AchievementCardHolder_mc._height - ListMask_mc._height;
+            maxScroll = list[ index ]._height - ListMask_mc._height;
             scrollbar.setScrollProperties( 0, 0, maxScroll );
         }
     }
@@ -64,7 +65,7 @@
 
     function onMouseWheelCallback(delta) {
         if ( scrollEnabled ) {
-            var value = AchievementCardHolder_mc._y + 20 * delta;
+            var value = AchievementCardHolder_mc._y + 15 * ( delta * 2 );
             value = clampValue( value, maxScroll * -1, 0 );
             scrollbar.position = value * -1;
         }
