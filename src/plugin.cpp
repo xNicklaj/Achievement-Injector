@@ -89,6 +89,7 @@ void MessageHandler(SKSE::MessagingInterface::Message* a_msg)
 		Scaleform::AchievementWidget::Register();
 		Scaleform::AchievementMenuInjector::Register();
 		Scaleform::AchievementMenu::Register();
+		Serializer::GetSingleton()->CreateFileIfNotExists();
 		break;
 	case SKSE::MessagingInterface::kPostLoad:
 		break;
@@ -116,8 +117,6 @@ void MessageHandler(SKSE::MessagingInterface::Message* a_msg)
 
 		Scaleform::AchievementWidget::Show();
         break;
-	case SKSE::MessagingInterface::kNewGame:
-		break;
 	case SKSE::MessagingInterface::kSaveGame:
 		Scaleform::AchievementWidget::Show();
 		break;

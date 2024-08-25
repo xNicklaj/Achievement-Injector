@@ -2,6 +2,15 @@
 #include "AchievementMenu.h"
 
 
+AchievementGroup::AchievementGroup(std::string name, std::string plugin, std::string iconPath) : name(name), plugin(plugin), iconPath(iconPath) {
+    if (name == "Skyrim") 
+        this->priority = 0;
+    else if(name == "Dawnguard" || name == "Hearthfire" || name == "Dragonborn") 
+		this->priority = 1;
+    else
+        this->priority = 2;
+}
+
 void AchievementGroup::ToGFxValue(RE::GFxValue* gfxValue) {
 
     RE::GFxValue gfxName;
@@ -36,6 +45,11 @@ json AchievementGroup::ToJson() {
 
 json AchievementManager::ToJson() {
     json data = json::array();
+
+    std::sort(this->achievementGroups.begin(), this->achievementGroups.end(), [](const AchievementGroup& a, const AchievementGroup& b) {
+        return a.priority < b.priority;
+    });
+
     for(auto& achievementGroup : this->achievementGroups) {
 		data.push_back(achievementGroup.ToJson());
 	}

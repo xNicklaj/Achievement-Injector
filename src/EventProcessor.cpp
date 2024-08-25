@@ -45,6 +45,11 @@ RE::BSEventNotifyControl EventProcessor::ProcessEvent(RE::InputEvent* const* a_e
     return RE::BSEventNotifyControl::kContinue;
 }
 
+RE::BSEventNotifyControl EventProcessor::ProcessEvent(RE::BGSActorCellEvent const* a_event,
+    RE::BSTEventSource<RE::BGSActorCellEvent>*) {
+    return  RE::BSEventNotifyControl::kContinue;
+}
+
 void EventProcessor::Register() {
     auto ui = RE::UI::GetSingleton();
     EventProcessor *eventProcessor = EventProcessor::GetSingleton();

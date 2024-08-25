@@ -27,7 +27,7 @@ std::string Serializer::GetFilename(bool useGlobal) const {
 	std::string fileName;
 
 	// Get final configuration path
-	if (!Settings::GetSingleton()->GetGlobal() && !useGlobal) {
+	if (!useGlobal) {
 		// Get player name
 		std::string playerName = RE::PlayerCharacter::GetSingleton()->GetName();
 		std::transform(playerName.begin(), playerName.end(), playerName.begin(), [](unsigned char c) { return std::toupper(c); });
@@ -40,7 +40,7 @@ std::string Serializer::GetFilename(bool useGlobal) const {
 
 void Serializer::SerializeAchievementData(Achievement* achievement) {
 	SerializeAchievementData_GLOBAL(achievement);
-	if (GetFilename() == "GLOBAL") {
+	if (Settings::GetSingleton()->GetGlobal()) {
 		return;
 	}
 
@@ -113,14 +113,14 @@ void Serializer::SerializeAchievementData_GLOBAL(Achievement* achievement) {
 
 struct SerializedAchievement Serializer::DeserializeAchievementData(std::string name) {
 	
-	if (GetFilename() == "GLOBAL") {
+	if (Settings::GetSingleton()->GetGlobal()) {
 		return DeserializeAchievementData_GLOBAL(name);
 	}
 	else
 		DeserializeAchievementData_GLOBAL(name);
 
 	try {
-		std::ifstream inFile(GetFilename());
+		std::ifstream inFile(GetFilename(false));
 		inFile >> jsonData;
 		inFile.close();
 	}
@@ -164,7 +164,7 @@ struct SerializedAchievement Serializer::DeserializeAchievementData_GLOBAL(std::
 }
 
 void Serializer::Save() {
-	std::string filename = this->GetFilename();
+	std::string filename = this->GetFilename(false);
 	try {
 		std::ofstream outFile(filename);
 		outFile << jsonData.dump(4);
@@ -187,7 +187,7 @@ void Serializer::Save_GLOBAL() {
 }
 
 void Serializer::CreateFileIfNotExists() {
-	std::string fileName = GetFilename();
+	std::string fileName = GetFilename(false);
 	try {
 		if (!fs::exists(DIRECTORY_PATH)) {
 			fs::create_directories(DIRECTORY_PATH);
@@ -199,10 +199,22 @@ void Serializer::CreateFileIfNotExists() {
 	}
 	jsonData["SchemaVersion"] = 1;
 	jsonData["AchievementData"] = json::array();
+	this->Save();
+
+	fileName = GetFilename(true);
+	try {
+		if (!fs::exists(DIRECTORY_PATH)) {
+			fs::create_directories(DIRECTORY_PATH);
+		}
+		if (fs::exists(fileName)) return;
+	}
+	catch (const fs::filesystem_error& e) {
+		logger::error("Filesystem error: {}", e.what());
+	}
 	jsonData_GLOBAL["SchemaVersion"] = 1;
 	jsonData_GLOBAL["AchievementData"] = json::array();
 
 
-	this->Save();
+	
 	this->Save_GLOBAL();
 }

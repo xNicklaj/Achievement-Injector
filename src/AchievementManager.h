@@ -19,9 +19,10 @@ public:
 	std::string plugin;
 	std::vector<Achievement*> achievements;
 	std::string iconPath = "";
+	short priority;
 
 	AchievementGroup(std::string name, std::string plugin) : name(name), plugin(plugin) {}
-	AchievementGroup(std::string name, std::string plugin, std::string iconPath) : name(name), plugin(plugin), iconPath(iconPath) {}
+	AchievementGroup(std::string name, std::string plugin, std::string iconPath);
 	void ToGFxValue(RE::GFxValue* gfxValue);
 	json ToJson();
 };
