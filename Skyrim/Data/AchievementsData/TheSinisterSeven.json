@@ -4,34 +4,6 @@
 	"iconPath": "1.dds",
 	"achievements": [
 		{
-			"achievementName": "The last one standing",
-			"description": "Defeat all members of the Sinister Seven",
-			"conditions": [
-				{
-					"type": "QuestStageDone",
-					"formID": "0130D4",
-					"stage": 20
-				}
-			]
-		},
-		{
-			"achievementName": "Some good family time",
-			"description": "Survive the Mother and the Father.",
-			"conditionType": "AND",
-			"conditions": [
-				{
-					"type": "BaseActorDeath",
-					"formID": "00434B",
-					"quantity": 1
-				},
-				{
-					"type": "BaseActorDeath",
-					"formID": "00434E",
-					"quantity": 1
-				}
-			]
-		},
-		{
 			"achievementName": "Force of Nature",
 			"description": "Survive the minor members of The Sinister Seven.",
 			"conditionType": "AND",
@@ -60,6 +32,34 @@
 					"type": "BaseActorDeath",
 					"formID": "0012C5",
 					"quantity": 1
+				}
+			]
+		},
+		{
+			"achievementName": "Some good family time",
+			"description": "Survive the Mother and the Father.",
+			"conditionType": "AND",
+			"conditions": [
+				{
+					"type": "BaseActorDeath",
+					"formID": "00434B",
+					"quantity": 1
+				},
+				{
+					"type": "BaseActorDeath",
+					"formID": "00434E",
+					"quantity": 1
+				}
+			]
+		},
+		{
+			"achievementName": "The last one standing",
+			"description": "Defeat all members of the Sinister Seven",
+			"conditions": [
+				{
+					"type": "QuestStageDone",
+					"formID": "0130D4",
+					"stage": 20
 				}
 			]
 		}
