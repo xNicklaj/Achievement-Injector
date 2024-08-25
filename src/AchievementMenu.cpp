@@ -129,7 +129,7 @@ namespace Scaleform {
             if (ui && ui->IsMenuOpen(AchievementMenu::Name())) {
                 auto a_buttonEvent = (*a_event)->AsButtonEvent();
                 std::string keyName = GetKeyNameFromScanCode(a_buttonEvent->GetIDCode());
-                logger::debug("Key: {}", keyName);
+                logger::debug("Pushed Key: {}", keyName);
                 if ((*a_event)->GetDevice() == RE::INPUT_DEVICE::kGamepad) {
                     if (keyName == "B" || keyName == "START") {
                         AchievementMenu::Hide();

@@ -23,14 +23,18 @@ class Serializer : public ISingleton<Serializer> {
 public:
 	Serializer();
 	void Save();
-	void Save(bool);
+	void Save_GLOBAL();
 	void SerializeAchievementData(Achievement* achievement);
+	void SerializeAchievementData_GLOBAL(Achievement* achievement);
 	struct SerializedAchievement DeserializeAchievementData(std::string name);
+	struct SerializedAchievement DeserializeAchievementData_GLOBAL(std::string name);
 	void CreateFileIfNotExists();
 private:
 	std::string GetFilename() const;
+	std::string GetFilename(bool) const;
 	const std::string& path = "DATA/SKSE/Plugins/AchievementInjector/UnlockedAchievements_{}.json";
 	json jsonData;
+	json jsonData_GLOBAL;
 };
 
 #endif

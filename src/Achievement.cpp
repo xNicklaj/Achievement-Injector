@@ -171,6 +171,7 @@ void Achievement::EnableListener(void) {
 		return;
 	}
 	// Enable listener for this achievement
+    this->unlocked = false;
     SerializedAchievement sa = Serializer::GetSingleton()->DeserializeAchievementData(this->achievementName);
     if (sa.unlocked) {
         this->unlocked = true;
@@ -278,9 +279,18 @@ void Achievement::ToGFxValue(RE::GFxValue* gfxValue) {
 
 json Achievement::ToJson() {
     json data = json::object();
-    data["AchievementName"] = this->achievementName;
-    data["Description"] = this->description;
-    data["UnlockDatetime"] = Serializer::GetSingleton()->DeserializeAchievementData(this->achievementName).unlockDatetime;
-    data["Unlocked"] = this->unlocked;
+    if (Settings::GetSingleton()->GetGlobal()) {
+        SerializedAchievement sa = Serializer::GetSingleton()->DeserializeAchievementData_GLOBAL(this->achievementName);
+        data["AchievementName"] = this->achievementName;
+        data["Description"] = this->description;
+        data["UnlockDatetime"] = sa.unlockDatetime;
+        data["Unlocked"] = sa.unlocked;
+    }
+    else {
+        data["AchievementName"] = this->achievementName;
+        data["Description"] = this->description;
+        data["UnlockDatetime"] = Serializer::GetSingleton()->DeserializeAchievementData(this->achievementName).unlockDatetime;
+        data["Unlocked"] = this->unlocked;
+    }
     return data;
 }
