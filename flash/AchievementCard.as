@@ -32,6 +32,7 @@
             unlockText = AchievementUtils.str_replace( '<year>', date.getFullYear(), unlockText );
             unlockText = AchievementUtils.str_replace( '<hour>', hour, unlockText );
             unlockText = AchievementUtils.str_replace( '<minute>', minutes, unlockText );
+            date_tf.autoSize = 'right';
             AchievementUtils.setText( date_tf, unlockText );
         } else {
             AchievementUtils.setText( date_tf, '$ACH_LOCKED' );
