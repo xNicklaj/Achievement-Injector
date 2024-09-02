@@ -112,7 +112,7 @@ namespace Scaleform {
             if (a_event->menuName == Scaleform::AchievementMenu::MENU_NAME) {
                 auto* ui = RE::UI::GetSingleton();
                 if (ui != nullptr && ui->GetMenu(Scaleform::AchievementMenu::MENU_NAME) != nullptr) {
-                    AchievementMenu::UpdateAchievementList(AchievementManager::GetSingleton()->ToJson().dump());
+                    AchievementMenu::UpdateAchievementList(AchievementManager::GetSingleton()->cache.dump());
                 }
             }
         }

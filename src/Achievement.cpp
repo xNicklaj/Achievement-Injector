@@ -28,6 +28,7 @@
 #include "Conditions/SpellLearned/SpellLearnedCondition.h"
 #include "Conditions/ShoutLearned/ShoutLearnedCondition.h"
 #include "Conditions/DungeonCleared/DungeonClearedCondition.h"
+#include "AchievementManager.h"
 
 Achievement::Achievement(json& jsonData, std::string plugin, std::string groupName)
     : Runnable(jsonData.value("onUnlock", json::array())), achievementName(jsonData["achievementName"].get<std::string>()),
@@ -198,6 +199,7 @@ void Achievement::EnableListener(void) {
 }
 
 void Achievement::OnSerializationRequested() {
+    AchievementManager::GetSingleton()->UpdateCache();
     Serializer::GetSingleton()->SerializeAchievementData(this);
 }
 
@@ -245,7 +247,8 @@ void Achievement::OnConditionMet(void) {
   //          Papyrus::ConsoleUtil::ExecuteCommand(NULL, command);
 		//}
     }
-    Serializer::GetSingleton()->SerializeAchievementData(this);
+    this->eventHandler.dispatch("SerializationRequested");
+    //Serializer::GetSingleton()->SerializeAchievementData(this);
 }
 
 std::vector<int> Achievement::GetConditionsState(void) {
@@ -287,10 +290,11 @@ json Achievement::ToJson() {
         data["Unlocked"] = sa.unlocked;
     }
     else {
+        SerializedAchievement sa = Serializer::GetSingleton()->DeserializeAchievementData(this->achievementName);
         data["AchievementName"] = this->achievementName;
         data["Description"] = this->description;
-        data["UnlockDatetime"] = Serializer::GetSingleton()->DeserializeAchievementData(this->achievementName).unlockDatetime;
-        data["Unlocked"] = this->unlocked;
+        data["UnlockDatetime"] = sa.unlockDatetime;
+        data["Unlocked"] = sa.unlocked;
     }
     return data;
 }

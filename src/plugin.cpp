@@ -38,7 +38,7 @@ void ReadAchievementFiles(std::vector<AchievementFile>* achievementFiles) {
 			for (const auto& entry : fs::directory_iterator(directoryPath)) {
 				if(fs::is_directory(entry.path().string())) continue;
 				struct AchievementFile achievementFile;
-				// Read JSON file
+				// Read JSON files
 				ReadJson(entry.path().string(), &tmp);
 				achievementFile.FileData = tmp["achievements"];
 				achievementFile.groupName = tmp["groupName"];
@@ -90,6 +90,7 @@ void MessageHandler(SKSE::MessagingInterface::Message* a_msg)
 		Scaleform::AchievementMenuInjector::Register();
 		Scaleform::AchievementMenu::Register();
 		Serializer::GetSingleton()->CreateFileIfNotExists();
+		AchievementManager::GetSingleton()->UpdateCache();
 		break;
 	case SKSE::MessagingInterface::kPostLoad:
 		break;
@@ -116,6 +117,7 @@ void MessageHandler(SKSE::MessagingInterface::Message* a_msg)
 		}
 
 		Scaleform::AchievementWidget::Show();
+		AchievementManager::GetSingleton()->UpdateCache();
         break;
 	case SKSE::MessagingInterface::kSaveGame:
 		Scaleform::AchievementWidget::Show();

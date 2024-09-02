@@ -2,6 +2,9 @@
 #include <nlohmann/json.hpp>
 #include "Achievement.h"
 
+#ifndef ACHIEVEMENTMANAGER_H
+#define ACHIEVEMENTMANAGER_H
+
 using json = nlohmann::json;
 
 struct AchievementFile {
@@ -32,6 +35,10 @@ public:
 	std::vector<AchievementFile> achievementFiles;
 	std::vector<AchievementGroup> achievementGroups;
 	std::string lastUsedPlayerName = "";
+	json cache;
 
 	json ToJson();
+	void UpdateCache();
 };
+
+#endif

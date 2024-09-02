@@ -1,5 +1,7 @@
 #include "settings.h"
 #include "log.h"
+#include "AchievementManager.h"
+#include "AchievementManager.h"
 
 void Settings::SerializeINI(const wchar_t* a_path, const std::function<void(CSimpleIniA&)> a_func, bool a_generate)
 {
@@ -34,7 +36,12 @@ void Settings::LoadMCMSettings() const
 	constexpr auto load_mcm = [](auto& ini) {
 		Settings::GetSingleton()->bDebug = ini.GetBoolValue("Main", "bDebug");
 		Settings::GetSingleton()->bUseDebugger = ini.GetBoolValue("Main", "bUseDebugger");
-		Settings::GetSingleton()->bGlobal = ini.GetBoolValue("Main", "bGlobal");
+		bool tmpGlobal = ini.GetBoolValue("Main", "bGlobal");
+		if (tmpGlobal != Settings::GetSingleton()->bGlobal)
+		{
+			Settings::GetSingleton()->bGlobal = tmpGlobal;
+			AchievementManager::GetSingleton()->UpdateCache();
+		}
 		Settings::GetSingleton()->bUsePopup = ini.GetBoolValue("Main", "bUsePopup");
 		Settings::GetSingleton()->bOverrideNotificationSound = ini.GetBoolValue("Sound", "bOverrideNotificationSound");
 

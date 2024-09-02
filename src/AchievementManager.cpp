@@ -55,3 +55,7 @@ json AchievementManager::ToJson() {
 	}
     return data;
 };
+
+void AchievementManager::UpdateCache() {
+    cache = AchievementManager::GetSingleton()->ToJson();
+}
