@@ -1,7 +1,6 @@
 {
     "groupName": "Dragonborn",
     "plugin": "Dragonborn.esm",
-    "iconPath": "1.dds",
     "achievements": [
         {
             "achievementName": "Outlander",

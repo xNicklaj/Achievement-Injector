@@ -1,7 +1,6 @@
 {
     "groupName": "Skyrim",
     "plugin": "Skyrim.esm",
-    "iconPath": "SkyrimSE.dds",
     "achievements": [
         {
             "achievementName": "Unbound",
