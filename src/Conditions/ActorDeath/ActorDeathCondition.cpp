@@ -26,6 +26,7 @@ bool ActorDeathCondition::CheckCondition(RE::FormID formid) {
 };
 RE::BSEventNotifyControl ActorDeathCondition::ProcessEvent(const RE::TESDeathEvent* a_event, RE::BSTEventSource<RE::TESDeathEvent>*) {
 	// 013BB9
+	if (!a_event->actorDying->IsDead()) return RE::BSEventNotifyControl::kContinue;
 	auto* target = GetForm(this->formID, this->plugin);
 
 	if (target == NULL) {

@@ -148,7 +148,7 @@ namespace Scaleform {
     RE::BSEventNotifyControl AchievementMenu::ProcessEvent(const SKSE::ModCallbackEvent* a_event, RE::BSTEventSource<SKSE::ModCallbackEvent>* a_eventSource) {
         RE::UI* ui = RE::UI::GetSingleton();
         RE::GFxValue menu;
-        logger::debug("Event: {}", a_event->eventName.data());
+        //logger::debug("Event: {}", a_event->eventName.data());
         if (a_event->eventName == "AchievementMenu_Init") {
             logger::debug("Init");
         }

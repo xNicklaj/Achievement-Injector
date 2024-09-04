@@ -26,8 +26,11 @@ bool BaseActorDeathCondition::CheckCondition() {
 	return false;
 };
 RE::BSEventNotifyControl BaseActorDeathCondition::ProcessEvent(const RE::TESDeathEvent* a_event, RE::BSTEventSource<RE::TESDeathEvent>*) {
+	bool isTarget = false;
+	if (!a_event->actorDying->IsDead()) return RE::BSEventNotifyControl::kContinue;
 	if (!this->isFormID && a_event->actorDying->GetName() == this->identifier && a_event->dead) {
 		currQuantity++;
+		isTarget = true;
 	}
 	else {
 		RE::TESNPC* target = static_cast<RE::TESNPC*>(GetForm(this->identifier, this->plugin));
@@ -36,10 +39,15 @@ RE::BSEventNotifyControl BaseActorDeathCondition::ProcessEvent(const RE::TESDeat
 			return RE::BSEventNotifyControl::kContinue;
 		}
 		if (a_event->actorDying->data.objectReference->As<RE::TESNPC>()->GetFormID() == target->formID && a_event->dead) {
-			currQuantity++;	
+			currQuantity++;
+			isTarget = true;
 		}
 	}
-	if(!this->CheckCondition()) this->eventManager->dispatch("SerializationRequested");
+	if (isTarget) {
+		if (!this->CheckCondition()) this->eventManager->dispatch("SerializationRequested");
+		else this->UnlockNotify();
+	}
+
 	return RE::BSEventNotifyControl::kContinue;
 };
 

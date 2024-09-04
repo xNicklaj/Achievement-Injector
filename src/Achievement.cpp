@@ -199,6 +199,7 @@ void Achievement::EnableListener(void) {
 }
 
 void Achievement::OnSerializationRequested() {
+    logger::info("Serialization requested.");
     AchievementManager::GetSingleton()->UpdateCache();
     Serializer::GetSingleton()->SerializeAchievementData(this);
 }

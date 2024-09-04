@@ -34,14 +34,14 @@ RE::BSEventNotifyControl EventProcessor::ProcessEvent(RE::InputEvent* const* a_e
 		return RE::BSEventNotifyControl::kContinue;
 	}
 
-    if (button->GetIDCode() == 201) {
-        Scaleform::AchievementMenu::Show();
-        logger::debug("PgUP");
-    }
-    else if (button->GetIDCode() == 209) {
-        Scaleform::AchievementMenu::Hide();
-        logger::debug("PgDOWN");
-    }
+    //if (button->GetIDCode() == 201) {
+    //    Scaleform::AchievementMenu::Show();
+    //    logger::debug("PgUP");
+    //}
+    //else if (button->GetIDCode() == 209) {
+    //    Scaleform::AchievementMenu::Hide();
+    //    logger::debug("PgDOWN");
+    //}
     return RE::BSEventNotifyControl::kContinue;
 }
 
