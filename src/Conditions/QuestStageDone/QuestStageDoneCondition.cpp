@@ -2,7 +2,7 @@
 
 extern void RegisterPostLoadFunction(Condition* condition);
 
-QuestStageDoneCondition::QuestStageDoneCondition() : Condition(ConditionType::QuestStageDone) {}
+QuestStageDoneCondition::QuestStageDoneCondition() : Condition(ConditionType::QuestObjectiveDone) {}
 void QuestStageDoneCondition::SetConditionParameters(std::string formID, std::string OP, int stage) {
     this->formID = formID;
     this->OP = OP;
@@ -30,13 +30,13 @@ RE::BSEventNotifyControl QuestStageDoneCondition::ProcessEvent(const RE::TESQues
 }
 bool QuestStageDoneCondition::CheckCondition() {
     if (this->isMet) return true;
-    if (this->OP == "GT" && CheckQuestStage(this->formID, this->plugin) >= stage) {
+    if ((this->OP == ">=" || this->OP == "GT") && CheckQuestStage(this->formID, this->plugin) >= stage) {
         logger::info("Quest {} met condition stage {}", this->formID, this->stage);
         this->UnlockNotify();
         RE::ScriptEventSourceHolder::GetSingleton()->RemoveEventSink(this);
         return true;
     }
-    else if (this->OP == "EQ" && CheckQuestStage(this->formID, this->plugin) == stage) {
+    else if ((this->OP == "==" || this->OP == "EQ") && CheckQuestStage(this->formID, this->plugin) == stage) {
         logger::info("Quest {} met condition stage {}", this->formID, this->stage);
         this->UnlockNotify();
         RE::ScriptEventSourceHolder::GetSingleton()->RemoveEventSink(this);

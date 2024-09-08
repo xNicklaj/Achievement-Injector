@@ -515,7 +515,7 @@
                     "type": "QuestStageDone",
                     "formID": "0FCC2F",
                     "stage": 10,
-                    "OP": "GT"
+                    "operation": ">="
                 }
             ]
         },

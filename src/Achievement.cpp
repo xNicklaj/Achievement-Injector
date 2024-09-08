@@ -28,6 +28,8 @@
 #include "Conditions/SpellLearned/SpellLearnedCondition.h"
 #include "Conditions/ShoutLearned/ShoutLearnedCondition.h"
 #include "Conditions/DungeonCleared/DungeonClearedCondition.h"
+#include "Conditions/QuestObjectiveDone/QuestObjectiveDoneCondition.h"
+#include "Conditions/AchievementUnlocked/AchievementUnlockedCondition.h"
 #include "AchievementManager.h"
 
 Achievement::Achievement(json& jsonData, std::string plugin, std::string groupName)
@@ -58,7 +60,7 @@ Achievement::Achievement(json& jsonData, std::string plugin, std::string groupNa
         if (type == "QuestStageDone") {
             QuestStageDoneConditionFactory* questStageDoneConditionFactory = new QuestStageDoneConditionFactory();
             a_condition = questStageDoneConditionFactory->createCondition();
-            a_condition->SetConditionParameters(condition["formID"].get<std::string>(), condition.value("OP", "GT"), condition["stage"].get<int>());
+            a_condition->SetConditionParameters(condition["formID"].get<std::string>(), condition.value("operation", ">="), condition["stage"].get<int>());
         }
 		else if (type == "PlayerLevel") {
 			PlayerLevelConditionFactory* playerLevelConditionFactory = new PlayerLevelConditionFactory();
@@ -125,7 +127,7 @@ Achievement::Achievement(json& jsonData, std::string plugin, std::string groupNa
 			a_condition = baseActorDeathConditionFactory->createCondition();
             std::string id = condition.value("formID", "");
             if(id == "") id = condition.value("name", "");
-			a_condition->SetConditionParameters(id, condition["quantity"].get<int>());
+			a_condition->SetConditionParameters(id, condition.value("quantity", 1));
         }
         else if (type == "SpellLearned") {
             SpellLearnedConditionFactory* spellLearnedConditionFactory = new SpellLearnedConditionFactory();
@@ -141,6 +143,16 @@ Achievement::Achievement(json& jsonData, std::string plugin, std::string groupNa
             ShoutLearnedConditionFactory* shoutLearnedConditionFactory = new ShoutLearnedConditionFactory();
             a_condition = shoutLearnedConditionFactory->createCondition();
             a_condition->SetConditionParameters(condition["formID"].get<std::string>(), condition["words"].get<int>());
+        }
+        else if (type == "QuestObjectiveDone") {
+            QuestObjectiveDoneConditionFactory* questObjectiveDoneConditionFactory = new QuestObjectiveDoneConditionFactory();
+            a_condition = questObjectiveDoneConditionFactory->createCondition();
+            a_condition->SetConditionParameters(condition["formID"].get<std::string>(), condition["objective"].get<int>());
+        }
+        else if (type == "AchievementUnlocked") {
+            AchievementUnlockedConditionFactory* achievementUnlockedConditionFactory = new AchievementUnlockedConditionFactory();
+			a_condition = achievementUnlockedConditionFactory->createCondition();
+			a_condition->SetConditionParameters(condition["achievement"].get<std::string>(), condition.value("group", this->groupName));
         }
         else {
             logger::warn("Unknown condition type {} in {}.", type, this->achievementName);
@@ -238,6 +250,10 @@ void Achievement::OnConditionMet(void) {
     if (allConditionsMet) {
         unlocked = true;
         logger::info("Achievement {} unlocked", achievementName);
+        AchievementUnlockedEvent e;
+        e.achievement = this;
+        e.achievementGroup = this->groupName;
+        AchievementManager::GetSingleton()->Dispatch(&e);
         if (this->showPopup && Settings::GetSingleton()->GetUsePopup()) {
             DisplayEntryWithWait(std::make_tuple(this->achievementName, this->description, this->notificationSound));
             //Scaleform::AchievementWidget::DisplayEntry(achievementName, description);

@@ -19,6 +19,7 @@ using json = nlohmann::json;
 
 enum ConditionType {
 	QuestStageDone, // Done
+	QuestObjectiveDone, // Done
 	PlayerLevel, // Done
 	SkillLevel, // Done
 	DungeonCleared, 

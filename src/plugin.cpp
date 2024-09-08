@@ -42,6 +42,7 @@ void ReadAchievementFiles(std::vector<AchievementFile>* achievementFiles) {
 				ReadJson(entry.path().string(), &tmp);
 				achievementFile.FileData = tmp["achievements"];
 				achievementFile.groupName = tmp["groupName"];
+				achievementFile.showInMenu = tmp.value("showAchievements", true);
 				achievementFile.path = entry.path().filename().string();
 				std::string iconPath = StripExtension(entry.path().filename().string()) + ".dds";
 				std::ifstream file("Data/AchievementsData/Icons/"+iconPath);
@@ -76,6 +77,7 @@ void MessageHandler(SKSE::MessagingInterface::Message* a_msg)
 		ReadAchievementFiles(&(AchievementManager::GetSingleton()->achievementFiles));
 		for (auto& achievementFile : (AchievementManager::GetSingleton()->achievementFiles)) {
 			AchievementGroup ag(achievementFile.groupName, achievementFile.plugin, achievementFile.iconPath);
+			ag.SetShowInMenu(achievementFile.showInMenu);
 			for (json achievement : achievementFile.FileData) {
 				ag.achievements.push_back(new Achievement(achievement, ag.plugin, StripExtension(achievementFile.path)));
 			}

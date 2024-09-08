@@ -10,7 +10,7 @@
                     "type": "QuestStageDone",
                     "formID": "0042B4",
                     "stage": 10,
-                    "OP": "GT"
+                    "operation": ">="
                 }
             ]
         },

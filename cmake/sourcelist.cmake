@@ -4,6 +4,7 @@ set(sources ${sources}
 	src/AchievementManager.cpp
 	src/AchievementMenu.cpp
 	src/CommonFunctions.cpp
+	src/Conditions/AchievementUnlocked/AchievementUnlockedCondition.cpp
 	src/Conditions/ActorDeath/ActorDeathCondition.cpp
 	src/Conditions/BaseActorDeath/BaseActorDeathCondition.cpp
 	src/Conditions/BookRead/BookReadCondition.cpp
@@ -20,6 +21,7 @@ set(sources ${sources}
 	src/Conditions/PlayerLevel/PlayerLevelCondition.cpp
 	src/Conditions/QueryStatValue/QueryStatValueCondition.cpp
 	src/Conditions/QuestStageDone/QuestStageDoneCondition.cpp
+	src/Conditions/QuestObjectiveDone/QuestObjectiveDoneCondition.cpp
 	src/Conditions/SkillLevel/SkillLevelCondition.cpp
 	src/Conditions/SpellLearned/SpellLearnedCondition.cpp
 	src/Conditions/ShoutLearned/ShoutLearnedCondition.cpp

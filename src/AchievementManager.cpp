@@ -9,6 +9,7 @@ AchievementGroup::AchievementGroup(std::string name, std::string plugin, std::st
 		this->priority = 1;
     else
         this->priority = 2;
+    this->showInMenu = true;
 }
 
 void AchievementGroup::ToGFxValue(RE::GFxValue* gfxValue) {
@@ -51,6 +52,7 @@ json AchievementManager::ToJson() {
     });
 
     for(auto& achievementGroup : this->achievementGroups) {
+        if(!achievementGroup.showInMenu) continue;
 		data.push_back(achievementGroup.ToJson());
 	}
     return data;
@@ -58,4 +60,12 @@ json AchievementManager::ToJson() {
 
 void AchievementManager::UpdateCache() {
     cache = AchievementManager::GetSingleton()->ToJson();
-}
+};
+
+void AchievementManager::AddEventSink(std::function<void(AchievementUnlockedEvent*)> callback) {
+    this->eventHandler.appendListener("AchievementUnlocked", callback);
+};
+
+void AchievementManager::Dispatch(AchievementUnlockedEvent* a_event) {
+    this->eventHandler.dispatch("AchievementUnlocked", a_event);
+};
