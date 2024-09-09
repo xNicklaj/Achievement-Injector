@@ -145,6 +145,7 @@ SKSEPluginLoad(const SKSE::LoadInterface *skse) {
 		};
 		logger::debug("Debugger attached.");
 	}
+	
 
 	SKSE::GetPapyrusInterface()->Register(NativePapyrus::Register);
 	std::thread(ProcessQueue).detach();

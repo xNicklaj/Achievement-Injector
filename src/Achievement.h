@@ -40,6 +40,7 @@ public:
     bool unlocked;
     bool hooked = false;
     bool showPopup = true;
+    bool hidden = false;
     std::vector<bool> conditionMet;
 private:
     ConditionsJoinType joinType;

@@ -43,6 +43,7 @@ Achievement::Achievement(json& jsonData, std::string plugin, std::string groupNa
     else this->joinType = ConditionsJoinType::AND;
     
     this->showPopup = jsonData.value("showPopup", true);
+    this->hidden = jsonData.value("hideDescription", false);
     this->notificationSound = jsonData.value("notificationSound", "");
 
     this->eventHandler.appendListener("ConditionMet", [this]() {
@@ -299,17 +300,21 @@ void Achievement::ToGFxValue(RE::GFxValue* gfxValue) {
 
 json Achievement::ToJson() {
     json data = json::object();
+
+    std::string description = this->description;
+    if (this->hidden && !Settings::GetSingleton()->GetShowHidden()) description = "Hidden Description.";
+
     if (Settings::GetSingleton()->GetGlobal()) {
         SerializedAchievement sa = Serializer::GetSingleton()->DeserializeAchievementData_GLOBAL(this->achievementName);
         data["AchievementName"] = this->achievementName;
-        data["Description"] = this->description;
+        data["Description"] = description;
         data["UnlockDatetime"] = sa.unlockDatetime;
         data["Unlocked"] = sa.unlocked;
     }
     else {
         SerializedAchievement sa = Serializer::GetSingleton()->DeserializeAchievementData(this->achievementName);
         data["AchievementName"] = this->achievementName;
-        data["Description"] = this->description;
+        data["Description"] = description;
         data["UnlockDatetime"] = sa.unlockDatetime;
         data["Unlocked"] = sa.unlocked;
     }
