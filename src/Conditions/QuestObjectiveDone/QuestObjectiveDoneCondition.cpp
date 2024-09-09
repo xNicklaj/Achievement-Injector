@@ -50,6 +50,10 @@ bool QuestObjectiveDoneCondition::CheckCondition() {
         }
 
         if (objective->index == this->objective && objective->initialized && objective->state == RE::QUEST_OBJECTIVE_STATE::kCompleted) {
+            logger::info("Player met condition quest {} objective {}", this->formID, this->objective);
+            this->UnlockNotify();
+            RE::ScriptEventSourceHolder::GetSingleton()->RemoveEventSink<RE::TESQuestStageEvent>(this);
+            RE::PlayerCharacter::GetSingleton()->AsPositionPlayerEventSource()->RemoveEventSink(this);
             return true;
         }
 	}

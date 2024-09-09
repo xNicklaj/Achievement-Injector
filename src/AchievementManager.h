@@ -49,6 +49,7 @@ public:
 	json ToJson();
 	void UpdateCache();
 	void AddEventSink(std::function<void(AchievementUnlockedEvent*)> callback);
+	void RemoveEventSink(std::function<void(AchievementUnlockedEvent*)> callback);
 	void Dispatch(AchievementUnlockedEvent*);
 private:
 	eventpp::EventDispatcher<std::string, void(AchievementUnlockedEvent*)> eventHandler;

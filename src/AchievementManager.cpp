@@ -66,6 +66,10 @@ void AchievementManager::AddEventSink(std::function<void(AchievementUnlockedEven
     this->eventHandler.appendListener("AchievementUnlocked", callback);
 };
 
+void AchievementManager::RemoveEventSink(std::function<void(AchievementUnlockedEvent*)> callback) {
+   // TODO this->eventHandler.removeListener("AchievementUnlocked", callback);
+}
+
 void AchievementManager::Dispatch(AchievementUnlockedEvent* a_event) {
     this->eventHandler.dispatch("AchievementUnlocked", a_event);
 };

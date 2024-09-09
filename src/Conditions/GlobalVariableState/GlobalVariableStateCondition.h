@@ -3,7 +3,7 @@
 
 #include "../Condition.h" // Ensure this is the correct path to Condition.h
 
-class GlobalVariableStateCondition : public Condition {
+class GlobalVariableStateCondition : public Condition, public RE::BSTEventSink<RE::PositionPlayerEvent> {
 public:
     GlobalVariableStateCondition();
     void OnDataLoaded() override;
@@ -14,6 +14,7 @@ public:
 private:
     std::string formID = "";
     float value = -1;
+    RE::BSEventNotifyControl ProcessEvent(const RE::PositionPlayerEvent* a_event, RE::BSTEventSource<RE::PositionPlayerEvent>*) override;
 };
 
 class GlobalVariableStateConditionFactory : public ConditionFactory {
