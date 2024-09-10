@@ -1,6 +1,7 @@
 ﻿import JSON;
 import skse;
 import AchievementUtils;
+import Components.CrossPlatformButtons;
 
 class AchievementMenu extends MovieClip {
 
@@ -9,12 +10,14 @@ class AchievementMenu extends MovieClip {
     public var heading_tf:TextField;
     public var progress_tf:TextField;
     public var AchievementList_mc:MovieClip;
+    public var BottomBar_mc:MovieClip;
 
     private var data:Object;
     private var isFocusOnGroups:Boolean = true;
     private var focusIndex:Number = -1;
 
     function onLoad(): Void {
+        BottomBar_mc = _root.BottomBar_mc;
         Key.addListener(this);
         Selection["alwaysEnableArrowKeys"] = false;
         heading_tf.noTranslate = progress_tf.noTranslate = true;
@@ -26,6 +29,10 @@ class AchievementMenu extends MovieClip {
 	}
 
 	function SetPlatform(aiPlatformIndex: Number, abPS3Switch: Boolean): Void {
+        var BackButtonInstance:CrossPlatformButtons = BottomBar_mc.ButtonRect.BackButtonInstance;
+        BackButtonInstance.SetPlatform(aiPlatformIndex, abPS3Switch);
+        var MoveColumnInstance:CrossPlatformButtons = BottomBar_mc.ButtonRect.MoveColumnInstance;
+        MoveColumnInstance.SetPlatform(aiPlatformIndex, abPS3Switch);
     }
 
     function render() {

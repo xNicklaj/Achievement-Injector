@@ -53,7 +53,7 @@
         scrollbar.track.disabled = scrollEnabled;
         if ( scrollEnabled ) {
             scrollbar.position = 0;
-            scrollbar.height = ListMask_mc._height + 25;
+            scrollbar.height = ListMask_mc._height + 33;
             maxScroll = list[ index ]._height - ListMask_mc._height;
             scrollbar.setScrollProperties( 0, 0, maxScroll );
         }
