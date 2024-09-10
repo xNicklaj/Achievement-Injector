@@ -6,6 +6,7 @@ class AchievementsMenuInjector extends MovieClip {
     public var CategoryList:MovieClip;
 
     private var LoadGameIndex = 0;
+    private var itemEmbedDone:Boolean = false;
 
     function onLoad() {
         SystemPage = _parent._parent.QuestJournalFader.Menu_mc.SystemFader.Page_mc;
@@ -13,14 +14,17 @@ class AchievementsMenuInjector extends MovieClip {
         var _this = this;
         CategoryList.__InvalidateData = CategoryList.InvalidateData;
         CategoryList.InvalidateData = function() {
-            var entryList = _this.CategoryList.entryList;
-            for ( var i = 0; i < entryList.length; i++ ) {
-                if ( entryList[ i ].text === '$LOAD' ) {
-                    _this.LoadGameIndex = i + 1;
-                    break;
+            if ( _this.itemEmbedDone === false ) {
+                var entryList = _this.CategoryList.entryList;
+                for ( var i = 0; i < entryList.length; i++ ) {
+                    if ( entryList[ i ].text === '$LOAD' ) {
+                        _this.LoadGameIndex = i + 1;
+                        break;
+                    }
                 }
+                _this.CategoryList.entryList = entryList.slice(0, _this.LoadGameIndex).concat( [ { text : '$ACH_MENULBL', isAchievements : true } ], entryList.slice( _this.LoadGameIndex ) );
+                _this.itemEmbedDone = true;
             }
-            _this.CategoryList.entryList = entryList.slice(0, _this.LoadGameIndex).concat( [ { text : '$ACH_MENULBL', isAchievements : true } ], entryList.slice( _this.LoadGameIndex ) );
             _this.CategoryList.__InvalidateData();
         }
         CategoryList.InvalidateData();
