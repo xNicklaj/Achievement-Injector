@@ -39,7 +39,14 @@ void ReadAchievementFiles(std::vector<AchievementFile>* achievementFiles) {
 				if(fs::is_directory(entry.path().string())) continue;
 				struct AchievementFile achievementFile;
 				// Read JSON files
-				ReadJson(entry.path().string(), &tmp);
+				try {
+					ReadJson(entry.path().string(), &tmp);
+				}
+				catch (const std::exception& e) {
+					logger::error("Error reading JSON file: {}", e.what());
+					logger::error("Skipping file.");
+					continue;
+				}
 				achievementFile.FileData = tmp["achievements"];
 				achievementFile.groupName = tmp["groupName"];
 				achievementFile.showInMenu = tmp.value("showAchievements", true);
