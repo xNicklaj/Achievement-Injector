@@ -28,6 +28,7 @@ set(headers ${headers}
 	src/Conditions/ShoutLearned/ShoutLearnedCondition.cpp
 	src/ConditionsJoinType.h
 	src/CustomRE.h
+	src/MessageBox.h
 	src/EventProcessor.h
 	src/LocalizationManager.h
 	src/KeyMapping.h

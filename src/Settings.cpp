@@ -1,7 +1,6 @@
 #include "settings.h"
 #include "log.h"
 #include "AchievementManager.h"
-#include "AchievementManager.h"
 
 void Settings::SerializeINI(const wchar_t* a_path, const std::function<void(CSimpleIniA&)> a_func, bool a_generate)
 {

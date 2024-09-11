@@ -46,6 +46,8 @@ public:
 		UIStartNewGame,
 		UINewShoutLearned
 	};
+
+	bool bInitialized{ false };
 private:
 	static void SerializeINI(const wchar_t* a_path, std::function<void(CSimpleIniA&)> a_func, bool a_generate = false);
 	static void SerializeINI(const wchar_t* a_defaultPath, const wchar_t* a_userPath, std::function<void(CSimpleIniA&)> a_func);

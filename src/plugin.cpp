@@ -127,6 +127,7 @@ void MessageHandler(SKSE::MessagingInterface::Message* a_msg)
 
 		Scaleform::AchievementWidget::Show();
 		AchievementManager::GetSingleton()->UpdateCache();
+		Settings::GetSingleton()->bInitialized = true;
         break;
 	case SKSE::MessagingInterface::kSaveGame:
 		Scaleform::AchievementWidget::Show();

@@ -4,6 +4,8 @@
 #include "AchievementWidget.h"
 #include "AchievementMenu.h"
 #include "KeyMapping.h"
+#include "MessageBox.h"
+#include "settings.h"
 
 RE::BSEventNotifyControl EventProcessor::ProcessEvent(const RE::MenuOpenCloseEvent* event,
                                                       RE::BSTEventSource<RE::MenuOpenCloseEvent>*) {
@@ -50,10 +52,20 @@ RE::BSEventNotifyControl EventProcessor::ProcessEvent(RE::BGSActorCellEvent cons
     return  RE::BSEventNotifyControl::kContinue;
 }
 
+RE::BSEventNotifyControl EventProcessor::ProcessEvent(const RE::PositionPlayerEvent* a_event, RE::BSTEventSource<RE::PositionPlayerEvent>*) {
+    if (!Settings::GetSingleton()->bInitialized) {
+        std::vector<std::string> args = { "OK" };
+        SkyrimScripting::ShowMessageBox("To complete the initialization of Achievement Injector save and load your game. \nUntil this task is completed, achievements will not be listened for.", args, [](int) {});
+        Settings::GetSingleton()->bInitialized = true;
+    }
+    return RE::BSEventNotifyControl::kContinue;
+}
+
 void EventProcessor::Register() {
     auto ui = RE::UI::GetSingleton();
     EventProcessor *eventProcessor = EventProcessor::GetSingleton();
 	ui->AddEventSink<RE::MenuOpenCloseEvent>(GetSingleton());
     RE::BSInputDeviceManager::GetSingleton()->AddEventSink<RE::InputEvent*>(eventProcessor);
+    RE::PlayerCharacter::GetSingleton()->AsPositionPlayerEventSource()->AddEventSink<RE::PositionPlayerEvent>(this);
 	logger::debug("Registered event {}"sv, typeid(RE::MenuOpenCloseEvent).name());
 }
