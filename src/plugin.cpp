@@ -27,7 +27,28 @@ void RegisterPostLoadFunction(Condition* condition) {
 	postLoadConditionRegistry.push_back(condition);
 }
 
+void InitializePostLoad() {
+	Serializer::GetSingleton()->CreateFileIfNotExists();
 
+	if (GetPlayerName() != AchievementManager::GetSingleton()->lastUsedPlayerName) {
+		AchievementManager::GetSingleton()->lastUsedPlayerName = GetPlayerName();
+
+		for (auto& achievementGroup : AchievementManager::GetSingleton()->achievementGroups) {
+			for (auto& achievement : achievementGroup.achievements) {
+				achievement->EnableListener();
+			}
+		}
+
+		logger::info("Data loaded. Executing {} functions.", postLoadConditionRegistry.size());
+		for (auto& condition : postLoadConditionRegistry) {
+			condition->OnDataLoaded();
+		}
+	}
+
+	Scaleform::AchievementWidget::Show();
+	AchievementManager::GetSingleton()->UpdateCache();
+	Settings::GetSingleton()->bInitialized = true;
+}
 
 void ReadAchievementFiles(std::vector<AchievementFile>* achievementFiles) {
 	std::string directoryPath = "Data/AchievementsData";
@@ -99,37 +120,20 @@ void MessageHandler(SKSE::MessagingInterface::Message* a_msg)
 		Scaleform::AchievementWidget::Register();
 		Scaleform::AchievementMenuInjector::Register();
 		Scaleform::AchievementMenu::Register();
-		Serializer::GetSingleton()->CreateFileIfNotExists();
+		//Serializer::GetSingleton()->CreateFileIfNotExists();
 		AchievementManager::GetSingleton()->UpdateCache();
+		EventProcessor::GetSingleton()->eventHandler.appendListener("PostLoadGame", InitializePostLoad);
 		break;
 	case SKSE::MessagingInterface::kPostLoad:
 		break;
 	case SKSE::MessagingInterface::kPreLoadGame:
 		break;
 	case SKSE::MessagingInterface::kPostLoadGame:
-		Serializer::GetSingleton()->CreateFileIfNotExists();
-
-		if (GetPlayerName() != AchievementManager::GetSingleton()->lastUsedPlayerName) {
-			AchievementManager::GetSingleton()->lastUsedPlayerName = GetPlayerName();
-
-			for (auto& achievementGroup : AchievementManager::GetSingleton()->achievementGroups) {
-				for (auto& achievement : achievementGroup.achievements) {
-					achievement->EnableListener();
-				}
-			}
-
-			
-
-			logger::info("Data loaded. Executing {} functions.", postLoadConditionRegistry.size());
-			for (auto& condition : postLoadConditionRegistry) {
-				condition->OnDataLoaded();
-			}
-		}
-
-		Scaleform::AchievementWidget::Show();
-		AchievementManager::GetSingleton()->UpdateCache();
-		Settings::GetSingleton()->bInitialized = true;
+		EventProcessor::GetSingleton()->eventHandler.dispatch("PostLoadGame");
         break;
+	case SKSE::MessagingInterface::kNewGame:
+		Settings::GetSingleton()->bIsNewGame = true;
+		break;
 	case SKSE::MessagingInterface::kSaveGame:
 		Scaleform::AchievementWidget::Show();
 		break;

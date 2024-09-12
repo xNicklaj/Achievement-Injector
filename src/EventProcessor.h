@@ -4,6 +4,7 @@
 #pragma once
 #include <RE/Skyrim.h>
 #include <SKSE/SKSE.h>
+#include <eventpp/eventdispatcher.h>
 
 #include "Utility.h"
 
@@ -29,6 +30,8 @@ public:
         RE::BSTEventSource<RE::BGSActorCellEvent>*) override;
     RE::BSEventNotifyControl ProcessEvent(const RE::PositionPlayerEvent* a_event, 
         RE::BSTEventSource<RE::PositionPlayerEvent>*) override;
+
+    eventpp::EventDispatcher<std::string, void(void)> eventHandler;
 private:
     short RequiredPositionPlayerEventCount = 4;
     short PositionPlayerEventCount = 0;

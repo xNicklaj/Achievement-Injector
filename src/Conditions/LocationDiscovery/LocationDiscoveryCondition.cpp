@@ -36,8 +36,6 @@ bool CheckKnownLocation(std::string targetLocation) {
             }
         }
     }
-    std::string result = targetLocation + " location is not known!";
-    RE::DebugNotification(result.c_str());
     return false;
 }
 // --- Exergist Code ---

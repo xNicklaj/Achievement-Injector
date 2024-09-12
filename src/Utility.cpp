@@ -23,40 +23,6 @@ int enableMenuOption;
 std::string tutorialMessage;
 std::string resistanceModConfig;
 bool hintShown = false;
-const std::string INI_FILE_PATH = "Data/Dragonborns Bestiary.ini";
-
-void LoadDataFromINI() {
-    CSimpleIniA ini;
-    ini.SetUnicode();
-    SI_Error rc = ini.LoadFile(INI_FILE_PATH.c_str());
-    if (rc < 0) {
-        logger::error("Failed to load INI file: {}", INI_FILE_PATH);
-        return;
-    }
-
-    const char* keycodeStr = ini.GetValue("General", "iKeycode", "0");
-    const char* widget_x = ini.GetValue("General", "iBestiaryWidget_X", "0");
-    const char* widget_y = ini.GetValue("General", "iBestiaryWidget_Y", "0");
-    const char* widget_scale = ini.GetValue("General", "iBestiaryWidgetScale", "0");
-    const char* enable_widget = ini.GetValue("General", "iEnableWidget", "0");
-    const char* enable_menu_option = ini.GetValue("General", "iEnableSystemMenuOption", "0");
-    const char* tutorial_msg = ini.GetValue("General", "sTutorialMessage", "0");
-    menuHotkey = std::stoi(keycodeStr);
-    widgetX = std::stoi(widget_x);
-    widgetY = std::stoi(widget_y);
-    widgetScale = std::stof(widget_scale);
-    enableWidget = std::stoi(enable_widget);
-    enableMenuOption = std::stoi(enable_menu_option);
-    tutorialMessage = tutorial_msg;
-    logger::debug("Loaded keycode: {}", keycodeStr);
-    logger::debug("Loaded widget x offset: {}", widget_x);
-    logger::debug("Loaded widget y offset: {}", widget_y);
-    logger::debug("Loaded widget scale: {}", widget_scale);
-    logger::debug("Loaded widget enabled: {}", enable_widget);
-    logger::debug("Loaded menu option enabled: {}", enable_menu_option);
-    logger::debug("Loaded tutorial message localization: {}", tutorial_msg);
-}
-
 
 std::string GetKeyNameFromScanCode(int scanCode) {
     auto it = kKeyMap.find(scanCode);

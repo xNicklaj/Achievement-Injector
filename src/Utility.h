@@ -33,7 +33,6 @@ struct VariantInfo {
 };
 
 
-void LoadDataFromINI();
 std::string GetKeyNameFromScanCode(int scanCode);
 void AddMenuOption();
 float GetGlobalVariableValue(const std::string& editorID);

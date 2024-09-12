@@ -27,7 +27,7 @@ void EventProcessor::EvaluateRequiredCellChanges() {
         this->RequiredPositionPlayerEventCount = 7;
         logger::debug("Optional Quick Start - SE found.");
     }
-    logger::debug("Set RequiredPositionPlayerEventCount to {}", this->RequiredPositionPlayerEventCount);
+    //logger::debug("Set RequiredPositionPlayerEventCount to {}", this->RequiredPositionPlayerEventCount);
 }
 
 RE::BSEventNotifyControl EventProcessor::ProcessEvent(const RE::MenuOpenCloseEvent* event,
@@ -43,6 +43,12 @@ RE::BSEventNotifyControl EventProcessor::ProcessEvent(const RE::MenuOpenCloseEve
         }
     } else if (!event->opening && event->menuName == Scaleform::AchievementWidget::MENU_NAME) {
         Scaleform::AchievementWidget::Show();
+    }
+
+    if (!event->opening && event->menuName == "RaceSex Menu") {
+        logger::debug("RaceMenu closed. Player's name is: {}", RE::PlayerCharacter::GetSingleton()->GetName());
+        Settings::GetSingleton()->bIsNewGame = false;
+        this->eventHandler.dispatch("PostLoadGame");
     }
     return RE::BSEventNotifyControl::kContinue;
 }
@@ -95,6 +101,6 @@ void EventProcessor::Register() {
     EventProcessor *eventProcessor = EventProcessor::GetSingleton();
 	ui->AddEventSink<RE::MenuOpenCloseEvent>(GetSingleton());
     RE::BSInputDeviceManager::GetSingleton()->AddEventSink<RE::InputEvent*>(eventProcessor);
-    RE::PlayerCharacter::GetSingleton()->AsPositionPlayerEventSource()->AddEventSink<RE::PositionPlayerEvent>(this);
-	logger::debug("Registered event {}"sv, typeid(RE::MenuOpenCloseEvent).name());
+    //RE::PlayerCharacter::GetSingleton()->AsPositionPlayerEventSource()->AddEventSink<RE::PositionPlayerEvent>(this);
+	//logger::debug("Registered event {}"sv, typeid(RE::MenuOpenCloseEvent).name());
 }
