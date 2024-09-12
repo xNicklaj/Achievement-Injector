@@ -37,8 +37,11 @@ public:
 	void SetDelayNewGameAlert(bool a_val) { bDelayNewGameAlert = a_val; }
 
 	void PrintSettings() const {
-		logger::debug("bDebug: {}, bGlobal: {}, bUseDebugger: {}, bUsePopup: {}, bMute: {}, bDelayNewGameAlert: {}, iNotificationSound: {}", bDebug, bGlobal, bUseDebugger, bUsePopup, bMute, bDelayNewGameAlert, sNotificationSound);
+		logger::debug("bDebug: {}, bGlobal: {}, bUseDebugger: {}, bUsePopup: {}, bMute: {}, bDelayNewGameAlert: {}, bShowHidden: {}, iNotificationSound: {}", bDebug, bGlobal, bUseDebugger, bUsePopup, bMute, bDelayNewGameAlert, bShowHidden, sNotificationSound);
 	}
+
+	template <typename T>
+	bool AssignValue(CSimpleIniA* ini, T* setting, std::string section, std::string key);
 
 
 	const enum NotificationSound_e {
@@ -49,7 +52,10 @@ public:
 		UINewShoutLearned
 	};
 
+
+
 	bool bInitialized{ false };
+	bool bIsNewGame{ false };
 private:
 	static void SerializeINI(const wchar_t* a_path, std::function<void(CSimpleIniA&)> a_func, bool a_generate = false);
 	static void SerializeINI(const wchar_t* a_defaultPath, const wchar_t* a_userPath, std::function<void(CSimpleIniA&)> a_func);

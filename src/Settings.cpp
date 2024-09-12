@@ -30,43 +30,71 @@ void Settings::LoadSettings()
 	PrintSettings();
 }
 
+template <typename T>
+bool Settings::AssignValue(CSimpleIniA* ini, T* setting, std::string section, std::string key) {
+	const char* value = nullptr;
+	value = ini->GetValue(section.c_str(), key.c_str());
+	if (value == nullptr) return false;
+	if (std::is_same<T, bool>::value) {
+		*setting = ini->GetBoolValue(section.c_str(), key.c_str());
+	}
+	else if (std::is_same<T, int>::value) {
+		*setting = ini->GetLongValue(section.c_str(), key.c_str());
+	}
+	else if (std::is_same<T, std::string>::value) {
+		*setting = *value;
+	}
+	else {
+		logger::error("Unsupported type");
+		return false;
+	}
+	return true;
+}
+
+
 void Settings::LoadMCMSettings() const
 {
 	constexpr auto load_mcm = [](auto& ini) {
-		Settings::GetSingleton()->bDebug = ini.GetBoolValue("Main", "bDebug");
-		Settings::GetSingleton()->bUseDebugger = ini.GetBoolValue("Main", "bUseDebugger");
-		bool tmpGlobal = ini.GetBoolValue("Main", "bGlobal");
+		std::string tmp;
+		Settings::GetSingleton()->AssignValue<bool>(&ini, &(Settings::GetSingleton()->bDebug), "Main", "bDebug");
+		Settings::GetSingleton()->AssignValue<bool>(&ini, &(Settings::GetSingleton()->bUseDebugger), "Main", "bUseDebugger");
+		bool tmpGlobal = Settings::GetSingleton()->GetGlobal();
+		Settings::GetSingleton()->AssignValue<bool>(&ini, &(tmpGlobal), "Main", "bGlobal");
 		if (tmpGlobal != Settings::GetSingleton()->bGlobal)
 		{
 			Settings::GetSingleton()->bGlobal = tmpGlobal;
 			AchievementManager::GetSingleton()->UpdateCache();
 		}
-		Settings::GetSingleton()->bUsePopup = ini.GetBoolValue("Main", "bUsePopup");
-		Settings::GetSingleton()->bOverrideNotificationSound = ini.GetBoolValue("Sound", "bOverrideNotificationSound");
-		Settings::GetSingleton()->bDelayNewGameAlert = ini.GetBoolValue("Main", "bDelayNewGameAlert");
-		Settings::GetSingleton()->bShowHidden = ini.GetBoolValue("Main", "bShowHidden");
-		logger::debug("Set ShowHidden to {}", Settings::GetSingleton()->GetShowHidden());
+		Settings::GetSingleton()->AssignValue<bool>(&ini, &(Settings::GetSingleton()->bUsePopup), "Main", "bUsePopup");
+		Settings::GetSingleton()->AssignValue<bool>(&ini, &(Settings::GetSingleton()->bDelayNewGameAlert), "Main", "bDelayNewGameAlert");
+		Settings::GetSingleton()->AssignValue<bool>(&ini, &(Settings::GetSingleton()->bShowHidden), "Main", "bShowHidden");
 
-		Settings::GetSingleton()->bMute = ini.GetBoolValue("Sound", "bMute");
-		switch (ini.GetLongValue("Sound", "iNotificationSound"))
-		{
-		case NotificationSound_e::UINewShoutLearned:
+		Settings::GetSingleton()->AssignValue<bool>(&ini, &(Settings::GetSingleton()->bOverrideNotificationSound), "Sound", "bOverrideNotificationSound");
+		Settings::GetSingleton()->AssignValue<bool>(&ini, &(Settings::GetSingleton()->bMute), "Sound", "bMute");
+
+		int tmpLong = 0;
+		if (Settings::GetSingleton()->AssignValue<int>(&ini, &(tmpLong), "Sound", "iNotificationSound")) {
+			switch (tmpLong)
+			{
+			case NotificationSound_e::UINewShoutLearned:
 				Settings::GetSingleton()->sNotificationSound = "UINewShoutLearned";
 				break;
-		case NotificationSound_e::UIQuestComplete:
+			case NotificationSound_e::UIQuestComplete:
 				Settings::GetSingleton()->sNotificationSound = "UIQuestComplete";
 				break;
-		case NotificationSound_e::UISkillsForward:
-			Settings::GetSingleton()->sNotificationSound = "UISkillsForward";
-			break;
-		case NotificationSound_e::UIStartNewGame:
-			Settings::GetSingleton()->sNotificationSound = "UIStartNewGame";
-			break;
-		case NotificationSound_e::UISkillIncreaseSD:
-		default:
-			Settings::GetSingleton()->sNotificationSound = "UISkillIncreaseSD";
-			break;
+			case NotificationSound_e::UISkillsForward:
+				Settings::GetSingleton()->sNotificationSound = "UISkillsForward";
+				break;
+			case NotificationSound_e::UIStartNewGame:
+				Settings::GetSingleton()->sNotificationSound = "UIStartNewGame";
+				break;
+			case NotificationSound_e::UISkillIncreaseSD:
+			default:
+				Settings::GetSingleton()->sNotificationSound = "UISkillIncreaseSD";
+				break;
+			}
 		}
+		
 	};
 	SerializeINI(defaultMCMPath, userMCMPath, load_mcm);
 }
