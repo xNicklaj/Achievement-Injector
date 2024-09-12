@@ -1,5 +1,6 @@
 #include "Serializer.h"
 #include "settings.h"
+#include <algorithm>
 
 
 namespace fs = std::filesystem;
@@ -31,6 +32,8 @@ std::string Serializer::GetFilename(bool useGlobal) const {
 		// Get player name
 		std::string playerName = RE::PlayerCharacter::GetSingleton()->GetName();
 		std::transform(playerName.begin(), playerName.end(), playerName.begin(), [](unsigned char c) { return std::toupper(c); });
+		playerName.erase(std::remove(playerName.begin(), playerName.end(), ' '), playerName.end());
+
 		fileName = fmt::format(FILENAME, playerName);
 	}
 	else fileName = fmt::format(FILENAME, "GLOBAL");
