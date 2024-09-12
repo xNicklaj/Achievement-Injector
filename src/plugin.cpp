@@ -95,6 +95,7 @@ void MessageHandler(SKSE::MessagingInterface::Message* a_msg)
 			logger::debug("Achievement group {} has {} achievements", achievementGroup.name, achievementGroup.achievements.size());
 		}
 		EventProcessor::GetSingleton()->Register();
+		EventProcessor::GetSingleton()->EvaluateRequiredCellChanges();
 		Scaleform::AchievementWidget::Register();
 		Scaleform::AchievementMenuInjector::Register();
 		Scaleform::AchievementMenu::Register();
@@ -102,7 +103,6 @@ void MessageHandler(SKSE::MessagingInterface::Message* a_msg)
 		AchievementManager::GetSingleton()->UpdateCache();
 		break;
 	case SKSE::MessagingInterface::kPostLoad:
-		EventProcessor::GetSingleton()->EvaluateRequiredCellChanges();
 		break;
 	case SKSE::MessagingInterface::kPreLoadGame:
 		break;

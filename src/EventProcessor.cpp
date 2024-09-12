@@ -23,6 +23,10 @@ void EventProcessor::EvaluateRequiredCellChanges() {
     //    logger::debug("Realm of Lorkhan found.");
     //}
     //else this->RequiredPositionPlayerEventCount = 4;
+    if (CheckIfModIsLoaded("Quick Start - SE.esp")) {
+        this->RequiredPositionPlayerEventCount = 7;
+        logger::debug("Optional Quick Start - SE found.");
+    }
     logger::debug("Set RequiredPositionPlayerEventCount to {}", this->RequiredPositionPlayerEventCount);
 }
 
@@ -79,7 +83,7 @@ RE::BSEventNotifyControl EventProcessor::ProcessEvent(const RE::PositionPlayerEv
 
         if (!Settings::GetSingleton()->GetDelayNewGameAlert() || (Settings::GetSingleton()->GetDelayNewGameAlert() && this->PositionPlayerEventCount >= this->RequiredPositionPlayerEventCount)) {
             std::vector<std::string> args = { "OK" };
-            SkyrimScripting::ShowMessageBox("To complete the initialization of Achievement Injector save and load your game. \nUntil this task is completed, achievements will not be listened for.", args, [](int) {});
+            SkyrimScripting::ShowMessageBox("Achievement Injector\n\nTo complete the initialization of Achievement Injector save and load your game. \nUntil this task is completed, achievements will not be listened for.", args, [](int) {});
             Settings::GetSingleton()->bInitialized = true;
         }
     }

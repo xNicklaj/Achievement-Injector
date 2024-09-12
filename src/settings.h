@@ -37,7 +37,7 @@ public:
 	void SetDelayNewGameAlert(bool a_val) { bDelayNewGameAlert = a_val; }
 
 	void PrintSettings() const {
-		logger::debug("bDebug: {}, bGlobal: {}, bUseDebugger: {}, bUsePopup: {}, bMute: {}, iNotificationSound: {}", bDebug, bGlobal, bUseDebugger, bUsePopup, bMute, sNotificationSound);
+		logger::debug("bDebug: {}, bGlobal: {}, bUseDebugger: {}, bUsePopup: {}, bMute: {}, bDelayNewGameAlert: {}, iNotificationSound: {}", bDebug, bGlobal, bUseDebugger, bUsePopup, bMute, bDelayNewGameAlert, sNotificationSound);
 	}
 
 
