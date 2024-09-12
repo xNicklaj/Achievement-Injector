@@ -10,19 +10,19 @@
 EventProcessor::EventProcessor() {}
 
 void EventProcessor::EvaluateRequiredCellChanges() {
-    if (CheckIfModIsLoaded("AlternatePerspective.esp")) {
-        this->RequiredPositionPlayerEventCount = 4;
-        logger::debug("Alternate Perspective found.");
-    }
-    else if (CheckIfModIsLoaded("alternate start - live another life.esp")) {
-        this->RequiredPositionPlayerEventCount = 4;
-        logger::debug("Alternate Start found.");
-    }
-    else if (CheckIfModIsLoaded("Realm of Lorkhan - Custom Alternate Start - Choose your own adventure.esp")) {
-        this->RequiredPositionPlayerEventCount = 4;
-        logger::debug("Realm of Lorkhan found.");
-    }
-    else this->RequiredPositionPlayerEventCount = 4;
+    //if (CheckIfModIsLoaded("AlternatePerspective.esp")) {
+    //    this->RequiredPositionPlayerEventCount = 4;
+    //    logger::debug("Alternate Perspective found.");
+    //}
+    //else if (CheckIfModIsLoaded("alternate start - live another life.esp")) {
+    //    this->RequiredPositionPlayerEventCount = 4;
+    //    logger::debug("Alternate Start found.");
+    //}
+    //else if (CheckIfModIsLoaded("Realm of Lorkhan - Custom Alternate Start - Choose your own adventure.esp")) {
+    //    this->RequiredPositionPlayerEventCount = 4;
+    //    logger::debug("Realm of Lorkhan found.");
+    //}
+    //else this->RequiredPositionPlayerEventCount = 4;
     logger::debug("Set RequiredPositionPlayerEventCount to {}", this->RequiredPositionPlayerEventCount);
 }
 
@@ -55,7 +55,7 @@ RE::BSEventNotifyControl EventProcessor::ProcessEvent(RE::InputEvent* const* a_e
 		return RE::BSEventNotifyControl::kContinue;
 	}
 
-    //if (button->GetIDCode() == 201) {
+    //if (button->GetIDCode() == 201) {//
     //    Scaleform::AchievementMenu::Show();
     //    logger::debug("PgUP");
     //}
