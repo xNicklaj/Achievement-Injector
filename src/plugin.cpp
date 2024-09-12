@@ -140,6 +140,7 @@ SKSEPluginLoad(const SKSE::LoadInterface *skse) {
     SKSE::Init(skse);
 	Settings::GetSingleton()->LoadSettings();
 	SetupLog();
+	Settings::GetSingleton()->PrintSettings();
 	LocalizationManager::GetSingleton(); // Load localizations
 
     auto messaging = SKSE::GetMessagingInterface();
