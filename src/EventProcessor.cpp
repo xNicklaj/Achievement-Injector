@@ -7,6 +7,25 @@
 #include "MessageBox.h"
 #include "settings.h"
 
+EventProcessor::EventProcessor() {}
+
+void EventProcessor::EvaluateRequiredCellChanges() {
+    if (CheckIfModIsLoaded("AlternatePerspective.esp")) {
+        this->RequiredPositionPlayerEventCount = 4;
+        logger::debug("Alternate Perspective found.");
+    }
+    else if (CheckIfModIsLoaded("alternate start - live another life.esp")) {
+        this->RequiredPositionPlayerEventCount = 4;
+        logger::debug("Alternate Start found.");
+    }
+    else if (CheckIfModIsLoaded("Realm of Lorkhan - Custom Alternate Start - Choose your own adventure.esp")) {
+        this->RequiredPositionPlayerEventCount = 4;
+        logger::debug("Realm of Lorkhan found.");
+    }
+    else this->RequiredPositionPlayerEventCount = 4;
+    logger::debug("Set RequiredPositionPlayerEventCount to {}", this->RequiredPositionPlayerEventCount);
+}
+
 RE::BSEventNotifyControl EventProcessor::ProcessEvent(const RE::MenuOpenCloseEvent* event,
                                                       RE::BSTEventSource<RE::MenuOpenCloseEvent>*) {
     if (!event) {
@@ -53,10 +72,16 @@ RE::BSEventNotifyControl EventProcessor::ProcessEvent(RE::BGSActorCellEvent cons
 }
 
 RE::BSEventNotifyControl EventProcessor::ProcessEvent(const RE::PositionPlayerEvent* a_event, RE::BSTEventSource<RE::PositionPlayerEvent>*) {
+    short requiredCount = 4;
     if (!Settings::GetSingleton()->bInitialized) {
-        std::vector<std::string> args = { "OK" };
-        SkyrimScripting::ShowMessageBox("To complete the initialization of Achievement Injector save and load your game. \nUntil this task is completed, achievements will not be listened for.", args, [](int) {});
-        Settings::GetSingleton()->bInitialized = true;
+        this->PositionPlayerEventCount++;
+        logger::debug("PositionPlayerEvent happened {} time(s). Required is {}", this->PositionPlayerEventCount, this->RequiredPositionPlayerEventCount);
+
+        if (!Settings::GetSingleton()->GetDelayNewGameAlert() || (Settings::GetSingleton()->GetDelayNewGameAlert() && this->PositionPlayerEventCount >= this->RequiredPositionPlayerEventCount)) {
+            std::vector<std::string> args = { "OK" };
+            SkyrimScripting::ShowMessageBox("To complete the initialization of Achievement Injector save and load your game. \nUntil this task is completed, achievements will not be listened for.", args, [](int) {});
+            Settings::GetSingleton()->bInitialized = true;
+        }
     }
     return RE::BSEventNotifyControl::kContinue;
 }

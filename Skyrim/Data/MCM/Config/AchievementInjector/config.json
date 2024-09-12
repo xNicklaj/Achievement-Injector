@@ -78,9 +78,6 @@
             "type": "empty"
         },
         {
-            "type": "empty"
-        },
-        {
             "type": "header",
             "text": "For developers"
         },
@@ -89,6 +86,15 @@
             "type": "toggle",
             "text": "Enable debug logs",
             "help": "Set this to true if you want logs to show all messages. This can be useful for developers.",
+            "valueOptions": {
+                "sourceType": "ModSettingBool"
+            }
+        },
+        {
+            "id": "bDelayNewGameAlert:Main",
+            "type": "toggle",
+            "text": "Delay initialization alert on new game.",
+            "help": "Set this to true to delay the initialization alert when starting a new game. This can be useful for modlist creators that don't want an alert popping up right away.",
             "valueOptions": {
                 "sourceType": "ModSettingBool"
             }

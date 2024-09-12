@@ -43,7 +43,7 @@ void Settings::LoadMCMSettings() const
 		}
 		Settings::GetSingleton()->bUsePopup = ini.GetBoolValue("Main", "bUsePopup");
 		Settings::GetSingleton()->bOverrideNotificationSound = ini.GetBoolValue("Sound", "bOverrideNotificationSound");
-
+		Settings::GetSingleton()->bDelayNewGameAlert = ini.GetBoolValue("Main", "bDelayNewGameAlert");
 		Settings::GetSingleton()->bShowHidden = ini.GetBoolValue("Main", "bShowHidden");
 		logger::debug("Set ShowHidden to {}", Settings::GetSingleton()->GetShowHidden());
 

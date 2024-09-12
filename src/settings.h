@@ -24,6 +24,7 @@ public:
 	bool GetOverrideNotificationSound() const { return bOverrideNotificationSound; }
 	bool GetShowHidden() const { return bShowHidden; }
 	std::string GetNotificationSound() const { return sNotificationSound; }
+	bool GetDelayNewGameAlert() const { return bDelayNewGameAlert; }
 
 	void SetDebug(bool a_val) { bDebug = a_val; }
 	void SetGlobal(bool a_val) { bGlobal = a_val; }
@@ -33,6 +34,7 @@ public:
 	void SetNotificationSound(std::string a_val) { sNotificationSound = a_val; }
 	void SetOverrideNotificationSounds(bool a_val) { bOverrideNotificationSound = a_val; }
 	void SetShowHidden(bool a_val) { bShowHidden = a_val; }
+	void SetDelayNewGameAlert(bool a_val) { bDelayNewGameAlert = a_val; }
 
 	void PrintSettings() const {
 		logger::debug("bDebug: {}, bGlobal: {}, bUseDebugger: {}, bUsePopup: {}, bMute: {}, iNotificationSound: {}", bDebug, bGlobal, bUseDebugger, bUsePopup, bMute, sNotificationSound);
@@ -63,5 +65,6 @@ private:
 	bool bMute{ false };
 	bool bShowHidden{ false };
 	bool bOverrideNotificationSound{ false };
+	bool bDelayNewGameAlert{ false };
 	std::string sNotificationSound{ "UISkillIncreaseSD" };
 };

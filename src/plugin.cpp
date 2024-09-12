@@ -102,6 +102,7 @@ void MessageHandler(SKSE::MessagingInterface::Message* a_msg)
 		AchievementManager::GetSingleton()->UpdateCache();
 		break;
 	case SKSE::MessagingInterface::kPostLoad:
+		EventProcessor::GetSingleton()->EvaluateRequiredCellChanges();
 		break;
 	case SKSE::MessagingInterface::kPreLoadGame:
 		break;
