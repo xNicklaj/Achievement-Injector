@@ -101,6 +101,7 @@ void EventProcessor::Register() {
     EventProcessor *eventProcessor = EventProcessor::GetSingleton();
 	ui->AddEventSink<RE::MenuOpenCloseEvent>(GetSingleton());
     RE::BSInputDeviceManager::GetSingleton()->AddEventSink<RE::InputEvent*>(eventProcessor);
+    // ENABLE THE FOLLOWING LINE TO ENABLE THE INITIALIZATION MESSAGE BOX
     //RE::PlayerCharacter::GetSingleton()->AsPositionPlayerEventSource()->AddEventSink<RE::PositionPlayerEvent>(this);
 	//logger::debug("Registered event {}"sv, typeid(RE::MenuOpenCloseEvent).name());
 }

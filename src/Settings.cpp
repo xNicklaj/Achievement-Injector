@@ -35,16 +35,16 @@ bool Settings::AssignValue(CSimpleIniA* ini, T* setting, std::string section, st
 	const char* value = nullptr;
 	value = ini->GetValue(section.c_str(), key.c_str());
 	if (value == nullptr) return false;
-	if (std::is_same<T, bool>::value) {
+	if constexpr (std::is_same<T, bool>::value) {
 		*setting = ini->GetBoolValue(section.c_str(), key.c_str());
 	}
-	else if (std::is_same<T, int>::value) {
+	else if constexpr (std::is_same<T, int>::value) {
 		*setting = ini->GetLongValue(section.c_str(), key.c_str());
 	}
-	else if (std::is_same<T, std::string>::value) {
+	else if constexpr (std::is_same<T, std::string>::value) {
 		*setting = *value;
 	}
-	else {
+	else{
 		logger::error("Unsupported type");
 		return false;
 	}
