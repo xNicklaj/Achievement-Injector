@@ -121,7 +121,7 @@ void MessageHandler(SKSE::MessagingInterface::Message* a_msg)
 		Scaleform::AchievementMenuInjector::Register();
 		Scaleform::AchievementMenu::Register();
 		//Serializer::GetSingleton()->CreateFileIfNotExists();
-		AchievementManager::GetSingleton()->UpdateCache();
+		//AchievementManager::GetSingleton()->UpdateCache();
 		EventProcessor::GetSingleton()->eventHandler.appendListener("PostLoadGame", InitializePostLoad);
 		break;
 	case SKSE::MessagingInterface::kPostLoad:
