@@ -1214,6 +1214,16 @@
                     "level": 25
                 }
             ]
+        },
+        {
+            "achievementName": "Master",
+            "description": "Reach Level 50",
+            "conditions": [
+                {
+                    "type": "PlayerLevel",
+                    "level": 50
+                }
+            ]
         }
     ]
 }
