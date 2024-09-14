@@ -33,23 +33,24 @@ RE::BSEventNotifyControl QuestObjectiveDoneCondition::ProcessEvent(const RE::Pos
     return RE::BSEventNotifyControl::kContinue;
 }
 bool QuestObjectiveDoneCondition::CheckCondition() {
+    bool found = false;
     if (this->isMet) return true;
-    logger::debug("Analyzing quest {}...", quest->fullName.c_str());
-    logger::debug("Quest {} is at stage {}", quest->fullName.c_str(), quest->currentStage);
     for (auto& objective : quest->objectives) {
+		if (objective->index != this->objective) continue;
+        found = true;
         if(objective->state == RE::QUEST_OBJECTIVE_STATE::kFailed) {
-            logger::debug("Objective \"{}\" has state kFailed", objective->displayText.c_str());
+            logger::debug("Objective {} for quest {} has state kFailed", objective->index, this->formID);
         } else if (objective->state == RE::QUEST_OBJECTIVE_STATE::kCompleted) {
-            logger::debug("Objective \"{}\" has state kCompleted", objective->displayText.c_str());
+            logger::debug("Objective {} for quest {} has state kCompleted", objective->index, this->formID);
         } else if (objective->state == RE::QUEST_OBJECTIVE_STATE::kDormant) {
-			logger::debug("Objective \"{}\" has state kDormant", objective->displayText.c_str());
+			logger::debug("Objective {} for quest {} has state kDormant", objective->index, this->formID);
         } else if (objective->state == RE::QUEST_OBJECTIVE_STATE::kCompletedDisplayed) {
-            logger::debug("Objective \"{}\" has state kCompletedDisplayed", objective->displayText.c_str());
+            logger::debug("Objective {} for quest {} has state kCompletedDisplayed", objective->index, this->formID);
         } else if (objective->state == RE::QUEST_OBJECTIVE_STATE::kDisplayed) {
-            logger::debug("Objective \"{}\" has state kDisplayed", objective->displayText.c_str());
+            logger::debug("Objective {} for quest {} has state kDisplayed", objective->index, this->formID);
         }
 
-        if (objective->index == this->objective && objective->initialized && objective->state == RE::QUEST_OBJECTIVE_STATE::kCompleted) {
+        if (objective->index == this->objective && (objective->state == RE::QUEST_OBJECTIVE_STATE::kDisplayed || objective->state == RE::QUEST_OBJECTIVE_STATE::kCompletedDisplayed )) {
             logger::info("Player met condition quest {} objective {}", this->formID, this->objective);
             this->UnlockNotify();
             RE::ScriptEventSourceHolder::GetSingleton()->RemoveEventSink<RE::TESQuestStageEvent>(this);
@@ -57,6 +58,7 @@ bool QuestObjectiveDoneCondition::CheckCondition() {
             return true;
         }
 	}
+	logger::debug("Objective {} for quest {} not found or not displayed.", this->objective, this->formID);
     return false;
 }
 
