@@ -7,19 +7,12 @@
     private var list:Object;
     private var scrollEnabled:Boolean;
     private var maxScroll:Number;
-    private var mouseListener:Object;
     private var currentIndex:Number;
 
     function onLoad(): Void {
         scrollbar.upArrow._visible = false;
         scrollbar.downArrow._visible = false;
         list = new Object();
-        this.mouseListener = new Object();
-        var _this = this;
-        mouseListener.onMouseWheel = function( delta ) {
-            _this.onMouseWheelCallback( delta );
-        }
-        Mouse.addListener(mouseListener);
         scrollbar.addEventListener("scroll", this, "onScroll");
     }
 
@@ -66,13 +59,9 @@
     function onMouseWheelCallback(delta) {
         if ( scrollEnabled ) {
             var value = AchievementCardHolder_mc._y + 15 * ( delta * 2 );
-            value = clampValue( value, maxScroll * -1, 0 );
+            value = AchievementUtils.clampValue( value, maxScroll * -1, 0 );
             scrollbar.position = value * -1;
         }
-    }
-
-    function clampValue(a_val: Number, a_min: Number, a_max: Number): Number {
-        return Math.min(a_max, Math.max(a_min, a_val));
     }
 
     function setFocusTo(index:Number) {

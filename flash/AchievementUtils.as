@@ -33,4 +33,8 @@ class AchievementUtils {
         input.text = text;
         input.setTextFormat( textFormat );
     }
+
+    public static function clampValue(a_val: Number, a_min: Number, a_max: Number): Number {
+        return Math.min(a_max, Math.max(a_min, a_val));
+    }
 }

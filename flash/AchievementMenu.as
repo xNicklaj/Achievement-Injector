@@ -6,22 +6,40 @@ import Components.CrossPlatformButtons;
 class AchievementMenu extends MovieClip {
 
     /* stage elements */
-    public var groupHolder_mc:MovieClip;
     public var heading_tf:TextField;
     public var progress_tf:TextField;
+    public var AchievementGroups_mc:MovieClip;
     public var AchievementList_mc:MovieClip;
     public var BottomBar_mc:MovieClip;
 
     private var data:Object;
     private var isFocusOnGroups:Boolean = true;
     private var focusIndex:Number = -1;
+    private var mouseListener:Object;
 
     function onLoad(): Void {
         BottomBar_mc = _root.BottomBar_mc;
         Key.addListener(this);
+        setupMouseListener();
         Selection["alwaysEnableArrowKeys"] = false;
         heading_tf.noTranslate = progress_tf.noTranslate = true;
-		skse.SendModEvent( 'AchievementMenu_Init' )
+    }
+
+    function setupMouseListener() {
+        mouseListener = new Object();
+        var _this = this;
+        mouseListener.onMouseWheel = function( delta ) {
+            _this.onMouseWheelCallback( delta );
+        }
+        Mouse.addListener(mouseListener);
+    }
+
+    function onMouseWheelCallback( delta ) {
+        if ( isFocusOnGroups ) {
+            AchievementGroups_mc.onMouseWheelCallback(delta);
+        } else {
+            AchievementList_mc.onMouseWheelCallback(delta);
+        }
     }
 
 	function InitExtensions(): Void {
@@ -31,18 +49,16 @@ class AchievementMenu extends MovieClip {
 	function SetPlatform(aiPlatformIndex: Number, abPS3Switch: Boolean): Void {
         var BackButtonInstance:CrossPlatformButtons = BottomBar_mc.ButtonRect.BackButtonInstance;
         BackButtonInstance.SetPlatform(aiPlatformIndex, abPS3Switch);
-        var MoveColumnInstance:CrossPlatformButtons = BottomBar_mc.ButtonRect.MoveColumnInstance;
-        MoveColumnInstance.SetPlatform(aiPlatformIndex, abPS3Switch);
+        var UpDownInstance:CrossPlatformButtons = BottomBar_mc.ButtonRect.UpDownInstance;
+        UpDownInstance.SetPlatform(aiPlatformIndex, abPS3Switch);
+        var RightInstance:CrossPlatformButtons = BottomBar_mc.ButtonRect.RightInstance;
+        RightInstance.SetPlatform(aiPlatformIndex, abPS3Switch);
+        var LeftInstance:CrossPlatformButtons = BottomBar_mc.ButtonRect.LeftInstance;
+        LeftInstance.SetPlatform(aiPlatformIndex, abPS3Switch);
     }
 
     function render() {
-        var y = 0;
-        for ( var i = 0; i < data.length; i++ ) {
-            var mc = groupHolder_mc.attachMovie('AchievementGroup', 'AchievementGroup_' + i, groupHolder_mc.getNextHighestDepth());
-            mc.setData( i, data[ i ].groupName, data[ i ].image, this );
-            mc._y = y;
-            y += 55;
-        }
+        AchievementGroups_mc.showGroups(data);
 
         loadGroup(0);
     }
@@ -79,8 +95,8 @@ class AchievementMenu extends MovieClip {
 
     function setFocusTo(nextIndex:Number) {
         if ( isFocusOnGroups ) {
-            if ( groupHolder_mc['AchievementGroup_' + nextIndex ] ) {
-                Selection.setFocus( groupHolder_mc['AchievementGroup_' + nextIndex ] );
+            if ( AchievementGroups_mc.getClipIndex( nextIndex ) ) {
+                AchievementGroups_mc.setFocusTo( nextIndex );
                 focusIndex = nextIndex;
             }
         } else {
@@ -102,7 +118,7 @@ class AchievementMenu extends MovieClip {
             if ( ! isFocusOnGroups ) {
                 isFocusOnGroups = true;
                 focusIndex = 0;
-                Selection.setFocus(groupHolder_mc['AchievementGroup_' + 0]);
+                AchievementGroups_mc.setFocusTo(0);
             }
         } else if ( Key.getCode() === 39 ) { // right
             if ( isFocusOnGroups ) {
@@ -111,8 +127,9 @@ class AchievementMenu extends MovieClip {
                 AchievementList_mc.setFocusTo(0);
             }
         } else if ( Key.getCode() === 13 ) { // Activate
-            if ( isFocusOnGroups && groupHolder_mc['AchievementGroup_' + focusIndex ] ) {
-                groupHolder_mc['AchievementGroup_' + focusIndex ].onRelease();
+            var mc;
+            if ( isFocusOnGroups && ( mc = AchievementGroups_mc.getClipIndex( focusIndex ) ) ) {
+                mc.onRelease();
             }
         }
     }
