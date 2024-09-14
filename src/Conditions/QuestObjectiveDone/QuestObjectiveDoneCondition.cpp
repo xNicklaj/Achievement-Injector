@@ -39,15 +39,15 @@ bool QuestObjectiveDoneCondition::CheckCondition() {
 		if (objective->index != this->objective) continue;
         found = true;
         if(objective->state == RE::QUEST_OBJECTIVE_STATE::kFailed) {
-            logger::debug("Objective {} for quest {} has state kFailed", objective->index, this->formID);
+            logger::debug("Objective {} for quest {} at stage {} has state kFailed", objective->index, this->formID, quest->currentStage);
         } else if (objective->state == RE::QUEST_OBJECTIVE_STATE::kCompleted) {
-            logger::debug("Objective {} for quest {} has state kCompleted", objective->index, this->formID);
+            logger::debug("Objective {} for quest {} at stage {} has state kCompleted", objective->index, this->formID, quest->currentStage);
         } else if (objective->state == RE::QUEST_OBJECTIVE_STATE::kDormant) {
-			logger::debug("Objective {} for quest {} has state kDormant", objective->index, this->formID);
+			logger::debug("Objective {} for quest {} at stage {} has state kDormant", objective->index, this->formID, quest->currentStage);
         } else if (objective->state == RE::QUEST_OBJECTIVE_STATE::kCompletedDisplayed) {
-            logger::debug("Objective {} for quest {} has state kCompletedDisplayed", objective->index, this->formID);
+            logger::debug("Objective {} for quest {} at stage {} has state kCompletedDisplayed", objective->index, this->formID, quest->currentStage);
         } else if (objective->state == RE::QUEST_OBJECTIVE_STATE::kDisplayed) {
-            logger::debug("Objective {} for quest {} has state kDisplayed", objective->index, this->formID);
+            logger::debug("Objective {} for quest {} at stage {} has state kDisplayed", objective->index, this->formID, quest->currentStage);
         }
 
         if (objective->index == this->objective && (objective->state == RE::QUEST_OBJECTIVE_STATE::kDisplayed || objective->state == RE::QUEST_OBJECTIVE_STATE::kCompletedDisplayed )) {
