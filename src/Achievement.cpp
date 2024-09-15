@@ -219,8 +219,8 @@ void Achievement::EnableListener(void) {
 
 void Achievement::OnSerializationRequested() {
     logger::info("Serialization requested.");
-    AchievementManager::GetSingleton()->UpdateCache();
     Serializer::GetSingleton()->SerializeAchievementData(this);
+    AchievementManager::GetSingleton()->UpdateCache();
 }
 
 void Achievement::OnConditionMet(void) {
@@ -308,14 +308,14 @@ json Achievement::ToJson() {
     json data = json::object();
 
     std::string description = this->description;
-    if (this->hidden && !Settings::GetSingleton()->GetShowHidden()) description = "Hidden Description.";
+    if (!this->unlocked && this->hidden && !Settings::GetSingleton()->GetShowHidden()) description = "Hidden Description.";
 
     if (Settings::GetSingleton()->GetGlobal()) {
         SerializedAchievement sa = Serializer::GetSingleton()->DeserializeAchievementData_GLOBAL(this->achievementName);
         data["AchievementName"] = this->achievementName;
         data["Description"] = description;
         data["UnlockDatetime"] = sa.unlockDatetime;
-        data["Unlocked"] = sa.unlocked;
+        data["Unlocked"] = this->unlocked;
     }
     else {
         SerializedAchievement sa = Serializer::GetSingleton()->DeserializeAchievementData(this->achievementName);
