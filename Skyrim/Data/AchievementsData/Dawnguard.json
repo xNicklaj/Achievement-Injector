@@ -3,8 +3,8 @@
     "plugin": "Dawnguard.esm",
     "achievements": [
         {
-            "achievementName": "Awakening",
-            "description": "Complete 'Awakening'",
+            "achievementName": "$NAME_Awakening",
+            "description": "$DESC_Awakening",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -14,8 +14,8 @@
             ]
         },
         {
-            "achievementName": "Beyond Death",
-            "description": "Complete 'Beyond Death'",
+            "achievementName": "$NAME_Beyond Death",
+            "description": "$DESC_Beyond Death",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -25,8 +25,8 @@
             ]
         },
         {
-            "achievementName": "Kindred Judgment",
-            "description": "Complete 'Kindred Judgment'",
+            "achievementName": "$NAME_Kindred Judgment",
+            "description": "$DESC_Kindred Judgment",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -36,8 +36,8 @@
             ]
         },
         {
-            "achievementName": "Lost to the Ages",
-            "description": "Complete 'Lost to the Ages'",
+            "achievementName": "$NAME_Lost to the Ages",
+            "description": "$DESC_Lost to the Ages",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -47,8 +47,8 @@
             ]
         },
         {
-            "achievementName": "Soul Tear",
-            "description": "Learn all three words of Soul Tear",
+            "achievementName": "$NAME_Soul Tear",
+            "description": "$DESC_Soul Tear",
             "conditions": [
                 {
                     "type": "ShoutLearned",
@@ -58,13 +58,13 @@
             ]
         },
         {
-            "achievementName": "Auriel's Bow",
-            "description": "Use the special power of Auriel's Bow",
+            "achievementName": "$NAME_Auriel's Bow",
+            "description": "$DESC_Auriel's Bow",
             "conditions": []
         },
         {
-            "achievementName": "Werewolf Mastered",
-            "description": "Acquire 11 werewolf perks",
+            "achievementName": "$NAME_Werewolf Mastered",
+            "description": "$DESC_Werewolf Mastered",
             "conditions": [
                 {
                     "type": "InvestedPerkPoints",
@@ -74,8 +74,8 @@
             ]
         },
         {
-            "achievementName": "Vampire Mastered",
-            "description": "Acquire 11 vampire perks",
+            "achievementName": "$NAME_Vampire Mastered",
+            "description": "$DESC_Vampire Mastered",
             "conditions": [
                 {
                     "type": "InvestedPerkPoints",
@@ -85,8 +85,8 @@
             ]
         },
         {
-            "achievementName": "A New You",
-            "description": "Change your face",
+            "achievementName": "$NAME_A New You",
+            "description": "$DESC_A New You",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -96,8 +96,8 @@
             ]
         },
         {
-            "achievementName": "Legend",
-            "description": "Defeat a Legendary Dragon",
+            "achievementName": "$NAME_Legend",
+            "description": "$DESC_Legend",
             "conditions": [
                 {
                     "type": "BaseActorDeath",

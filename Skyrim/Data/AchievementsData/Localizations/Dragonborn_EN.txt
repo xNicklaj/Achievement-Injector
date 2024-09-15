@@ -1,0 +1,20 @@
+$NAME_Outlander	Outlander
+$DESC_Outlander	Arrive on Solstheim
+$NAME_The Temple of Miraak	The Temple of Miraak
+$DESC_The Temple of Miraak	Complete 'The Temple of Miraak'
+$NAME_The Path of Knowledge	The Path of Knowledge
+$DESC_The Path of Knowledge	Complete 'The Path of Knowledge'
+$NAME_At the Summit of Apocrypha	At the Summit of Apocrypha
+$DESC_At the Summit of Apocrypha	Complete 'At the Summit of Apocrypha'
+$NAME_Dragon Aspect	Dragon Aspect
+$DESC_Dragon Aspect	Learn all 3 words of Dragon Aspect
+$NAME_Hidden Knowledge	Hidden Knowledge
+$DESC_Hidden Knowledge	Learn the secrets of 5 Black Books
+$NAME_Stalhrim Crafter	Stalhrim Crafter
+$DESC_Stalhrim Crafter	Craft an item out of Stalhrim
+$NAME_Dragonrider	Dragonrider
+$DESC_Dragonrider	Tame and ride 5 dragons
+$NAME_Raven Rock Owner	Raven Rock Owner
+$DESC_Raven Rock Owner	Own a house in Raven Rock
+$NAME_Solstheim Explorer	Solstheim Explorer
+$DESC_Solstheim Explorer	Discover 30 locations on the island of Solstheim

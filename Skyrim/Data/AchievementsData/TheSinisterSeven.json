@@ -3,8 +3,8 @@
 	"plugin": "The_Sinister_Seven.esp",
 	"achievements": [
 		{
-			"achievementName": "Force of Nature",
-			"description": "Survive the minor members of The Sinister Seven.",
+			"achievementName": "$NAME_Force of Nature",
+			"description": "$DESC_Force of Nature",
 			"conditionType": "AND",
 			"conditions": [
 				{
@@ -35,8 +35,8 @@
 			]
 		},
 		{
-			"achievementName": "Some good family time",
-			"description": "Survive the Mother and the Father.",
+			"achievementName": "$NAME_Some good family time",
+			"description": "$DESC_Some good family time",
 			"conditionType": "AND",
 			"conditions": [
 				{
@@ -52,8 +52,8 @@
 			]
 		},
 		{
-			"achievementName": "The last one standing",
-			"description": "Defeat all members of the Sinister Seven",
+			"achievementName": "$NAME_The last one standing",
+			"description": "$DESC_The last one standing",
 			"conditions": [
 				{
 					"type": "QuestStageDone",

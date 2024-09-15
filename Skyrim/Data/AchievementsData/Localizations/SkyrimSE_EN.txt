@@ -1,3 +1,103 @@
+$NAME_Unbound	Unbound
+$DESC_Unbound	Complete "Unbound"
+$NAME_Bleak Falls Barrow	Bleak Falls Barrow
+$DESC_Bleak Falls Barrow	Complete "Bleak Falls Barrow"
+$NAME_The Way of the Voice	The Way of the Voice
+$DESC_The Way of the Voice	Complete "The Way of the Voice"
+$NAME_Diplomatic Immunity	Diplomatic Immunity
+$DESC_Diplomatic Immunity	Complete "Diplomatic Immunity"
+$NAME_Alduin's Wall	Alduin's Wall
+$DESC_Alduin's Wall	Complete "Alduin's Wall"
+$NAME_Elder Knowledge	Elder Knowledge
+$DESC_Elder Knowledge	Complete "Elder Knowledge"
+$NAME_The Fallen	The Fallen
+$DESC_The Fallen	Complete "The Fallen"
+$NAME_Dragonslayer	Dragonslayer
+$DESC_Dragonslayer	Complete "Dragonslayer"
+$NAME_Take Up Arms	Take Up Arms
+$DESC_Take Up Arms	Join the Companions
+$NAME_Blood Oath	Blood Oath
+$DESC_Blood Oath	Become a member of the Circle
+$NAME_Glory of the Dead	Glory of the Dead
+$DESC_Glory of the Dead	Complete "Glory of the Dead"
+$NAME_Gatekeeper	Gatekeeper
+$DESC_Gatekeeper	Join the College of Winterhold
+$NAME_Revealing the Unseen	Revealing the Unseen
+$DESC_Revealing the Unseen	Complete "Revealing the Unseen"
+$NAME_The Eye of Magnus	The Eye of Magnus
+$DESC_The Eye of Magnus	Complete "The Eye of Magnus"
+$NAME_Taking Care of Business	Taking Care of Business
+$DESC_Taking Care of Business	Join the Thieves Guild
+$NAME_Darkness Returns	Darkness Returns
+$DESC_Darkness Returns	Complete "Darkness Returns"
+$NAME_One with the Shadows	One with the Shadows
+$DESC_One with the Shadows	Returned the Thieves Guild to its former glory
+$NAME_With Friends Like These	With Friends Like These
+$DESC_With Friends Like These	Join the Dark Brotherhood
+$NAME_Bound Until Death	Bound Until Death
+$DESC_Bound Until Death	Complete "Bound Until Death"
+$NAME_Hail Sithis!	Hail Sithis!
+$DESC_Hail Sithis!	Complete "Hail Sithis!"
+$NAME_Taking Sides	Taking Sides
+$DESC_Taking Sides	Join the Stormcloaks or the Imperial Army
+$NAME_War Hero	War Hero
+$DESC_War Hero	Capture Fort Sungard or Fort Greenwall
+$NAME_Hero of Skyrim	Hero of Skyrim
+$DESC_Hero of Skyrim	Capture Solitude or Windhelm
+$NAME_Sideways	Sideways
+$DESC_Sideways	Complete 10 side quests
+$NAME_Hero of the People	Hero of the People
+$DESC_Hero of the People	Complete 50 Misc Objectives
+$NAME_Hard Worker	Hard Worker
+$DESC_Hard Worker	Chop wood, mine ore, and cook food
+$NAME_Thief	Thief
+$DESC_Thief	Pick 50 locks and 50 pockets
+$NAME_Snake Tongue	Snake Tongue
+$DESC_Snake Tongue	Successfully persuade, bribe, and intimidate
+$NAME_Blessed	Blessed
+$DESC_Blessed	Select a Standing Stone blessing
+$NAME_Standing Stones	Standing Stones
+$DESC_Standing Stones	Find 13 Standing Stones
+$NAME_Citizen	Citizen
+$DESC_Citizen	Buy a house
+$NAME_Wanted	Wanted
+$DESC_Wanted	Escape from jail
+$NAME_Married	Married
+$DESC_Married	Get married
+$NAME_Artificer	Artificer
+$DESC_Artificer	Make a smithed item, an enchanted item, and a potion
+$NAME_Master Criminal	Master Criminal
+$DESC_Master Criminal	Bounty of 1000 gold in all nine holds
+$NAME_Golden Touch	Golden Touch
+$DESC_Golden Touch	Have 100,000 gold
+$NAME_Delver	Delver
+$DESC_Delver	Clear 50 dungeons
+$NAME_Skill Master	Skill Master
+$DESC_Skill Master	Get a skill to 100
+$NAME_Explorer	Explorer
+$DESC_Explorer	Discover 100 Locations
+$NAME_Reader	Reader
+$DESC_Reader	Read 50 Skill Books
+$NAME_Daedric Influence	Daedric Influence
+$DESC_Daedric Influence	Acquire a Daedric Artifact
+$NAME_Oblivion Walker	Oblivion Walker
+$DESC_Oblivion Walker	Collect 15 Daedric Artifacts
+$NAME_Dragon Soul	Dragon Soul
+$DESC_Dragon Soul	Absorb a dragon soul
+$NAME_Dragon Hunter	Dragon Hunter
+$DESC_Dragon Hunter	Absorb 20 dragon souls
+$NAME_Words of Power	Words of Power
+$DESC_Words of Power	Learn all three words of a shout
+$NAME_Thu'um Master	Thu'um Master
+$DESC_Thu'um Master	Learn 20 shouts
+$NAME_Apprentice	Apprentice
+$DESC_Apprentice	Reach Level 5
+$NAME_Adept	Adept
+$DESC_Adept	Reach Level 10
+$NAME_Expert	Expert
+$DESC_Expert	Reach Level 25
+$NAME_Master	Master
+$DESC_Master	Reach Level 50
 $Guardian Stones	The Guardian Stones
 $Apprentice Stone	The Apprentice Stone
 $Atronach Stone		The Atronach Stone

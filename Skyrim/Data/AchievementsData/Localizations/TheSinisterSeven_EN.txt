@@ -1,0 +1,6 @@
+$NAME_Force of Nature	Force of Nature
+$DESC_Force of Nature	Survive the minor members of The Sinister Seven.
+$NAME_Some good family time	Some good family time
+$DESC_Some good family time	Survive the Mother and the Father.
+$NAME_The last one standing	The last one standing
+$DESC_The last one standing	Defeat all members of the Sinister Seven

@@ -1,1 +1,21 @@
+$NAME_Awakening	Awakening
+$DESC_Awakening	Complete 'Awakening'
+$NAME_Beyond Death	Beyond Death
+$DESC_Beyond Death	Complete 'Beyond Death'
+$NAME_Kindred Judgment	Kindred Judgment
+$DESC_Kindred Judgment	Complete 'Kindred Judgment'
+$NAME_Lost to the Ages	Lost to the Ages
+$DESC_Lost to the Ages	Complete 'Lost to the Ages'
+$NAME_Soul Tear	Soul Tear
+$DESC_Soul Tear	Learn all three words of Soul Tear
+$NAME_Auriel's Bow	Auriel's Bow
+$DESC_Auriel's Bow	Use the special power of Auriel's Bow
+$NAME_Werewolf Mastered	Werewolf Mastered
+$DESC_Werewolf Mastered	Acquire 11 werewolf perks
+$NAME_Vampire Mastered	Vampire Mastered
+$DESC_Vampire Mastered	Acquire 11 vampire perks
+$NAME_A New You	A New You
+$DESC_A New You	Change your face
+$NAME_Legend	Legend
+$DESC_Legend	Defeat a Legendary Dragon
 $Legendary Dragon	Legendary Dragon

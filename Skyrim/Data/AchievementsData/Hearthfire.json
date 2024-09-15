@@ -3,8 +3,8 @@
     "plugin": "HearthFires.esm",
     "achievements": [
         {
-            "achievementName": "Proud Parent",
-            "description": "Adopt a child",
+            "achievementName": "$NAME_Proud Parent",
+            "description": "$DESC_Proud Parent",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -15,8 +15,8 @@
             ]
         },
         {
-            "achievementName": "Landowner",
-            "description": "Buy a plot of land",
+            "achievementName": "$NAME_Landowner",
+            "description": "$DESC_Landowner",
             "conditionsJoinType": "OR",
             "conditions": [
                 {
@@ -37,12 +37,12 @@
             ]
         },
         {
-            "achievementName": "Architect",
-            "description": "Build three wings on a house"
+            "achievementName": "$NAME_Architect",
+            "description": "$DESC_Architect"
         },
         {
-            "achievementName": "Land Baron",
-            "description": "Buy three plots of land",
+            "achievementName": "$NAME_Land Baron",
+            "description": "$DESC_Land Baron",
             "conditionsJoinType": "AND",
             "conditions": [
                 {
@@ -63,8 +63,8 @@
             ]
         },
         {
-            "achievementName": "Master Architect",
-            "description": "Build three houses",
+            "achievementName": "$NAME_Master Architect",
+            "description": "$DESC_Master Architect",
             "conditionsJoinType": "AND",
             "conditions": [
                 {

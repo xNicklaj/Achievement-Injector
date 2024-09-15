@@ -3,8 +3,8 @@
     "plugin": "Skyrim.esm",
     "achievements": [
         {
-            "achievementName": "Unbound",
-            "description": "Complete \"Unbound\"",
+            "achievementName": "$NAME_Unbound",
+            "description": "$DESC_Unbound",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -14,8 +14,8 @@
             ]
         },
         {
-            "achievementName": "Bleak Falls Barrow",
-            "description": "Complete \"Bleak Falls Barrow\"",
+            "achievementName": "$NAME_Bleak Falls Barrow",
+            "description": "$DESC_Bleak Falls Barrow",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -25,8 +25,8 @@
             ]
         },
         {
-            "achievementName": "The Way of the Voice",
-            "description": "Complete \"The Way of the Voice\"",
+            "achievementName": "$NAME_The Way of the Voice",
+            "description": "$DESC_The Way of the Voice",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -36,8 +36,8 @@
             ]
         },
         {
-            "achievementName": "Diplomatic Immunity",
-            "description": "Complete \"Diplomatic Immunity\"",
+            "achievementName": "$NAME_Diplomatic Immunity",
+            "description": "$DESC_Diplomatic Immunity",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -47,8 +47,8 @@
             ]
         },
         {
-            "achievementName": "Alduin's Wall",
-            "description": "Complete \"Alduin's Wall\"",
+            "achievementName": "$NAME_Alduin's Wall",
+            "description": "$DESC_Alduin's Wall",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -58,8 +58,8 @@
             ]
         },
         {
-            "achievementName": "Elder Knowledge",
-            "description": "Complete \"Elder Knowledge\"",
+            "achievementName": "$NAME_Elder Knowledge",
+            "description": "$DESC_Elder Knowledge",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -69,8 +69,8 @@
             ]
         },
         {
-            "achievementName": "The Fallen",
-            "description": "Complete \"The Fallen\"",
+            "achievementName": "$NAME_The Fallen",
+            "description": "$DESC_The Fallen",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -80,8 +80,8 @@
             ]
         },
         {
-            "achievementName": "Dragonslayer",
-            "description": "Complete \"Dragonslayer\"",
+            "achievementName": "$NAME_Dragonslayer",
+            "description": "$DESC_Dragonslayer",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -91,8 +91,8 @@
             ]
         },
         {
-            "achievementName": "Take Up Arms",
-            "description": "Join the Companions",
+            "achievementName": "$NAME_Take Up Arms",
+            "description": "$DESC_Take Up Arms",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -102,8 +102,8 @@
             ]
         },
         {
-            "achievementName": "Blood Oath",
-            "description": "Become a member of the Circle",
+            "achievementName": "$NAME_Blood Oath",
+            "description": "$DESC_Blood Oath",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -113,8 +113,8 @@
             ]
         },
         {
-            "achievementName": "Glory of the Dead",
-            "description": "Complete \"Glory of the Dead\"",
+            "achievementName": "$NAME_Glory of the Dead",
+            "description": "$DESC_Glory of the Dead",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -124,8 +124,8 @@
             ]
         },
         {
-            "achievementName": "Gatekeeper",
-            "description": "Join the College of Winterhold",
+            "achievementName": "$NAME_Gatekeeper",
+            "description": "$DESC_Gatekeeper",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -135,8 +135,8 @@
             ]
         },
         {
-            "achievementName": "Revealing the Unseen",
-            "description": "Complete \"Revealing the Unseen\"",
+            "achievementName": "$NAME_Revealing the Unseen",
+            "description": "$DESC_Revealing the Unseen",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -146,8 +146,8 @@
             ]
         },
         {
-            "achievementName": "The Eye of Magnus",
-            "description": "Complete \"The Eye of Magnus\"",
+            "achievementName": "$NAME_The Eye of Magnus",
+            "description": "$DESC_The Eye of Magnus",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -157,8 +157,8 @@
             ]
         },
         {
-            "achievementName": "Taking Care of Business",
-            "description": "Join the Thieves Guild",
+            "achievementName": "$NAME_Taking Care of Business",
+            "description": "$DESC_Taking Care of Business",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -168,8 +168,8 @@
             ]
         },
         {
-            "achievementName": "Darkness Returns",
-            "description": "Complete \"Darkness Returns\"",
+            "achievementName": "$NAME_Darkness Returns",
+            "description": "$DESC_Darkness Returns",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -179,8 +179,8 @@
             ]
         },
         {
-            "achievementName": "One with the Shadows",
-            "description": "Returned the Thieves Guild to its former glory",
+            "achievementName": "$NAME_One with the Shadows",
+            "description": "$DESC_One with the Shadows",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -190,8 +190,8 @@
             ]
         },
         {
-            "achievementName": "With Friends Like These",
-            "description": "Join the Dark Brotherhood",
+            "achievementName": "$NAME_With Friends Like These",
+            "description": "$DESC_With Friends Like These",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -201,8 +201,8 @@
             ]
         },
         {
-            "achievementName": "Bound Until Death",
-            "description": "Complete \"Bound Until Death\"",
+            "achievementName": "$NAME_Bound Until Death",
+            "description": "$DESC_Bound Until Death",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -212,8 +212,8 @@
             ]
         },
         {
-            "achievementName": "Hail Sithis!",
-            "description": "Complete \"Hail Sithis!\"",
+            "achievementName": "$NAME_Hail Sithis!",
+            "description": "$DESC_Hail Sithis!",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -223,8 +223,8 @@
             ]
         },
         {
-            "achievementName": "Taking Sides",
-            "description": "Join the Stormcloaks or the Imperial Army",
+            "achievementName": "$NAME_Taking Sides",
+            "description": "$DESC_Taking Sides",
             "joinType": "OR",
             "conditions": [
                 {
@@ -240,8 +240,8 @@
             ]
         },
         {
-            "achievementName": "War Hero",
-            "description": "Capture Fort Sungard or Fort Greenwall",
+            "achievementName": "$NAME_War Hero",
+            "description": "$DESC_War Hero",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -251,8 +251,8 @@
             ]
         },
         {
-            "achievementName": "Hero of Skyrim",
-            "description": "Capture Solitude or Windhelm",
+            "achievementName": "$NAME_Hero of Skyrim",
+            "description": "$DESC_Hero of Skyrim",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -262,8 +262,8 @@
             ]
         },
         {
-            "achievementName": "Sideways",
-            "description": "Complete 10 side quests",
+            "achievementName": "$NAME_Sideways",
+            "description": "$DESC_Sideways",
             "conditions": [
                 {
                     "type": "GlobalVariableState",
@@ -273,8 +273,8 @@
             ]
         },
         {
-            "achievementName": "Hero of the People",
-            "description": "Complete 50 Misc Objectives",
+            "achievementName": "$NAME_Hero of the People",
+            "description": "$DESC_Hero of the People",
             "conditions": [
                 {
                     "type": "GlobalVariableState",
@@ -284,8 +284,8 @@
             ]
         },
         {
-            "achievementName": "Hard Worker",
-            "description": "Chop wood, mine ore, and cook food",
+            "achievementName": "$NAME_Hard Worker",
+            "description": "$DESC_Hard Worker",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -295,8 +295,8 @@
             ]
         },
         {
-            "achievementName": "Thief",
-            "description": "Pick 50 locks and 50 pockets",
+            "achievementName": "$NAME_Thief",
+            "description": "$DESC_Thief",
             "joinType": "AND",
             "conditions": [
                 {
@@ -312,8 +312,8 @@
             ]
         },
         {
-            "achievementName": "Snake Tongue",
-            "description": "Successfully persuade, bribe, and intimidate",
+            "achievementName": "$NAME_Snake Tongue",
+            "description": "$DESC_Snake Tongue",
             "joinType": "AND",
             "conditions": [
                 {
@@ -334,8 +334,8 @@
             ]
         },
         {
-            "achievementName": "Blessed",
-            "description": "Select a Standing Stone blessing",
+            "achievementName": "$NAME_Blessed",
+            "description": "$DESC_Blessed",
             "joinType": "OR",
             "conditions": [
                 {
@@ -393,8 +393,8 @@
             ]
         },
         {
-            "achievementName": "Standing Stones",
-            "description": "Find 13 Standing Stones",
+            "achievementName": "$NAME_Standing Stones",
+            "description": "$DESC_Standing Stones",
             "joinType": "AND",
             "conditions": [
                 {
@@ -465,8 +465,8 @@
             ]
         },
         {
-            "achievementName": "Citizen",
-            "description": "Buy a house",
+            "achievementName": "$NAME_Citizen",
+            "description": "$DESC_Citizen",
             "joinType": "OR",
             "conditions": [
                 {
@@ -508,8 +508,8 @@
             ]
         },
         {
-            "achievementName": "Wanted",
-            "description": "Escape from jail",
+            "achievementName": "$NAME_Wanted",
+            "description": "$DESC_Wanted",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -520,8 +520,8 @@
             ]
         },
         {
-            "achievementName": "Married",
-            "description": "Get married",
+            "achievementName": "$NAME_Married",
+            "description": "$DESC_Married",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -531,8 +531,8 @@
             ]
         },
         {
-            "achievementName": "Artificer",
-            "description": "Make a smithed item, an enchanted item, and a potion",
+            "achievementName": "$NAME_Artificer",
+            "description": "$DESC_Artificer",
             "joinType": "AND",
             "conditions": [
                 {
@@ -543,8 +543,8 @@
             ]
         },
         {
-            "achievementName": "Master Criminal",
-            "description": "Bounty of 1000 gold in all nine holds",
+            "achievementName": "$NAME_Master Criminal",
+            "description": "$DESC_Master Criminal",
             "joinType": "AND",
             "conditions": [
                 {
@@ -595,8 +595,8 @@
             ]
         },
         {
-            "achievementName": "Golden Touch",
-            "description": "Have 100,000 gold",
+            "achievementName": "$NAME_Golden Touch",
+            "description": "$DESC_Golden Touch",
             "conditions": [
                 {
                     "type": "ItemInInventory",
@@ -606,8 +606,8 @@
             ]
         },
         {
-            "achievementName": "Delver",
-            "description": "Clear 50 dungeons",
+            "achievementName": "$NAME_Delver",
+            "description": "$DESC_Delver",
             "conditions": [
                 {
                     "type": "QueryStatValue",
@@ -617,8 +617,8 @@
             ]
         },
         {
-            "achievementName": "Skill Master",
-            "description": "Get a skill to 100",
+            "achievementName": "$NAME_Skill Master",
+            "description": "$DESC_Skill Master",
             "joinType": "OR",
             "conditions": [
                 {
@@ -714,8 +714,8 @@
             ]
         },
         {
-            "achievementName": "Explorer",
-            "description": "Discover 100 Locations",
+            "achievementName": "$NAME_Explorer",
+            "description": "$DESC_Explorer",
             "conditions": [
                 {
                     "type": "QueryStatValue",
@@ -725,8 +725,8 @@
             ]
         },
         {
-            "achievementName": "Reader",
-            "description": "Read 50 Skill Books",
+            "achievementName": "$NAME_Reader",
+            "description": "$DESC_Reader",
             "conditions": [
                 {
                     "type": "QueryStatValue",
@@ -736,8 +736,8 @@
             ]
         },
         {
-            "achievementName": "Daedric Influence",
-            "description": "Acquire a Daedric Artifact",
+            "achievementName": "$NAME_Daedric Influence",
+            "description": "$DESC_Daedric Influence",
             "joinType": "OR",
             "conditions": [
                 {
@@ -828,8 +828,8 @@
             ]
         },
         {
-            "achievementName": "Oblivion Walker",
-            "description": "Collect 15 Daedric Artifacts",
+            "achievementName": "$NAME_Oblivion Walker",
+            "description": "$DESC_Oblivion Walker",
             "joinType": "AND",
             "conditions": [
                 {
@@ -910,8 +910,8 @@
             ]
         },
         {
-            "achievementName": "Dragon Soul",
-            "description": "Absorb a dragon soul",
+            "achievementName": "$NAME_Dragon Soul",
+            "description": "$DESC_Dragon Soul",
             "conditions": [
                 {
                     "type": "DragonSoulAbsorbed",
@@ -920,8 +920,8 @@
             ]
         },
         {
-            "achievementName": "Dragon Hunter",
-            "description": "Absorb 20 dragon souls",
+            "achievementName": "$NAME_Dragon Hunter",
+            "description": "$DESC_Dragon Hunter",
             "conditions": [
                 {
                     "type": "DragonSoulAbsorbed",
@@ -930,8 +930,8 @@
             ]
         },
         {
-            "achievementName": "Words of Power",
-            "description": "Learn all three words of a shout",
+            "achievementName": "$NAME_Words of Power",
+            "description": "$DESC_Words of Power",
             "joinType": "OR",
             "conditions": [
                 {
@@ -1079,8 +1079,8 @@
             ]
         },
         {
-            "achievementName": "Thu'um Master",
-            "description": "Learn 20 shouts",
+            "achievementName": "$NAME_Thu'um Master",
+            "description": "$DESC_Thu'um Master",
             "joinCondition": "AND",
             "conditions": [
                 {
@@ -1186,8 +1186,8 @@
             ]
         },
         {
-            "achievementName": "Apprentice",
-            "description": "Reach Level 5",
+            "achievementName": "$NAME_Apprentice",
+            "description": "$DESC_Apprentice",
             "conditions": [
                 {
                     "type": "PlayerLevel",
@@ -1196,8 +1196,8 @@
             ]
         },
         {
-            "achievementName": "Adept",
-            "description": "Reach Level 10",
+            "achievementName": "$NAME_Adept",
+            "description": "$DESC_Adept",
             "conditions": [
                 {
                     "type": "PlayerLevel",
@@ -1206,8 +1206,8 @@
             ]
         },
         {
-            "achievementName": "Expert",
-            "description": "Reach Level 25",
+            "achievementName": "$NAME_Expert",
+            "description": "$DESC_Expert",
             "conditions": [
                 {
                     "type": "PlayerLevel",
@@ -1216,8 +1216,8 @@
             ]
         },
         {
-            "achievementName": "Master",
-            "description": "Reach Level 50",
+            "achievementName": "$NAME_Master",
+            "description": "$DESC_Master",
             "conditions": [
                 {
                     "type": "PlayerLevel",

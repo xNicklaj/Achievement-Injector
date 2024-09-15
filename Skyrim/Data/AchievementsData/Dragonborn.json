@@ -3,8 +3,8 @@
     "plugin": "Dragonborn.esm",
     "achievements": [
         {
-            "achievementName": "Outlander",
-            "description": "Arrive on Solstheim",
+            "achievementName": "$NAME_Outlander",
+            "description": "$DESC_Outlander",
             "joinType": "OR",
             "conditions": [
                 {
@@ -46,8 +46,8 @@
             ]
         },
         {
-            "achievementName": "The Temple of Miraak",
-            "description": "Complete 'The Temple of Miraak'",
+            "achievementName": "$NAME_The Temple of Miraak",
+            "description": "$DESC_The Temple of Miraak",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -57,8 +57,8 @@
             ]
         },
         {
-            "achievementName": "The Path of Knowledge",
-            "description": "Complete 'The Path of Knowledge'",
+            "achievementName": "$NAME_The Path of Knowledge",
+            "description": "$DESC_The Path of Knowledge",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -68,8 +68,8 @@
             ]
         },
         {
-            "achievementName": "At the Summit of Apocrypha",
-            "description": "Complete 'At the Summit of Apocrypha'",
+            "achievementName": "$NAME_At the Summit of Apocrypha",
+            "description": "$DESC_At the Summit of Apocrypha",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -79,8 +79,8 @@
             ]
         },
         {
-            "achievementName": "Dragon Aspect",
-            "description": "Learn all 3 words of Dragon Aspect",
+            "achievementName": "$NAME_Dragon Aspect",
+            "description": "$DESC_Dragon Aspect",
             "conditions": [
                 {
                     "type": "ShoutLearned",
@@ -90,14 +90,13 @@
             ]
         },
         {
-            "achievementName": "Hidden Knowledge",
-            "description": "Learn the secrets of 5 Black Books",
-            "conditions": [
-            ]
+            "achievementName": "$NAME_Hidden Knowledge",
+            "description": "$DESC_Hidden Knowledge",
+            "conditions": []
         },
         {
-            "achievementName": "Stalhrim Crafter",
-            "description": "Craft an item out of Stalhrim",
+            "achievementName": "$NAME_Stalhrim Crafter",
+            "description": "$DESC_Stalhrim Crafter",
             "joinCondition": "OR",
             "conditions": [
                 {
@@ -171,15 +170,13 @@
             ]
         },
         {
-            "achievementName": "Dragonrider",
-            "description": "Tame and ride 5 dragons",
-            "conditions": [
-
-            ]
+            "achievementName": "$NAME_Dragonrider",
+            "description": "$DESC_Dragonrider",
+            "conditions": []
         },
         {
-            "achievementName": "Raven Rock Owner",
-            "description": "Own a house in Raven Rock",
+            "achievementName": "$NAME_Raven Rock Owner",
+            "description": "$DESC_Raven Rock Owner",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -189,11 +186,9 @@
             ]
         },
         {
-            "achievementName": "Solstheim Explorer",
-            "description": "Discover 30 locations on the island of Solstheim",
-            "conditions": [
-
-            ]
+            "achievementName": "$NAME_Solstheim Explorer",
+            "description": "$DESC_Solstheim Explorer",
+            "conditions": []
         }
     ]
 }

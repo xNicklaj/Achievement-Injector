@@ -1,0 +1,10 @@
+$NAME_Proud Parent	Proud Parent
+$DESC_Proud Parent	Adopt a child
+$NAME_Landowner	Landowner
+$DESC_Landowner	Buy a plot of land
+$NAME_Architect	Architect
+$DESC_Architect	Build three wings on a house
+$NAME_Land Baron	Land Baron
+$DESC_Land Baron	Buy three plots of land
+$NAME_Master Architect	Master Architect
+$DESC_Master Architect	Build three houses
