@@ -43,7 +43,6 @@ namespace NativePapyrus {
 		void operator()(RE::BSScript::Variable a_result)
 		{
 			this->result = a_result.Unpack<short>();
-			logger::info("Suca {}", result);
 		}
 		bool CanSave() {
 			return false;

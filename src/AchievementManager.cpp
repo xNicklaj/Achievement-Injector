@@ -52,7 +52,7 @@ json AchievementManager::ToJson() {
     });
 
     for(auto& achievementGroup : this->achievementGroups) {
-        if(!achievementGroup.showInMenu) continue;
+        if(!achievementGroup.showInMenu || !CheckIfModIsLoaded(achievementGroup.plugin)) continue;
 		data.push_back(achievementGroup.ToJson());
 	}
     return data;
