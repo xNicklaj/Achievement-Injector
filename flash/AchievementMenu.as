@@ -16,6 +16,7 @@ class AchievementMenu extends MovieClip {
     private var isFocusOnGroups:Boolean = true;
     private var focusIndex:Number = -1;
     private var mouseListener:Object;
+    private var currentGroupIndex:Number = 0;
 
     function onLoad(): Void {
         BottomBar_mc = _root.BottomBar_mc;
@@ -60,8 +61,6 @@ class AchievementMenu extends MovieClip {
 
     function render() {
         AchievementGroups_mc.showGroups(data);
-
-        loadGroup(0);
     }
 
     function loadGroup(index) {

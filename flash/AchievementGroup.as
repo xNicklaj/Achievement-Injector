@@ -9,9 +9,11 @@
 
     function onLoad() {
         title_tf.noTranslate = true;
-        title_tf._visible = false;
-        highlight_mc._visible = false;
-        _alpha = 50;
+        if ( index !== 0 ) {
+            title_tf._visible = false;
+            highlight_mc._visible = false;
+            _alpha = 50;
+        }
     }
 
     function setData( a_index:Number, title:String, imagePath:String, a_Menu_mc:MovieClip ) {
@@ -45,11 +47,20 @@
 
     function highlight(state:Boolean) {
         title_tf._visible = state;
+        if ( state === false && Menu_mc.currentGroupIndex === index ) {
+            return;
+        }
+
         highlight_mc._visible = state;
         _alpha = state ? 100 : 50;
     }
 
     function onRelease() {
         Menu_mc.loadGroup( index );
+        var prevIndex = Menu_mc.currentGroupIndex;
+        Menu_mc.currentGroupIndex = index;
+        _parent._parent.getClipIndex(prevIndex).highlight(false);
+        highlight(true);
+        title_tf._visible = false;
     }
 }

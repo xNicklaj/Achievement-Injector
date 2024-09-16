@@ -24,6 +24,7 @@
             mc._y = y;
             y += ItemHeight;
         }
+        getClipIndex(0).onRelease();
     }
 
     function getClipIndex(index:Number) {
