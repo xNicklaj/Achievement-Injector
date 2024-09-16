@@ -3,12 +3,14 @@
 
 
 AchievementGroup::AchievementGroup(std::string name, std::string plugin, std::string iconPath) : name(name), plugin(plugin), iconPath(iconPath) {
-    if (name == "Skyrim") 
+    if (name == "Skyrim")
         this->priority = 0;
-    else if(name == "Dawnguard" || name == "Hearthfire" || name == "Dragonborn") 
-		this->priority = 1;
-    else
+    else if (name == "Dawnguard" || name == "Hearthfire" || name == "Dragonborn")
+        this->priority = 1;
+    else if (name == "The Sinister Seven")
         this->priority = 2;
+    else
+        this->priority = 3;
     this->showInMenu = true;
 }
 
