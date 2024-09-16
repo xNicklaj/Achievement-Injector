@@ -47,6 +47,7 @@ class AchievementMenu extends MovieClip {
 	}
 
 	function SetPlatform(aiPlatformIndex: Number, abPS3Switch: Boolean): Void {
+        isFocusOnGroups = aiPlatformIndex != 0 ? true : false;
         var BackButtonInstance:CrossPlatformButtons = BottomBar_mc.ButtonRect.BackButtonInstance;
         BackButtonInstance.SetPlatform(aiPlatformIndex, abPS3Switch);
         var UpDownInstance:CrossPlatformButtons = BottomBar_mc.ButtonRect.UpDownInstance;

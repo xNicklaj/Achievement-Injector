@@ -11,37 +11,42 @@
         title_tf.noTranslate = true;
         title_tf._visible = false;
         highlight_mc._visible = false;
+        _alpha = 50;
     }
 
     function setData( a_index:Number, title:String, imagePath:String, a_Menu_mc:MovieClip ) {
-        title_tf.border = false;
+        title_tf.border = true;
+        title_tf.border = true;
         title_tf.background = true;
-        title_tf.backgroundColor = 0x000000;
+        title_tf.backgroundColor = 0xffffff;
+        title_tf.borderColor = 0xeeeeee;
         title_tf.autoSize = 'left';
-        AchievementUtils.setText( title_tf, title );
+        AchievementUtils.setText( title_tf, ' ' + title + ' ' );
         imagePlaceholder_mc.loadMovie( "../AchievementsData/Icons/" + imagePath );
         index = a_index;
         Menu_mc = a_Menu_mc;
     }
 
     function onRollOver() {
-        title_tf._visible = true;
-        highlight_mc._visible = true;
+        highlight(true);
     }
 
     function onRollOut() {
-        title_tf._visible = false;
-        highlight_mc._visible = false;
+        highlight(false);
     }
 
     function onSetFocus() {
-        title_tf._visible = true;
-        highlight_mc._visible = true;
+        highlight(true);
     }
 
     function onKillFocus() {
-        title_tf._visible = false;
-        highlight_mc._visible = false;
+        highlight(false);
+    }
+
+    function highlight(state:Boolean) {
+        title_tf._visible = state;
+        highlight_mc._visible = state;
+        _alpha = state ? 100 : 50;
     }
 
     function onRelease() {
