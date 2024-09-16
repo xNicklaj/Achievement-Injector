@@ -1,0 +1,376 @@
+{
+    "groupName": "A Tale of Blood and Snow",
+    "plugin": "DV01VampireClanWar.esm",
+    "achievements": [
+        {
+            "achievementName": "$NAME_Aemar the Unworthy",
+            "description": "$DESC_Aemar the Unworthy",
+            "conditions": [
+                {
+                    "type": "LocationCleared",
+                    "formID": "0F3D35"
+                }
+            ]
+        },
+        {
+            "achievementName": "$NAME_The Wolf of Solitude",
+            "description": "$DESC_The Wolf of Solitude",
+            "conditions": [
+                {
+                    "type": "LocationCleared",
+                    "formID": "0CB477"
+                }
+            ]
+        },
+        {
+            "achievementName": "$NAME_Above the Garden",
+            "description": "$DESC_Above the Garden",
+            "conditions": [
+                {
+                    "type": "LocationCleared",
+                    "formID": "163945"
+                }
+            ]
+        },
+        {
+            "achievementName": "$NAME_Seat of the Spiders",
+            "description": "$DESC_Seat of the Spiders",
+            "conditions": [
+                {
+                    "type": "LocationCleared",
+                    "formID": "163944"
+                }
+            ]
+        },
+        {
+            "achievementName": "$NAME_Frozen Coven",
+            "description": "$DESC_Frozen Coven",
+            "joinType": "AND",
+            "conditions": [
+                {
+                    "type": "LocationCleared",
+                    "formID": "206DB6"
+                },
+                {
+                    "type": "LocationCleared",
+                    "formID": "177DD0"
+                }
+            ]
+        },
+        {
+            "achievementName": "$NAME_Condemned to the Depths",
+            "description": "$DESC_Condemned to the Depths",
+            "conditions": [
+                {
+                    "type": "LocationCleared",
+                    "formID": "00AA32"
+                }
+            ]
+        },
+        {
+            "achievementName": "$NAME_Cavern of Nightmares",
+            "description": "$DESC_Cavern of Nightmares",
+            "conditions": [
+                {
+                    "type": "LocationCleared",
+                    "formID": "569FE5"
+                }
+            ]
+        },
+        {
+            "achievementName": "$NAME_Legacy of the Lothid",
+            "description": "$DESC_Legacy of the Lothid",
+            "joinType": "AND",
+            "conditions": [
+                {
+                    "type": "LocationCleared",
+                    "formID": "61C734"
+                },
+                {
+                    "type": "LocationCleared",
+                    "formID": "76C076"
+                }
+            ]
+        },
+        {
+            "achievementName": "$NAME_Behold the Berne",
+            "description": "$DESC_Behold the Berne",
+            "conditions": [
+                {
+                    "type": "LocationCleared",
+                    "formID": "569FE4"
+                }
+            ]
+        },
+        {
+            "achievementName": "$NAME_Horrors From the Void",
+            "description": "$DESC_Horrors From the Void",
+            "conditions": [
+                {
+                    "type": "LocationCleared",
+                    "formID": "61C735"
+                }
+            ]
+        },
+        {
+            "achievementName": "$NAME_The Bloodfire Amulet",
+            "description": "$DESC_The Bloodfire Amulet",
+            "conditions": [
+                {
+                    "type": "QuestStageDone",
+                    "formID": "005915",
+                    "stage": 21
+                }
+            ]
+        },
+        {
+            "achievementName": "$NAME_Silence the Spy",
+            "description": "$DESC_Silence the Spy",
+            "conditions": [
+                {
+                    "type": "QuestStageDone",
+                    "formID": "005917",
+                    "stage": 30
+                }
+            ]
+        },
+        {
+            "achievementName": "$NAME_A Tale of Blood and Snow",
+            "description": "$DESC_A Tale of Blood and Snow",
+            "joinType": "OR",
+            "conditions": [
+                {
+                    "type": "QuestStageDone",
+                    "formID": "005919",
+                    "stage": 150
+                },
+                {
+                    "type": "QuestStageDone",
+                    "formID": "005918",
+                    "stage": 150
+                },
+                {
+                    "type": "QuestStageDone",
+                    "formID": "00591A",
+                    "stage": 400
+                }
+            ]
+        },
+        {
+            "achievementName": "$NAME_Savior of Skyrim",
+            "description": "$DESC_Savior of Skyrim",
+            "conditions": [
+                {
+                    "type": "QuestStageDone",
+                    "formID": "7283F3",
+                    "stage": 100
+                }
+            ]
+        },
+        {
+            "achievementName": "$NAME_Might of the Quarra",
+            "description": "$DESC_Might of the Quarra",
+            "joinType": "OR",
+            "conditions": [
+                {
+                    "type": "QuestStageDone",
+                    "formID": "4861FB",
+                    "stage": 100
+                },
+                {
+                    "type": "QuestStageDone",
+                    "formID": "4861FB",
+                    "stage": 250
+                }
+            ]
+        },
+        {
+            "achievementName": "$NAME_Superiority of the Spiders",
+            "description": "$DESC_Superiority of the Spiders",
+            "joinType": "OR",
+            "conditions": [
+                {
+                    "type": "QuestStageDone",
+                    "formID": "0989A2",
+                    "stage": 300
+                },
+                {
+                    "type": "QuestStageDone",
+                    "formID": "0989A2",
+                    "stage": 100
+                },
+                {
+                    "type": "QuestStageDone",
+                    "formID": "0989A2",
+                    "stage": 250
+                }
+            ]
+        },
+        {
+            "achievementName": "$NAME_Highly Specialized",
+            "description": "$DESC_Highly Specialized",
+            "joinType": "OR",
+            "conditions": [
+                {
+                    "type": "GlobalVariableState",
+                    "formID": "262288",
+                    "value": 1.0
+                },
+                {
+                    "type": "GlobalVariableState",
+                    "formID": "3EE0E8",
+                    "value": 1.0
+                },
+                {
+                    "type": "GlobalVariableState",
+                    "formID": "7A6D74",
+                    "value": 1.0
+                }
+            ]
+        },
+        {
+            "achievementName": "$NAME_Seeker of Specalties",
+            "description": "$DESC_Seeker of Specalties",
+            "joinType": "OR",
+            "conditions": [
+                {
+                    "type": "GlobalVariableState",
+                    "formID": "262288",
+                    "value": 2.0
+                },
+                {
+                    "type": "GlobalVariableState",
+                    "formID": "3EE0E8",
+                    "value": 2.0
+                },
+                {
+                    "type": "GlobalVariableState",
+                    "formID": "7A6D74",
+                    "value": 2.0
+                }
+            ]
+        },
+        {
+            "achievementName": "$NAME_Superior Specialist",
+            "description": "$DESC_Superior Specialist",
+            "joinType": "OR",
+            "conditions": [
+                {
+                    "type": "GlobalVariableState",
+                    "formID": "262288",
+                    "value": 3.0
+                },
+                {
+                    "type": "GlobalVariableState",
+                    "formID": "3EE0E8",
+                    "value": 3.0
+                },
+                {
+                    "type": "GlobalVariableState",
+                    "formID": "7A6D74",
+                    "value": 3.0
+                }
+            ]
+        },
+        {
+            "achievementName": "$NAME_Skyrim's Supreme Specialist",
+            "description": "$DESC_Skyrim's Supreme Specialist",
+            "joinType": "OR",
+            "conditions": [
+                {
+                    "type": "GlobalVariableState",
+                    "formID": "262288",
+                    "value": 4.0
+                },
+                {
+                    "type": "GlobalVariableState",
+                    "formID": "3EE0E8",
+                    "value": 4.0
+                },
+                {
+                    "type": "GlobalVariableState",
+                    "formID": "7A6D74",
+                    "value": 4.0
+                }
+            ]
+        },
+        {
+            "achievementName": "$NAME_Playing Favorites",
+            "description": "$DESC_Playing Favorites",
+            "conditions": [
+                {
+                    "type": "GlobalVariableState",
+                    "formID": "7C235A",
+                    "value": 1.0
+                }
+            ]
+        },
+        {
+            "achievementName": "$NAME_Highly Favored",
+            "description": "$DESC_Highly Favored",
+            "conditions": [
+                {
+                    "type": "GlobalVariableState",
+                    "formID": "7C235A",
+                    "value": 3.0
+                }
+            ]
+        },
+        {
+            "achievementName": "$NAME_Full of Favors",
+            "description": "$DESC_Full of Favors",
+            "conditions": [
+                {
+                    "type": "GlobalVariableState",
+                    "formID": "7C235A",
+                    "value": 5.0
+                }
+            ]
+        },
+        {
+            "achievementName": "$NAME_Loyal Cronvangr",
+            "description": "$DESC_Loyal Cronvangr",
+            "conditions": [
+                {
+                    "type": "GlobalVariableState",
+                    "formID": "00FB3C",
+                    "value": 50.0
+                }
+            ]
+        },
+        {
+            "achievementName": "$NAME_Quality Quarra",
+            "description": "$DESC_Quality Quarra",
+            "conditions": [
+                {
+                    "type": "GlobalVariableState",
+                    "formID": "00FB3B",
+                    "value": 50.0
+                }
+            ]
+        },
+        {
+            "achievementName": "$NAME_Virtuous Vigilant",
+            "description": "$DESC_Virtuous Vigilant",
+            "conditions": [
+                {
+                    "type": "GlobalVariableState",
+                    "formID": "00FB39",
+                    "value": 50.0
+                }
+            ]
+        },
+        {
+            "achievementName": "$NAME_The Truth of the Tale",
+            "description": "$DESC_The Truth of the Tale",
+            "hideDescription":  true,
+            "conditions": [
+                {
+                    "type": "ItemInInventory",
+                    "formID": "16DBB0",
+                    "quantity": 1
+                }
+            ]
+        }
+    ]
+}

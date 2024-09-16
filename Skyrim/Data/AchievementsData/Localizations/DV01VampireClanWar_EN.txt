@@ -1,0 +1,54 @@
+$NAME_Aemar the Unworthy	Aemar the Unworthy
+$DESC_Aemar the Unworthy	Defeat the boss of Iceblood Barrow
+$NAME_The Wolf of Solitude	The Wolf of Solitude
+$DESC_The Wolf of Solitude	Defeat the boss of the Lower Solitude Catacombs
+$NAME_Above the Garden	Above the Garden
+$DESC_Above the Garden	Defeat the boss of Stone Garden Overlook
+$NAME_Seat of the Spiders	Seat of the Spiders
+$DESC_Seat of the Spiders	Defeat the boss of Cronvangr Temple
+$NAME_Frozen Coven	Frozen Coven
+$DESC_Frozen Coven	Defeat the bosses of Bjorn and Fryse Pit
+$NAME_Condemned to the Depths	Condemned to the Depths
+$DESC_Condemned to the Depths	Defeat the boss of Midnight Barrow
+$NAME_Cavern of Nightmares	Cavern of Nightmares
+$DESC_Cavern of Nightmares	Defeat the boss of Stormcaller Cave
+$NAME_Legacy of the Lothid	Legacy of the Lothid
+$DESC_Legacy of the Lothid	Defeat the bosses of Reachwind Depths and the Blinds
+$NAME_Behold the Berne	Behold the Berne
+$DESC_Behold the Berne	Defeat the boss of Varstaad Caves
+$NAME_Horrors From the Void	Horrors From the Void
+$DESC_Horrors From the Void	Defeat the boss of The Lightless Hollow
+$NAME_The Bloodfire Amulet	The Bloodfire Amulet
+$DESC_The Bloodfire Amulet	Claim the Bloodfire Amulet
+$NAME_Silence the Spy	Silence the Spy
+$DESC_Silence the Spy	Kill Domna Magia
+$NAME_A Tale of Blood and Snow	A Tale of Blood and Snow
+$DESC_A Tale of Blood and Snow	Determine the future of Skyrim's vampires
+$NAME_Savior of Skyrim	Savior of Skyrim
+$DESC_Savior of Skyrim	Help Ciirta Antabolis protect Skyrim
+$NAME_Might of the Quarra	Might of the Quarra
+$DESC_Might of the Quarra	Determine the future of the Quarra
+$NAME_Superiority of the Spiders	Superiority of the Spiders
+$DESC_Superiority of the Spiders	Determine the future of the Cronvangr
+$NAME_Highly Specialized	Highly Specialized
+$DESC_Highly Specialized	Complete one Special Faction Quest
+$NAME_Seeker of Specalties	Seeker of Specalties
+$DESC_Seeker of Specalties	Complete two Special Faction Quests
+$NAME_Superior Specialist	Superior Specialist
+$DESC_Superior Specialist	Complete Three Special Faction Quests
+$NAME_Skyrim's Supreme Specialist	Skyrim's Supreme Specialist
+$DESC_Skyrim's Supreme Specialist	Complete Four Special Faction Quests
+$NAME_Playing Favorites	Playing Favorites
+$DESC_Playing Favorites	Complete One Favor Quest
+$NAME_Highly Favored	Highly Favored
+$DESC_Highly Favored	Complete Three Favor Quests
+$NAME_Full of Favors	Full of Favors
+$DESC_Full of Favors	Complete Five Favor Quests
+$NAME_Loyal Cronvangr	Loyal Cronvangr
+$DESC_Loyal Cronvangr	Complete 50 Radiant Quests for the Cronvangr
+$NAME_Quality Quarra	Quality Quarra
+$DESC_Quality Quarra	Complete 50 Radiant Quests for the Quarra
+$NAME_Virtuous Vigilant	Virtuous Vigilant
+$DESC_Virtuous Vigilant	Complete 50 Radiant Quests for Ciirta's Vigilants
+$NAME_The Truth of the Tale	The Truth of the Tale
+$DESC_The Truth of the Tale	Learn the full story from Viatrix
