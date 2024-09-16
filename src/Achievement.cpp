@@ -224,6 +224,7 @@ void Achievement::OnSerializationRequested() {
 }
 
 void Achievement::OnConditionMet(void) {
+    if (this->unlocked) return;
     bool allConditionsMet = false;
     int i = 0;
     for (Condition* condition : conditions) {
