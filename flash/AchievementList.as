@@ -48,7 +48,9 @@
             scrollbar.position = 0;
             scrollbar.height = ListMask_mc._height + 33;
             maxScroll = list[ index ]._height - ListMask_mc._height;
-            scrollbar.setScrollProperties( 0, 0, maxScroll );
+            scrollbar.trackScrollPageSize = maxScroll / 10;
+            scrollbar.pageScrollSize = maxScroll / 10;
+            scrollbar.setScrollProperties( maxScroll / 3, 0, maxScroll );
         }
     }
 
