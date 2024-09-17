@@ -5,6 +5,8 @@
     public var desc_tf:TextField;
     public var highlight_mc:MovieClip;
 
+    private var sidePadding:Number = 5;
+
     function onLoad(): Void {
         highlight_mc._visible = false;
         date_tf.noTranslate = desc_tf.noTranslate = true;
@@ -37,7 +39,19 @@
         } else {
             AchievementUtils.setText( date_tf, '$ACH_LOCKED' );
         }
+        desc_tf.autoSize = 'left';
+        desc_tf.multiline = true;
+        desc_tf.wordWrap = true;
         AchievementUtils.setText( desc_tf, data.Description );
+        drawHghlight();
+    }
+
+    function drawHghlight() {
+        highlight_mc.lineStyle(1, 0xffffff, 70);
+        highlight_mc.lineTo( _width + sidePadding, 0);
+        highlight_mc.lineTo( _width + sidePadding, _height + sidePadding );
+        highlight_mc.lineTo( 0, _height + sidePadding );
+        highlight_mc.lineTo(0, 0);
     }
 
     function onRelease() {

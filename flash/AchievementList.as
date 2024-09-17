@@ -8,6 +8,7 @@
     private var scrollEnabled:Boolean;
     private var maxScroll:Number;
     private var currentIndex:Number;
+    private var verticalGap:Number = 10;
 
     function onLoad(): Void {
         scrollbar.upArrow._visible = false;
@@ -33,7 +34,7 @@
                 var mc = parent.attachMovie('AchievementCard', 'AC_' + i, parent.getNextHighestDepth());
                 mc.setData( data[ i ] );
                 mc._y = yOffset;
-                yOffset += mc._height;
+                yOffset += mc._height + verticalGap;
             }
 
             list[ index ] = parent;
@@ -72,7 +73,7 @@
             Selection.setFocus( mc );
             
             if ( scrollEnabled ) {
-                scrollbar.position = mc._height * index;
+                scrollbar.position = ( mc._height + verticalGap ) * index;
             }
         }
     }
