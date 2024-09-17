@@ -64,6 +64,10 @@
                 {
                     "type": "LocationCleared",
                     "formID": "00AA32"
+                },
+                {
+                    "type": "LocationCleared",
+                    "formID": "8A11A6"
                 }
             ]
         },
@@ -363,7 +367,7 @@
         {
             "achievementName": "$NAME_The Truth of the Tale",
             "description": "$DESC_The Truth of the Tale",
-            "hideDescription":  true,
+            "hideDescription": true,
             "conditions": [
                 {
                     "type": "ItemInInventory",

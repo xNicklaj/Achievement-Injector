@@ -9,7 +9,7 @@ $DESC_Seat of the Spiders	Defeat the boss of Cronvangr Temple
 $NAME_Frozen Coven	Frozen Coven
 $DESC_Frozen Coven	Defeat the bosses of Bjorn and Fryse Pit
 $NAME_Condemned to the Depths	Condemned to the Depths
-$DESC_Condemned to the Depths	Defeat the boss of Midnight Barrow
+$DESC_Condemned to the Depths	Defeat the bosses of Midnight Barrow and The Undergrove
 $NAME_Cavern of Nightmares	Cavern of Nightmares
 $DESC_Cavern of Nightmares	Defeat the boss of Stormcaller Cave
 $NAME_Legacy of the Lothid	Legacy of the Lothid
