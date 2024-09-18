@@ -13,24 +13,28 @@ void LocalizationManager::LoadLocalizations() {
         innermap.second.clear();
     }
     localizations.clear();
+    
+	if (std::filesystem::exists(LOCALIZATION_PATH)) {
+        for (const auto& entry : std::filesystem::directory_iterator(LOCALIZATION_PATH)) {
 
-	for (const auto& entry : std::filesystem::directory_iterator(LOCALIZATION_PATH)) {
+            std::string filename = entry.path().filename().string();
+            std::string locale = StripExtension(filename.substr(filename.find_last_of('_') + 1));
+            std::string groupName = filename.substr(0, filename.find_last_of('_'));
 
-		std::string filename = entry.path().filename().string();
-		std::string locale = StripExtension(filename.substr(filename.find_last_of('_') + 1));
-		std::string groupName = filename.substr(0, filename.find_last_of('_'));
-
-		// TODO Maybe read only my locale
-		localizations[std::tuple<std::string, std::string>(groupName, locale)] = LocalizationManager::ReadLocalizationFile(LOCALIZATION_PATH + filename);
+            // TODO Maybe read only my locale
+            localizations[std::tuple<std::string, std::string>(groupName, locale)] = LocalizationManager::ReadLocalizationFile(LOCALIZATION_PATH + filename);
+        }
 	}
 
-    for (const auto& entry : std::filesystem::directory_iterator(LOCALIZATION_PATH_2)) {
-        std::string filename = entry.path().filename().string();
-        std::string locale = StripExtension(filename.substr(filename.find_last_of('_') + 1));
-        std::string groupName = filename.substr(0, filename.find_last_of('_'));
+    if (std::filesystem::exists(LOCALIZATION_PATH_2)) {
+        for (const auto& entry : std::filesystem::directory_iterator(LOCALIZATION_PATH_2)) {
+            std::string filename = entry.path().filename().string();
+            std::string locale = StripExtension(filename.substr(filename.find_last_of('_') + 1));
+            std::string groupName = filename.substr(0, filename.find_last_of('_'));
 
-        // TODO Maybe read only my locale
-        localizations[std::tuple<std::string, std::string>(groupName, locale)] = LocalizationManager::ReadLocalizationFile(LOCALIZATION_PATH_2 + filename);
+            // TODO Maybe read only my locale
+            localizations[std::tuple<std::string, std::string>(groupName, locale)] = LocalizationManager::ReadLocalizationFile(LOCALIZATION_PATH_2 + filename);
+        }
     }
 }
 

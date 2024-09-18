@@ -154,6 +154,14 @@ void MessageHandler(SKSE::MessagingInterface::Message* a_msg)
 	}
 }
 
+void WaitForDebugger(void) {
+	logger::debug("Waiting for debugger to attach...");
+	while (!IsDebuggerPresent()) {
+		::Sleep(1000);
+	};
+	logger::debug("Debugger attached.");
+}
+
 SKSEPluginLoad(const SKSE::LoadInterface *skse) {
     SKSE::Init(skse);
 	Settings::GetSingleton()->LoadSettings();
@@ -166,13 +174,7 @@ SKSEPluginLoad(const SKSE::LoadInterface *skse) {
 		return false;
 	}
 
-	if (Settings::GetSingleton()->GetUseDebugger()) {
-		logger::debug("Waiting for debugger to attach...");
-		while (!IsDebuggerPresent()) {
-			::Sleep(1000);
-		};
-		logger::debug("Debugger attached.");
-	}
+	if (Settings::GetSingleton()->GetUseDebugger()) WaitForDebugger();
 	
 
 	SKSE::GetPapyrusInterface()->Register(NativePapyrus::Register);
