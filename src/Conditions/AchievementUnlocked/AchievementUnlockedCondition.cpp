@@ -4,7 +4,7 @@
 
 extern void RegisterPostLoadFunction(Condition* condition);
 
-AchievementUnlockedCondition::AchievementUnlockedCondition(void) : Condition(ConditionType::QueryStatValue) {};
+AchievementUnlockedCondition::AchievementUnlockedCondition(void) : Condition(ConditionType::AchievementUnlocked) {};
 void AchievementUnlockedCondition::OnDataLoaded(void) {
 	CheckCondition();
 };

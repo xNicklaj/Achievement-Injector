@@ -6,6 +6,7 @@
 #define LOCALIZATIONMANAGER_H
 
 #define LOCALIZATION_PATH "Data/AchievementsData/Localizations/"
+#define LOCALIZATION_PATH_2 "Data/SKSE/Plugins/AchievementsData/Localizations/"
 
 class LocalizationManager : public ISingleton<LocalizationManager> {
 public:

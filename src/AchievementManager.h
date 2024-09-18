@@ -13,7 +13,8 @@ struct AchievementFile {
 	std::string plugin;
 	std::string path;
 	std::string iconPath;
-	bool showInMenu;
+	bool useNewDirectory = false;
+	bool showInMenu = true;
 	json FileData;
 };
 

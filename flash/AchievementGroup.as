@@ -24,7 +24,7 @@
         title_tf.borderColor = 0xeeeeee;
         title_tf.autoSize = 'left';
         AchievementUtils.setText( title_tf, ' ' + title + ' ' );
-        imagePlaceholder_mc.loadMovie( "../AchievementsData/Icons/" + imagePath );
+        imagePlaceholder_mc.loadMovie( "../" + imagePath );
         index = a_index;
         Menu_mc = a_Menu_mc;
     }

@@ -23,6 +23,15 @@ void LocalizationManager::LoadLocalizations() {
 		// TODO Maybe read only my locale
 		localizations[std::tuple<std::string, std::string>(groupName, locale)] = LocalizationManager::ReadLocalizationFile(LOCALIZATION_PATH + filename);
 	}
+
+    for (const auto& entry : std::filesystem::directory_iterator(LOCALIZATION_PATH_2)) {
+        std::string filename = entry.path().filename().string();
+        std::string locale = StripExtension(filename.substr(filename.find_last_of('_') + 1));
+        std::string groupName = filename.substr(0, filename.find_last_of('_'));
+
+        // TODO Maybe read only my locale
+        localizations[std::tuple<std::string, std::string>(groupName, locale)] = LocalizationManager::ReadLocalizationFile(LOCALIZATION_PATH_2 + filename);
+    }
 }
 
 std::map<std::string, std::string> LocalizationManager::ReadLocalizationFile(const std::string& filename) {

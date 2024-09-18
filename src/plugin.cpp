@@ -50,14 +50,13 @@ void InitializePostLoad() {
 	Settings::GetSingleton()->bInitialized = true;
 }
 
-void ReadAchievementFiles(std::vector<AchievementFile>* achievementFiles) {
-	std::string directoryPath = "Data/AchievementsData";
+void ReadAchievementDirectory(std::vector<AchievementFile>* achievementFiles, std::string directoryPath) {
 	json tmp;
 
 	try {
 		if (fs::exists(directoryPath) && fs::is_directory(directoryPath)) {
 			for (const auto& entry : fs::directory_iterator(directoryPath)) {
-				if(fs::is_directory(entry.path().string())) continue;
+				if (fs::is_directory(entry.path().string())) continue;
 				struct AchievementFile achievementFile;
 				// Read JSON files
 				try {
@@ -68,27 +67,42 @@ void ReadAchievementFiles(std::vector<AchievementFile>* achievementFiles) {
 					logger::error("Skipping file.");
 					continue;
 				}
+				achievementFile.useNewDirectory = entry.path().string().find("SKSE/Plugins/AchievementsData") != std::string::npos;
 				achievementFile.FileData = tmp["achievements"];
 				achievementFile.groupName = tmp["groupName"];
 				achievementFile.showInMenu = tmp.value("showAchievements", true);
 				achievementFile.path = entry.path().filename().string();
 				std::string iconPath = StripExtension(entry.path().filename().string()) + ".dds";
-				std::ifstream file("Data/AchievementsData/Icons/"+iconPath);
-				if(file.good())
-					achievementFile.iconPath = iconPath;
-				else
-					achievementFile.iconPath = "Default.dds";
+				std::ifstream file("Data/AchievementsData/Icons/" + iconPath);
+				if (file.good())
+					achievementFile.iconPath = "AchievementsData/Icons/" + iconPath;
+				else {
+					std::ifstream file2("Data/SKSE/Plugins/AchievementsData/Icons/" + iconPath);
+					if (file2.good())
+						achievementFile.iconPath = "SKSE/Plugins/AchievementsData/Icons/" + iconPath;
+					else {
+						achievementFile.iconPath = "SKSE/Plugins/AchievementsData/Icons/Default.dds";
+					}
+				}
+					
 				achievementFile.plugin = tmp["plugin"];
 				(*achievementFiles).push_back(achievementFile);
 			}
 		}
 		else {
-			logger::error("Path does not exist or is not a directory."); 
+			logger::error("Path does not exist or is not a directory.");
 		}
 	}
 	catch (const fs::filesystem_error& e) {
 		logger::error("Filesystem error: {}", e.what());
 	}
+}
+
+void ReadAchievementFiles(std::vector<AchievementFile>* achievementFiles) {
+	std::string directoryPath = "Data/AchievementsData";
+	ReadAchievementDirectory(achievementFiles, directoryPath);
+	directoryPath = "Data/SKSE/Plugins/AchievementsData";
+	ReadAchievementDirectory(achievementFiles, directoryPath);
 }
 
 void OnDataLoaded()
@@ -116,7 +130,7 @@ void MessageHandler(SKSE::MessagingInterface::Message* a_msg)
 			logger::debug("Achievement group {} has {} achievements", achievementGroup.name, achievementGroup.achievements.size());
 		}
 		EventProcessor::GetSingleton()->Register();
-		EventProcessor::GetSingleton()->EvaluateRequiredCellChanges();
+		//EventProcessor::GetSingleton()->EvaluateRequiredCellChanges();
 		Scaleform::AchievementWidget::Register();
 		Scaleform::AchievementMenuInjector::Register();
 		Scaleform::AchievementMenu::Register();

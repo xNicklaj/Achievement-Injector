@@ -85,11 +85,15 @@ void AddMenuOption() {
 }
 
 bool CheckIfModIsLoaded(RE::BSFixedString a_modname) {
+    // TODO remove logs
+    //logger::info("Checking for {}...", a_modname.c_str());
     auto* dataHandler = RE::TESDataHandler::GetSingleton();
     const RE::TESFile* modInfo = dataHandler->LookupModByName(a_modname.data());
     if (!modInfo || modInfo->compileIndex == 255) {
+		//logger::info("Mod {} is not loaded.", a_modname.c_str());
         return false;
     }
+	//logger::info("Mod {} is loaded.", a_modname.c_str());
     return true;
 }
 
