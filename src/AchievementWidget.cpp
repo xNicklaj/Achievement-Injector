@@ -85,7 +85,9 @@ namespace Scaleform {
     void AchievementWidget::DisplayEntry(std::string name, std::string description, std::string sound = "") {
         auto ui = RE::UI::GetSingleton();
         RE::GFxValue widget;
-        if (ui->GetMenu(AchievementWidget::MENU_NAME)->uiMovie->GetVariable(&widget, "_root.AchievementWidget_mc")) {
+        auto menu = ui->GetMenu(AchievementWidget::MENU_NAME); 
+        // Maybe at some point understand why this is null with racemenu and skyrim unbound reborn
+        if (menu != nullptr && ui->GetMenu(AchievementWidget::MENU_NAME)->uiMovie->GetVariable(&widget, "_root.AchievementWidget_mc")) {
             std::array<RE::GFxValue, 1> nameArgs;
             std::array<RE::GFxValue, 1> descriptionArgs;
             std::array<RE::GFxValue, 3> showArgs;
