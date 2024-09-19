@@ -15,13 +15,13 @@
     {
       "name": "debug",
       "displayName": "Debug NG",
-      "configurePreset": "default",
+      "configurePreset": "default-debug",
       "configuration": "Debug"
     },
     {
         "name": "relwithdebinfo",
         "displayName": "RelWithDebInfo NG",
-        "configurePreset": "default",
+        "configurePreset": "default-relwithdebinfo",
         "configuration": "RelWithDebInfo"
     },
     {
@@ -61,108 +61,132 @@
       "configuration": "RelWithDebInfo"
     }
   ],
-  "configurePresets": [
-    {
-      "name": "common",
-      "hidden": true,
-      "binaryDir": "${sourceDir}/build",
-      "installDir": "${sourceDir}/build/install"
-    },
-    {
-      "name": "vcpkg",
-      "hidden": true,
-      "cacheVariables": {
-        "CMAKE_TOOLCHAIN_FILE": {
-          "type": "STRING",
-          "value": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+    "configurePresets": [
+        {
+            "name": "common",
+            "hidden": true,
+            "binaryDir": "${sourceDir}/build",
+            "installDir": "${sourceDir}/build/install"
         },
-        "VCPKG_OVERLAY_PORTS": {
-          "type": "STRING",
-          "value": "${sourceDir}/cmake/ports/"
+        {
+            "name": "vcpkg",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_TOOLCHAIN_FILE": {
+                    "type": "STRING",
+                    "value": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+                },
+                "VCPKG_OVERLAY_PORTS": {
+                    "type": "STRING",
+                    "value": "${sourceDir}/cmake/ports/"
+                },
+                "VCPKG_TARGET_TRIPLET": "x64-windows-static-md"
+            }
         },
-        "VCPKG_TARGET_TRIPLET": "x64-windows-static-md"
-      }
-    },
-    {
-      "name": "win64",
-      "hidden": true,
-      "architecture": "x64",
-      "cacheVariables": {
-        "CMAKE_MSVC_RUNTIME_LIBRARY": "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL"
-      }
-    },
-    {
-      "name": "msvc",
-      "hidden": true,
-      "cacheVariables": {
-        "CMAKE_CXX_FLAGS": "/EHsc /MP /W4 /WX $penv{CXXFLAGS}"
-      },
-      "generator": "Visual Studio 17 2022",
-      "vendor": {
-        "microsoft.com/VisualStudioSettings/CMake/1.0": {
-          "intelliSenseMode": "windows-msvc-x64",
-          "enableMicrosoftCodeAnalysis": true,
-          "enableClangTidyCodeAnalysis": true
+        {
+            "name": "win64",
+            "hidden": true,
+            "architecture": "x64",
+            "cacheVariables": {
+                "CMAKE_MSVC_RUNTIME_LIBRARY": "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL"
+            }
+        },
+        {
+            "name": "msvc",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_CXX_FLAGS": "/EHsc /MP /W4 /WX $penv{CXXFLAGS}"
+            },
+            "generator": "Visual Studio 17 2022",
+            "vendor": {
+                "microsoft.com/VisualStudioSettings/CMake/1.0": {
+                    "intelliSenseMode": "windows-msvc-x64",
+                    "enableMicrosoftCodeAnalysis": true,
+                    "enableClangTidyCodeAnalysis": true
+                }
+            }
+        },
+        {
+            "name": "build-ng",
+            "hidden": true,
+            "cacheVariables": {
+                "SKYRIM_SUPPORT_AE": "ON",
+                "ENABLE_SKYRIM_AE": "ON",
+                "ENABLE_SKYRIM_SE": "ON",
+                "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+            }
+        },
+        {
+            "name": "build-vr",
+            "hidden": true,
+            "cacheVariables": {
+                "ENABLE_SKYRIM_VR": "ON"
+            }
+        },
+        {
+            "name": "build-novr",
+            "hidden": true,
+            "cacheVariables": {
+                "ENABLE_SKYRIM_VR": "OFF"
+            }
+        },
+        {
+            "name": "default",
+            "hidden": false,
+            "inherits": [
+                "common",
+                "vcpkg",
+                "win64",
+                "msvc",
+                "build-ng"
+            ]
+        },
+        {
+            "name": "default-relwithdebinfo",
+            "hidden": false,
+            "inherits": [
+                "common",
+                "vcpkg",
+                "win64",
+                "msvc",
+                "build-ng"
+            ],
+            "cacheVariables": { "CMAKE_BUILD_TYPE": "RelWithDebInfo" }
+        },
+        {
+            "name": "default-debug",
+            "hidden": false,
+            "inherits": [
+                "common",
+                "vcpkg",
+                "win64",
+                "msvc",
+                "build-ng"
+            ],
+            "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" }
+        },
+        {
+            "name": "vr",
+            "hidden": false,
+            "inherits": [
+                "common",
+                "vcpkg",
+                "win64",
+                "msvc",
+                "build-vr"
+            ]
+        },
+        {
+            "name": "no-vr",
+            "hidden": false,
+            "inherits": [
+                "common",
+                "vcpkg",
+                "win64",
+                "msvc",
+                "build-ng",
+                "build-novr"
+            ]
         }
-      }
-    },
-    {
-      "name": "build-ng",
-      "hidden": true,
-      "cacheVariables": {
-        "SKYRIM_SUPPORT_AE": "ON",
-        "ENABLE_SKYRIM_AE": "ON",
-        "ENABLE_SKYRIM_SE": "ON",
-        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
-      }
-    },
-    {
-      "name": "build-vr",
-      "hidden": true,
-      "cacheVariables": {
-        "ENABLE_SKYRIM_VR": "ON"
-      }
-    },
-    {
-      "name": "build-novr",
-      "hidden": true,
-      "cacheVariables": {
-        "ENABLE_SKYRIM_VR": "OFF"
-      }
-    },
-    {
-      "name": "default",
-      "hidden": false,
-      "inherits": [
-        "common",
-        "vcpkg",
-        "win64",
-        "msvc",
-        "build-ng"
-      ]
-    },
-    {
-      "name": "vr",
-      "hidden": false,
-      "inherits": [
-        "common",
-        "vcpkg",
-        "win64",
-        "msvc",
-        "build-vr"
-      ]
-    },
-    {
-      "name": "no-vr",
-      "hidden": false,
-      "inherits": [
-        "common",
-        "vcpkg",
-        "win64",
-        "msvc",
-        "build-ng",
-        "build-novr"
-      ]
-    }
-  ]
+    ]
 }
