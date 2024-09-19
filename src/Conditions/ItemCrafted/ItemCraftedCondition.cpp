@@ -10,13 +10,13 @@ void ItemCraftedCondition::EnableListener() {
 	RegisterPostLoadFunction(this);
 	RE::ItemCrafted::GetEventSource()->AddEventSink(this);
 }
-void ItemCraftedCondition::SetConditionParameters(std::string itemID) {
-	this->itemID = itemID;
+void ItemCraftedCondition::SetConditionParameters(std::string itemID__a) {
+	this->itemID = itemID__a;
 }
-bool ItemCraftedCondition::CheckCondition(RE::FormID itemID) {
+bool ItemCraftedCondition::CheckCondition(RE::FormID itemID_a) {
 	auto* target = GetForm(this->itemID, this->plugin);
 	if(target == NULL) return false;
-	if (itemID == target->formID) {
+	if (itemID_a == target->formID) {
 		logger::info("Player met condition crafted {}.", this->itemID);
 		this->UnlockNotify();
 		RE::ItemCrafted::GetEventSource()->RemoveEventSink(this);

@@ -11,9 +11,9 @@ void GlobalVariableStateCondition::EnableListener(void) {
 	RegisterPostLoadFunction(this);
 	RE::PlayerCharacter::GetSingleton()->AsPositionPlayerEventSource()->AddEventSink<RE::PositionPlayerEvent>(this);
 };
-void GlobalVariableStateCondition::SetConditionParameters(std::string formID, float value) {
-	this->formID = formID;
-	this->value = value;
+void GlobalVariableStateCondition::SetConditionParameters(std::string formID_a, float value_a) {
+	this->formID = formID_a;
+	this->value = value_a;
 };
 bool GlobalVariableStateCondition::CheckCondition() {
 	if(this->isMet) return true;
@@ -28,7 +28,7 @@ bool GlobalVariableStateCondition::CheckCondition() {
 	return false;
 };
 
-RE::BSEventNotifyControl GlobalVariableStateCondition::ProcessEvent(const RE::PositionPlayerEvent* a_event, RE::BSTEventSource<RE::PositionPlayerEvent>*) {
+RE::BSEventNotifyControl GlobalVariableStateCondition::ProcessEvent(const RE::PositionPlayerEvent*, RE::BSTEventSource<RE::PositionPlayerEvent>*) {
 	if (!this->isMet) CheckCondition();
 	return RE::BSEventNotifyControl::kContinue;
 }

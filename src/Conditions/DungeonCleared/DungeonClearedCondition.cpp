@@ -12,8 +12,8 @@ void DungeonClearedCondition::EnableListener() {
     RegisterPostLoadFunction(this);
     RE::ScriptEventSourceHolder::GetSingleton()->AddEventSink(this);
 }
-void DungeonClearedCondition::SetConditionParameters(std::string formid) {
-    this->formid = formid;
+void DungeonClearedCondition::SetConditionParameters(std::string formid_a) {
+    this->formid = formid_a;
 }
 bool DungeonClearedCondition::CheckCondition() {
     RE::BGSLocation* target = static_cast<RE::BGSLocation*>(GetForm(this->formid, this->plugin));

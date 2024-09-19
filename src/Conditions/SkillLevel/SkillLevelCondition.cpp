@@ -11,17 +11,17 @@ void PlayerSkillLevelCondition::EnableListener(void)
     RegisterPostLoadFunction(this);
     RE::SkillIncrease::GetEventSource()->AddEventSink(this);
 }
-void PlayerSkillLevelCondition::SetConditionParameters(std::string skill, int level) {
-    this->level = level;
-    this->skill = skill;
+void PlayerSkillLevelCondition::SetConditionParameters(std::string skill_a, int level_a) {
+    this->level = level_a;
+    this->skill = skill_a;
 }
-RE::BSEventNotifyControl PlayerSkillLevelCondition::ProcessEvent(const RE::SkillIncrease::Event* a_event, RE::BSTEventSource<RE::SkillIncrease::Event>* src) {
+RE::BSEventNotifyControl PlayerSkillLevelCondition::ProcessEvent(const RE::SkillIncrease::Event* a_event, RE::BSTEventSource<RE::SkillIncrease::Event>*) {
     if (StringToActorValue(this->skill) == a_event->actorValue) this->CheckCondition();
     return RE::BSEventNotifyControl::kContinue;
 }
 bool PlayerSkillLevelCondition::CheckCondition() {
-    RE::ActorValue skill = StringToActorValue(this->skill);
-    float skillLevel = RE::PlayerCharacter::GetSingleton()->AsActorValueOwner()->GetActorValue(skill);
+    RE::ActorValue skill_l = StringToActorValue(this->skill);
+    float skillLevel = RE::PlayerCharacter::GetSingleton()->AsActorValueOwner()->GetActorValue(skill_l);
     if (!this->isMet && skillLevel >= this->level) {
         logger::info("Skill {} met condition level {}", this->skill, skillLevel);
         this->UnlockNotify();

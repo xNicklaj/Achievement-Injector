@@ -29,7 +29,7 @@ public:
 	bool showInMenu;
 
 	AchievementGroup(std::string name, std::string plugin, std::string iconPath);
-	void SetShowInMenu(bool showInMenu) { this->showInMenu = showInMenu; }
+	void SetShowInMenu(bool showInMenu_p) { this->showInMenu = showInMenu_p; }
 	void ToGFxValue(RE::GFxValue* gfxValue);
 	json ToJson();
 };

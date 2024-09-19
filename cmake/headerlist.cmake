@@ -4,8 +4,8 @@ set(headers ${headers}
 	src/AchievementManager.h
 	src/AchievementMenu.h
 	src/AchievementWidget.h
-	src/Conditions/AchievementUnlocked/AchievementUnlockedCondition.h
 	src/CommonFunctions.h
+	src/Conditions/AchievementUnlocked/AchievementUnlockedCondition.h
 	src/Conditions/ActorDeath/ActorDeathCondition.h
 	src/Conditions/BaseActorDeath/BaseActorDeathCondition.h
 	src/Conditions/BookRead/BookReadCondition.h
@@ -17,21 +17,20 @@ set(headers ${headers}
 	src/Conditions/ItemInInventory/ItemInInventoryCondition.h
 	src/Conditions/LocationDiscovery/LocationDiscoveryCondition.h
 	src/Conditions/PlayerActivation/PlayerActivationCondition.h
-	src/Conditions/PlayerCrime/PlayerCrimeCondition.h
 	src/Conditions/PlayerFirstEnterCell/PlayerFirstEnterCellCondition.h
 	src/Conditions/PlayerLevel/PlayerLevelCondition.h
 	src/Conditions/QueryStatValue/QueryStatValueCondition.h
-	src/Conditions/QuestStageDone/QuestStageDoneCondition.h
 	src/Conditions/QuestObjectiveDone/QuestObjectiveDoneCondition.h
+	src/Conditions/QuestStageDone/QuestStageDoneCondition.h
+	src/Conditions/ShoutLearned/ShoutLearnedCondition.h
 	src/Conditions/SkillLevel/SkillLevelCondition.h
 	src/Conditions/SpellLearned/SpellLearnedCondition.h
-	src/Conditions/ShoutLearned/ShoutLearnedCondition.cpp
 	src/ConditionsJoinType.h
 	src/CustomRE.h
-	src/MessageBox.h
 	src/EventProcessor.h
-	src/LocalizationManager.h
 	src/KeyMapping.h
+	src/LocalizationManager.h
+	src/MessageBox.h
 	src/PCH.h
 	src/Papyrus.h
 	src/Runnable.h

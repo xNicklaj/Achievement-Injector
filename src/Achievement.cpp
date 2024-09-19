@@ -308,20 +308,20 @@ void Achievement::ToGFxValue(RE::GFxValue* gfxValue) {
 json Achievement::ToJson() {
     json data = json::object();
 
-    std::string description = this->description;
-    if (!this->unlocked && this->hidden && !Settings::GetSingleton()->GetShowHidden()) description = "Hidden Description.";
+    std::string desc = this->description;
+    if (!this->unlocked && this->hidden && !Settings::GetSingleton()->GetShowHidden()) desc = "Hidden Description.";
 
     if (Settings::GetSingleton()->GetGlobal()) {
         SerializedAchievement sa = Serializer::GetSingleton()->DeserializeAchievementData_GLOBAL(this->achievementName);
         data["AchievementName"] = this->achievementName;
-        data["Description"] = description;
+        data["Description"] = desc;
         data["UnlockDatetime"] = sa.unlockDatetime;
         data["Unlocked"] = this->unlocked;
     }
     else {
         SerializedAchievement sa = Serializer::GetSingleton()->DeserializeAchievementData(this->achievementName);
         data["AchievementName"] = this->achievementName;
-        data["Description"] = description;
+        data["Description"] = desc;
         data["UnlockDatetime"] = sa.unlockDatetime;
         data["Unlocked"] = sa.unlocked;
     }

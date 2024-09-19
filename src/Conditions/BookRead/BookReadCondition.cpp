@@ -11,8 +11,8 @@ void BookReadCondition::EnableListener() {
     RegisterPostLoadFunction(this);
     RE::BooksRead::GetEventSource()->AddEventSink(this);
 }
-void BookReadCondition::SetConditionParameters(std::string bookName) {
-    this->bookName = bookName;
+void BookReadCondition::SetConditionParameters(std::string bookName_a) {
+    this->bookName = bookName_a;
 }
 void BookReadCondition::Localize(std::string path) {
     if(this->bookName[0] == '$')

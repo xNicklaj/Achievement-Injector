@@ -3,8 +3,8 @@
 extern void RegisterPostLoadFunction(Condition* condition);
 
 PlayerFirstEnterCellCondition::PlayerFirstEnterCellCondition() : Condition(ConditionType::FirstEnterCell) {}
-void PlayerFirstEnterCellCondition::SetConditionParameters(std::string cellID) {
-    this->cellID = cellID;
+void PlayerFirstEnterCellCondition::SetConditionParameters(std::string cellID_a) {
+    this->cellID = cellID_a;
 }
 void PlayerFirstEnterCellCondition::OnDataLoaded(void) {
     // Check that quest hasn't been completed already

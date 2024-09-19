@@ -1,8 +1,8 @@
 set(sources ${sources}
 	src/Achievement.cpp
-	src/AchievementWidget.cpp
 	src/AchievementManager.cpp
 	src/AchievementMenu.cpp
+	src/AchievementWidget.cpp
 	src/CommonFunctions.cpp
 	src/Conditions/AchievementUnlocked/AchievementUnlockedCondition.cpp
 	src/Conditions/ActorDeath/ActorDeathCondition.cpp
@@ -16,15 +16,14 @@ set(sources ${sources}
 	src/Conditions/ItemInInventory/ItemInInventoryCondition.cpp
 	src/Conditions/LocationDiscovery/LocationDiscoveryCondition.cpp
 	src/Conditions/PlayerActivation/PlayerActivationCondition.cpp
-	src/Conditions/PlayerCrime/PlayerCrimeCondition.cpp
 	src/Conditions/PlayerFirstEnterCell/PlayerFirstEnterCellCondition.cpp
 	src/Conditions/PlayerLevel/PlayerLevelCondition.cpp
 	src/Conditions/QueryStatValue/QueryStatValueCondition.cpp
-	src/Conditions/QuestStageDone/QuestStageDoneCondition.cpp
 	src/Conditions/QuestObjectiveDone/QuestObjectiveDoneCondition.cpp
+	src/Conditions/QuestStageDone/QuestStageDoneCondition.cpp
+	src/Conditions/ShoutLearned/ShoutLearnedCondition.cpp
 	src/Conditions/SkillLevel/SkillLevelCondition.cpp
 	src/Conditions/SpellLearned/SpellLearnedCondition.cpp
-	src/Conditions/ShoutLearned/ShoutLearnedCondition.cpp
 	src/CustomRE.cpp
 	src/EventProcessor.cpp
 	src/LocalizationManager.cpp

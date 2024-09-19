@@ -9,8 +9,8 @@ void PlayerActivationCondition::EnableListener(void) {
 	RegisterPostLoadFunction(this);
 	RE::ScriptEventSourceHolder::GetSingleton()->AddEventSink(this);
 };
-void PlayerActivationCondition::SetConditionParameters(std::string formid) {
-	this->formid = formid;
+void PlayerActivationCondition::SetConditionParameters(std::string formid_a) {
+	this->formid = formid_a;
 };
 bool PlayerActivationCondition::CheckCondition() {
 	return false;

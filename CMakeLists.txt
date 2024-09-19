@@ -1,16 +1,34 @@
-# It's recommended to set a minimum CMake version.
-# If you use CMake features from higher versions, update this to match.
-cmake_minimum_required(VERSION 3.21)
+cmake_minimum_required(VERSION 3.25)
 
-# Set your project name. This will be the name of your SKSE .dll file.
-project(AchievementInjector VERSION 0.0.1 LANGUAGES CXX)
+project(
+        AchievementInjector
+        VERSION 0.0.1
+        LANGUAGES CXX)
+set(PROJECT_LICENSE "MIT")
+set(PROJECT_FRIENDLY_NAME ${PROJECT_NAME})
+set(PROJECT_LONG_NAME "AchievementInjector CommonLibSSE-NG")
+set(PROJECT_DESCRIPTION ${PROJECT_LONG_NAME})
+set(PROJECT_COPYRIGHT "Copyright")
 
-#
+list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
+include(GNUInstallDirs)
+include(addpluginsources)
+include(pluginconfig)
+include(plugintarget)
+include(pluginpackage)
+include("${PROJECT_SOURCE_DIR}/local.cmake" OPTIONAL)
 
-# YOU DO NOT NEED TO EDIT ANYTHING BELOW HERE
-#
-# Please see the "Project setup" section of README.md
-#
+message(CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})
+
+######## dependencies
+set(Boost_NO_WARN_NEW_VERSIONS 1)
+set(Boost_USE_STATIC_LIBS ON)
+set(Boost_USE_MULTITHREADED  ON)
+find_package(Boost REQUIRED COMPONENTS)
+if(Boost_FOUND)
+    target_link_libraries(${PROJECT_NAME} PRIVATE ${Boost_LIBRARIES})
+    target_include_directories(${PROJECT_NAME} PRIVATE ${Boost_INCLUDE_DIRS})
+endif()
 
 # If you're not using a mod manager, you probably want the SKSE plugin to go
 # inside of your Skyrim "Data" folder.
@@ -30,26 +48,6 @@ if(DEFINED ENV{SKYRIM_MODS_FOLDER} AND IS_DIRECTORY "$ENV{SKYRIM_MODS_FOLDER}")
     set(OUTPUT_FOLDER "$ENV{SKYRIM_MODS_FOLDER}/${PROJECT_NAME} ${CMAKE_BUILD_TYPE}")
 endif()
 
-# Otherwise, you can set OUTPUT_FOLDER to any place you'd like :)
-# set(OUTPUT_FOLDER "C:/path/to/any/folder")
-
-# Setup your SKSE plugin as an SKSE plugin!
-find_package(CommonLibSSE CONFIG REQUIRED)
-include(cmake/headerlist.cmake)
-include(cmake/sourcelist.cmake)
-add_commonlibsse_plugin(${PROJECT_NAME} SOURCES ${headers} ${sources}) # <--- specifies plugin.cpp
-
-target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_23) # <--- use C++23 standard
-target_precompile_headers(${PROJECT_NAME} PRIVATE src/PCH.h) # <--- PCH.h is required!
-
-target_include_directories(
-	"${PROJECT_NAME}"
-	PRIVATE
-		${SIMPLEINI_INCLUDE_DIRS}
-        ${CMAKE_CURRENT_SOURCE_DIR}/include
-)
-# When your SKSE .dll is compiled, this will automatically copy the .dll into your mods folder.
-# Only works if you configure DEPLOY_ROOT above (or set the SKYRIM_MODS_FOLDER environment variable)
 if(DEFINED OUTPUT_FOLDER)
     # If you specify an <OUTPUT_FOLDER> (including via environment variables)
     # then we'll copy your mod files into Skyrim or a mod manager for you!
@@ -76,7 +74,7 @@ if(DEFINED OUTPUT_FOLDER)
     )
 
     # If you perform a "Debug" build, also copy .pdb file (for debug symbols)
-    if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+    if(CMAKE_BUILD_TYPE_INIT STREQUAL "Debug" OR CMAKE_BUILD_TYPE_INIT STREQUAL "RelWithDebInfo")
         add_custom_command(
             TARGET "${PROJECT_NAME}"
             POST_BUILD
@@ -85,3 +83,5 @@ if(DEFINED OUTPUT_FOLDER)
         )
     endif()
 endif()
+
+

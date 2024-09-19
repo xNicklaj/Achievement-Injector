@@ -10,19 +10,19 @@ void QueryStatValueCondition::OnDataLoaded(void) {
 void QueryStatValueCondition::EnableListener(void) {
 	RegisterPostLoadFunction(this);
 };
-void QueryStatValueCondition::SetConditionParameters(std::string stat, float value) {
-	this->stat = stat;
-	this->value = value;
+void QueryStatValueCondition::SetConditionParameters(std::string stat_a, float value_a) {
+	this->stat = stat_a;
+	this->value = value_a;
 };
 bool QueryStatValueCondition::CheckCondition() {
-	float globValue = RE::QueryStat(this->stat.c_str());
+	int32_t globValue = RE::QueryStat(this->stat.c_str());
 	if (globValue >= this->value) {
 		this->UnlockNotify();
 		return true;
 	}
 	return false;
 };
-RE::BSEventNotifyControl QueryStatValueCondition::ProcessEvent(const RE::TESTrackedStatsEvent* a_event, RE::BSTEventSource<RE::TESTrackedStatsEvent>* a_eventSource) {
+RE::BSEventNotifyControl QueryStatValueCondition::ProcessEvent(const RE::TESTrackedStatsEvent* a_event, RE::BSTEventSource<RE::TESTrackedStatsEvent>*) {
 	if(strcmp(a_event->stat.c_str(), this->stat.c_str()) == 0) {
 		CheckCondition();
 	}

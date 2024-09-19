@@ -60,7 +60,7 @@ std::map<std::string, std::string> LocalizationManager::ReadLocalizationFile(con
         file.close();
     }
     else {
-        std::cerr << "Unable to open file: " << filename << std::endl;
+        logger::error("Unable to open file: {}", filename);
     }
 
     return keyValueMap;
@@ -71,7 +71,7 @@ std::string LocalizationManager::GetLocalizedText(std::string group, std::string
 	try {
         return this->localizations[std::tuple<std::string, std::string>(group, locale)][key];
 	}
-	catch (const std::out_of_range& e) {
+	catch (const std::out_of_range&) {
 		logger::error("Localization not found for group: {}, locale: {}, key: {}", group, locale, key);
 	}
 	return "NOTFOUND";

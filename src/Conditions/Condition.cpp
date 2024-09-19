@@ -8,8 +8,8 @@ Condition::Condition(ConditionType type, json jsonData) : Runnable(jsonData.valu
 Condition::Condition(ConditionType type) : Runnable(json::array()) {
     this->type = type;
 }
-void Condition::SetPlugin(std::string plugin) {
-    this->plugin = plugin;
+void Condition::SetPlugin(std::string plugin_a) {
+    this->plugin = plugin_a;
 }
 void Condition::EnableListener() {}
 void Condition::OnDataLoaded() {
@@ -22,8 +22,8 @@ void Condition::SetConditionParameters(std::string) {}
 void Condition::SetConditionParameters(std::string, std::string) {}
 void Condition::SetConditionParameters(std::string, float) {}
 bool Condition::CheckCondition() { return false; }
-void Condition::SetEventManager(eventpp::EventDispatcher<std::string, void()>* eventManager) {
-	this->eventManager = eventManager;
+void Condition::SetEventManager(eventpp::EventDispatcher<std::string, void()>* eventManager_a) {
+	this->eventManager = eventManager_a;
 }
 void Condition::Localize(std::string) {}
 

@@ -18,10 +18,10 @@ void ActorDeathCondition::EnableListener(void) {
 	RegisterPostLoadFunction(this);
 	RE::ScriptEventSourceHolder::GetSingleton()->AddEventSink(this);
 };
-void ActorDeathCondition::SetConditionParameters(std::string formID) {
-	this->formID = formID;
+void ActorDeathCondition::SetConditionParameters(std::string formID_a) {
+	this->formID = formID_a;
 };
-bool ActorDeathCondition::CheckCondition(RE::FormID formid) {
+bool ActorDeathCondition::CheckCondition(RE::FormID) {
 	return false;
 };
 RE::BSEventNotifyControl ActorDeathCondition::ProcessEvent(const RE::TESDeathEvent* a_event, RE::BSTEventSource<RE::TESDeathEvent>*) {

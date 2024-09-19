@@ -9,7 +9,7 @@ public:
     AchievementUnlockedCondition();
     void OnDataLoaded() override;
     void EnableListener() override;
-    void SetConditionParameters(std::string stat, std::string value) override;
+    void SetConditionParameters(std::string, std::string) override;
     bool CheckCondition();
     
     void ProcessEvent(AchievementUnlockedEvent*);

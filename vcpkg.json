@@ -1,16 +1,24 @@
 {
   "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
-  "name": "achievement-injector",
+  "name": "skse-clibng-template",
   "version-string": "0.0.1",
-    "dependencies": [
-        "commonlibsse-ng",
-        "simpleini",
-        "nlohmann-json",
-        "eventpp",
-        {
-            "name": "imgui",
-            "features": [ "dx11-binding", "win32-binding", "freetype", "wchar32" ]
-        }
-    ],
-  "builtin-baseline": "576379156e82da642f8d1834220876759f13534d"
+  "description": "SKSE CommonLibSSE-NG Template",
+  "homepage": "https://github.com/epinter/skse-clibng-template",
+  "features": {
+    "plugin": {
+      "description": "SKSE plugin",
+        "dependencies": [
+            "commonlibsse-ng",
+            "spdlog",
+            "boost-algorithm",
+            "simpleini",
+            "nlohmann-json",
+            "eventpp"
+        ]
+    }
+  },
+  "default-features": [
+    "plugin"
+  ],
+  "builtin-baseline": "a4275b7eee79fb24ec2e135481ef5fce8b41c339"
 }

@@ -2,6 +2,8 @@
 #include "AchievementWidget.h"
 #include "settings.h"
 
+#undef PlaySound
+
 namespace Scaleform {
     AchievementWidget::AchievementWidget() {
         auto scaleformManager = RE::BSScaleformManager::GetSingleton();

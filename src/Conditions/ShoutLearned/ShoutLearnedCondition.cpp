@@ -11,9 +11,9 @@ void ShoutLearnedCondition::EnableListener(void)
     RegisterPostLoadFunction(this);
     RE::ScriptEventSourceHolder::GetSingleton()->AddEventSink(this);
 }
-void ShoutLearnedCondition::SetConditionParameters(std::string formID, int wordNumber) {
-    this->FormID = formID;
-    this->wordNumber = wordNumber;
+void ShoutLearnedCondition::SetConditionParameters(std::string formID_a, int wordNumber_a) {
+    this->FormID = formID_a;
+    this->wordNumber = wordNumber_a;
 }
 RE::BSEventNotifyControl ShoutLearnedCondition::ProcessEvent(const RE::TESTrackedStatsEvent* a_event, RE::BSTEventSource<RE::TESTrackedStatsEvent>*) {
     if (a_event->stat == "Words Of Power Learned") {
@@ -32,7 +32,7 @@ bool ShoutLearnedCondition::CheckCondition() {
 
     int wordCount = 0;
     if (!found) {
-        for (int i = 0; i < player->GetSpellList()->numShouts; i++) {
+        for (unsigned i = 0; i < player->GetSpellList()->numShouts; i++) {
             RE::TESShout* shout = player->GetSpellList()->shouts[i];
             if (shout && shout->formID == target->formID) {
                 found = true;

@@ -5,7 +5,7 @@ public:
 	ActorDeathCondition();
 	void OnDataLoaded(void) override;
 	void EnableListener(void) override;
-	void SetConditionParameters(std::string formID) override;
+	void SetConditionParameters(std::string) override;
 	bool CheckCondition(RE::FormID);
 
 	std::string formID;

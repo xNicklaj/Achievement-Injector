@@ -10,12 +10,12 @@ void DragonSoulAbsorbedCondition::EnableListener() {
     RegisterPostLoadFunction(this);
     RE::DragonSoulsGained::GetEventSource()->AddEventSink(this);
 }
-void DragonSoulAbsorbedCondition::SetConditionParameters(int quantity) {
-    this->quantity = quantity;
+void DragonSoulAbsorbedCondition::SetConditionParameters(int quantity_a) {
+    this->quantity = quantity_a;
 }
 bool DragonSoulAbsorbedCondition::CheckCondition() {
     RE::TESGlobal* absorbed = RE::TESDataHandler::GetSingleton()->LookupForm<RE::TESGlobal>(0x1C0F2, "Skyrim.esm");
-    short totalAbsorbed = absorbed->value;
+    float totalAbsorbed = absorbed->value;
     if (totalAbsorbed >= quantity) {
         logger::info("Player met condition absorbed souls {}", this->quantity);
         this->UnlockNotify();
@@ -24,7 +24,7 @@ bool DragonSoulAbsorbedCondition::CheckCondition() {
     }
     return false;
 }
-RE::BSEventNotifyControl DragonSoulAbsorbedCondition::ProcessEvent(const RE::DragonSoulsGained::Event* a_event, RE::BSTEventSource<RE::DragonSoulsGained::Event>*) {
+RE::BSEventNotifyControl DragonSoulAbsorbedCondition::ProcessEvent(const RE::DragonSoulsGained::Event*, RE::BSTEventSource<RE::DragonSoulsGained::Event>*) {
     // TODO tutto ma triggera
     CheckCondition();
     return RE::BSEventNotifyControl::kContinue;

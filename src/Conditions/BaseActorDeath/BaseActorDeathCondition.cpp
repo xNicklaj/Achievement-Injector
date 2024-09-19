@@ -12,10 +12,10 @@ void BaseActorDeathCondition::EnableListener(void) {
 	RegisterPostLoadFunction(this);
 	RE::ScriptEventSourceHolder::GetSingleton()->AddEventSink(this);
 };
-void BaseActorDeathCondition::SetConditionParameters(std::string identifier, int quantity) {
-	this->isFormID = isHex(identifier);
-	this->identifier = identifier;
-	this->quantity = quantity;
+void BaseActorDeathCondition::SetConditionParameters(std::string identifier_a, int quantity_a) {
+	this->isFormID = isHex(identifier_a);
+	this->identifier = identifier_a;
+	this->quantity = quantity_a;
 };
 bool BaseActorDeathCondition::CheckCondition() {
 	if (this->currQuantity >= this->quantity) {

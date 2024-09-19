@@ -14,9 +14,9 @@ void AchievementUnlockedCondition::EnableListener(void) {
 			this->ProcessEvent(a_event);
 	});
 };
-void AchievementUnlockedCondition::SetConditionParameters(std::string achievementName, std::string groupName) {
-	this->achievementName = achievementName;
-	this->groupName = groupName;
+void AchievementUnlockedCondition::SetConditionParameters(std::string achievementName_a, std::string groupName_a) {
+	this->achievementName = achievementName_a;
+	this->groupName = groupName_a;
 };
 bool AchievementUnlockedCondition::CheckCondition() {
 	if (Settings::GetSingleton()->GetGlobal()) {

@@ -14,7 +14,7 @@ void SpellLearnedCondition::EnableListener(void)
 void SpellLearnedCondition::SetConditionParameters(std::string formID) {
     this->FormID = formID;
 }
-RE::BSEventNotifyControl SpellLearnedCondition::ProcessEvent(const RE::SpellsLearned::Event* a_event, RE::BSTEventSource<RE::SpellsLearned::Event>* src) {
+RE::BSEventNotifyControl SpellLearnedCondition::ProcessEvent(const RE::SpellsLearned::Event* a_event, RE::BSTEventSource<RE::SpellsLearned::Event>*) {
     if(!a_event || !a_event->spell) return RE::BSEventNotifyControl::kContinue;
     CheckCondition();
     
@@ -30,7 +30,7 @@ bool SpellLearnedCondition::CheckCondition() {
         found = true;
 
     if (!found) {
-        for (int i = 0; i < player->GetSpellList()->numSpells; i++) {
+        for (unsigned i = 0; i < player->GetSpellList()->numSpells; i++) {
             RE::SpellItem* spell = player->GetSpellList()->spells[i];
             if (spell && spell->formID == target->formID) {
                 found = true;

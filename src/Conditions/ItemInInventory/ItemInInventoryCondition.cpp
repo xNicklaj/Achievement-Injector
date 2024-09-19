@@ -11,9 +11,9 @@ void ItemInInventoryCondition::EnableListener() {
     RE::ScriptEventSourceHolder* eventSourceHolder = RE::ScriptEventSourceHolder::GetSingleton();
     eventSourceHolder->AddEventSink(this);
 }
-void ItemInInventoryCondition::SetConditionParameters(std::string formid, int quantity) {
-    this->formid = formid;
-    this->quantity = quantity;
+void ItemInInventoryCondition::SetConditionParameters(std::string formid_a, int quantity_a) {
+    this->formid = formid_a;
+    this->quantity = quantity_a;
 }
 RE::BSEventNotifyControl ItemInInventoryCondition::ProcessEvent(const RE::TESContainerChangedEvent* a_event, RE::BSTEventSource<RE::TESContainerChangedEvent>*) {
     if (a_event->newContainer == RE::PlayerCharacter::GetSingleton()->GetFormID()) {
@@ -22,8 +22,8 @@ RE::BSEventNotifyControl ItemInInventoryCondition::ProcessEvent(const RE::TESCon
     return RE::BSEventNotifyControl::kContinue;
 }
 bool ItemInInventoryCondition::CheckCondition() {
-    RE::PlayerCharacter* player = RE::PlayerCharacter::GetSingleton();
-    int quantity = 0;
+    //RE::PlayerCharacter* player = RE::PlayerCharacter::GetSingleton();
+    int quantity_l = 0;
 
     const auto inventory = RE::PlayerCharacter::GetSingleton()->GetInventory();
     RE::TESForm* target;
@@ -31,10 +31,10 @@ bool ItemInInventoryCondition::CheckCondition() {
         // For fucking reasons data.first is the amount. Ok
         target = GetForm(this->formid, this->plugin);
         if (item != NULL && target != NULL && item->GetFormID() == target->formID) {
-            quantity += data.first;
+            quantity_l += data.first;
         }
     }
-    if (quantity >= this->quantity) {
+    if (quantity_l >= this->quantity) {
         logger::info("Player met condition item {} quantity {}", this->formid, this->quantity);
         this->UnlockNotify();
         RE::ScriptEventSourceHolder::GetSingleton()->RemoveEventSink(this);

@@ -6,6 +6,8 @@
 #include "SKSE/SKSE.h"
 #include "Utility.h"
 
+#undef PlaySound
+
 namespace Scaleform {
 
     class AchievementWidget : RE::IMenu {

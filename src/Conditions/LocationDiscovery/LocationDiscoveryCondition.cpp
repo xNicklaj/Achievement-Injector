@@ -56,12 +56,12 @@ void LocationDiscoveryCondition::EnableListener() {
     RegisterPostLoadFunction(this);
     RE::LocationDiscovery::GetEventSource()->AddEventSink(this);
 }
-void LocationDiscoveryCondition::SetConditionParameters(std::string locationName, std::string worldspaceID) {
-    this->locationName = locationName;
-    this->worldspaceID = worldspaceID;
+void LocationDiscoveryCondition::SetConditionParameters(std::string locationName_a, std::string worldspaceID_a) {
+    this->locationName = locationName_a;
+    this->worldspaceID = worldspaceID_a;
 }
-bool LocationDiscoveryCondition::CheckCondition(std::string locationName, std::string worldspaceID) {
-    if (locationName == this->locationName && worldspaceID == this->worldspaceID) {
+bool LocationDiscoveryCondition::CheckCondition(std::string locationName_l, std::string worldspaceID_l) {
+    if (locationName_l == this->locationName && worldspaceID_l == this->worldspaceID) {
         logger::info("Player met condition found {} in {}.", this->locationName, this->worldspaceID);
         this->UnlockNotify();
         RE::LocationDiscovery::GetEventSource()->RemoveEventSink(this);

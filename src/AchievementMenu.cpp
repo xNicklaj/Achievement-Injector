@@ -10,12 +10,10 @@ namespace Scaleform {
         auto scaleformManager = RE::BSScaleformManager::GetSingleton();
         scaleformManager->LoadMovieEx(this, MENU_PATH, [this](RE::GFxMovieDef* a_def) {
             using StateType = RE::GFxState::StateType;
-
             fxDelegate.reset(new RE::FxDelegate());
             fxDelegate->RegisterHandler(this);
             a_def->SetState(StateType::kExternalInterface, fxDelegate.get());
             fxDelegate->Release();
-
             auto logger = new Logger<AchievementMenu>();
             a_def->SetState(StateType::kLog, logger);
             logger->Release();
@@ -23,35 +21,41 @@ namespace Scaleform {
 
         inputContext = Context::kMenuMode;
         depthPriority = 3;
+        
         //RE::UIBlurManager::GetSingleton()->blurCount = 0;
         menuFlags.set(RE::UI_MENU_FLAGS::kPausesGame, RE::UI_MENU_FLAGS::kDisablePauseMenu,
              RE::UI_MENU_FLAGS::kModal,
             RE::UI_MENU_FLAGS::kUsesMenuContext, RE::UI_MENU_FLAGS::kTopmostRenderedMenu,
             RE::UI_MENU_FLAGS::kUsesMovementToDirection);
-
+        
         if (!RE::BSInputDeviceManager::GetSingleton()->IsGamepadEnabled()) {
             menuFlags |= RE::UI_MENU_FLAGS::kUsesCursor;
         }
+        
     }
 
     void AchievementMenu::Register() {
+        logger::info("Register: 0");
         auto ui = RE::UI::GetSingleton();
+        logger::info("Register: 0.5");
         static AchievementMenu singleton;
-
+        logger::info("Register: 1");
         auto eventSource = SKSE::GetModCallbackEventSource();
-
         if (!eventSource) {
             logger::error("EventSource not found!");
             return;
         }
-
+        logger::info("Register: 2");
         if (ui) {
             ui->Register(AchievementMenu::MENU_NAME, Creator);
             logger::debug("Registered {}", AchievementMenu::MENU_NAME);
+            logger::info("Register: 3");
             eventSource->AddEventSink(&singleton);
             ui->AddEventSink<RE::MenuOpenCloseEvent>(&singleton);
+            logger::info("Register: 4");
             RE::BSInputDeviceManager::GetSingleton()->AddEventSink<RE::InputEvent*>(&singleton);
         }
+        logger::info("Register: 5");
     }
 
     void AchievementMenu::Show() {
@@ -107,7 +111,7 @@ namespace Scaleform {
         }
     }
 
-    RE::BSEventNotifyControl AchievementMenu::ProcessEvent(const RE::MenuOpenCloseEvent* a_event, RE::BSTEventSource<RE::MenuOpenCloseEvent>* a_eventSource) {
+    RE::BSEventNotifyControl AchievementMenu::ProcessEvent(const RE::MenuOpenCloseEvent* a_event, RE::BSTEventSource<RE::MenuOpenCloseEvent>*) {
         if (a_event->opening) {
             if (a_event->menuName == Scaleform::AchievementMenu::MENU_NAME) {
                 auto* ui = RE::UI::GetSingleton();
@@ -119,7 +123,7 @@ namespace Scaleform {
         return RE::BSEventNotifyControl::kContinue;
     };
 
-    RE::BSEventNotifyControl AchievementMenu::ProcessEvent(RE::InputEvent* const* a_event, RE::BSTEventSource<RE::InputEvent*>* a_eventSource) {
+    RE::BSEventNotifyControl AchievementMenu::ProcessEvent(RE::InputEvent* const* a_event, RE::BSTEventSource<RE::InputEvent*>*) {
         auto* ui = RE::UI::GetSingleton();
         if (!a_event || !(*a_event) || !RE::Main::GetSingleton()->gameActive) {
             return RE::BSEventNotifyControl::kContinue;
@@ -144,8 +148,8 @@ namespace Scaleform {
         return RE::BSEventNotifyControl::kContinue;
     }
 
-    RE::BSEventNotifyControl AchievementMenu::ProcessEvent(const SKSE::ModCallbackEvent* a_event, RE::BSTEventSource<SKSE::ModCallbackEvent>* a_eventSource) {
-        RE::UI* ui = RE::UI::GetSingleton();
+    RE::BSEventNotifyControl AchievementMenu::ProcessEvent(const SKSE::ModCallbackEvent* a_event, RE::BSTEventSource<SKSE::ModCallbackEvent>*) {
+        //RE::UI* ui = RE::UI::GetSingleton();
         RE::GFxValue menu;
         //logger::debug("Event: {}", a_event->eventName.data());
         if (a_event->eventName == "AchievementMenu_Init") {
@@ -173,7 +177,7 @@ namespace Scaleform {
         }
     }
 
-    RE::BSEventNotifyControl AchievementMenuInjector::ProcessEvent(const SKSE::ModCallbackEvent* a_event, RE::BSTEventSource<SKSE::ModCallbackEvent>* a_eventSource) {
+    RE::BSEventNotifyControl AchievementMenuInjector::ProcessEvent(const SKSE::ModCallbackEvent* a_event, RE::BSTEventSource<SKSE::ModCallbackEvent>*) {
         RE::UI* ui = RE::UI::GetSingleton();
         RE::GFxValue menu;
         if (a_event->eventName == "AchievementsMenu_Open") {

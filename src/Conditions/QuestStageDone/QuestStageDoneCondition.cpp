@@ -3,10 +3,10 @@
 extern void RegisterPostLoadFunction(Condition* condition);
 
 QuestStageDoneCondition::QuestStageDoneCondition() : Condition(ConditionType::QuestObjectiveDone) {}
-void QuestStageDoneCondition::SetConditionParameters(std::string formID, std::string OP, int stage) {
-    this->formID = formID;
-    this->OP = OP;
-    this->stage = stage;
+void QuestStageDoneCondition::SetConditionParameters(std::string formID_a, std::string OP_a, int stage_a) {
+    this->formID = formID_a;
+    this->OP = OP_a;
+    this->stage = stage_a;
 }
 void QuestStageDoneCondition::OnDataLoaded(void) {
     // Check that quest hasn't been completed already

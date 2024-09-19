@@ -14,7 +14,7 @@ uint16_t CheckQuestStage(std::string FormID, std::string baseEsp) {
     auto* target = GetForm(FormID, baseEsp);
     if (!target) {
         logger::error("Could not find quest with FormID {} in {}.", FormID, baseEsp);
-        return -1;
+        return 0;
     }
     const auto quest = RE::TESForm::LookupByID<RE::TESQuest>(target->formID);
 

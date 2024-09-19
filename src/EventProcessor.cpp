@@ -36,7 +36,7 @@ RE::BSEventNotifyControl EventProcessor::ProcessEvent(const RE::MenuOpenCloseEve
         return RE::BSEventNotifyControl::kContinue;
     }
 
-    auto ui = RE::UI::GetSingleton();
+    //auto ui = RE::UI::GetSingleton();
     if (event->opening) {
         if (event->menuName == "Journal Menu") {
             Scaleform::AchievementMenuInjector::Inject();
@@ -76,13 +76,13 @@ RE::BSEventNotifyControl EventProcessor::ProcessEvent(RE::InputEvent* const* a_e
     return RE::BSEventNotifyControl::kContinue;
 }
 
-RE::BSEventNotifyControl EventProcessor::ProcessEvent(RE::BGSActorCellEvent const* a_event,
+RE::BSEventNotifyControl EventProcessor::ProcessEvent(RE::BGSActorCellEvent const*,
     RE::BSTEventSource<RE::BGSActorCellEvent>*) {
     return  RE::BSEventNotifyControl::kContinue;
 }
 
-RE::BSEventNotifyControl EventProcessor::ProcessEvent(const RE::PositionPlayerEvent* a_event, RE::BSTEventSource<RE::PositionPlayerEvent>*) {
-    short requiredCount = 4;
+RE::BSEventNotifyControl EventProcessor::ProcessEvent(const RE::PositionPlayerEvent*, RE::BSTEventSource<RE::PositionPlayerEvent>*) {
+    //short requiredCount = 4;
     if (!Settings::GetSingleton()->bInitialized) {
         this->PositionPlayerEventCount++;
         logger::debug("PositionPlayerEvent happened {} time(s). Required is {}", this->PositionPlayerEventCount, this->RequiredPositionPlayerEventCount);

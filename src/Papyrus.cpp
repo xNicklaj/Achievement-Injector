@@ -2,6 +2,8 @@
 #include "settings.h"
 #include "log.h"
 
+#undef PlaySound
+
 
 
 namespace NativePapyrus {
