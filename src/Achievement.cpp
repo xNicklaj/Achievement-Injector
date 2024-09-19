@@ -264,7 +264,6 @@ void Achievement::OnConditionMet(void) {
         AchievementManager::GetSingleton()->Dispatch(&e);
         if (this->showPopup && Settings::GetSingleton()->GetUsePopup()) {
             DisplayEntryWithWait(std::make_tuple(this->achievementName, this->description, this->notificationSound));
-            //Scaleform::AchievementWidget::DisplayEntry(achievementName, description);
         }
         this->RunAll();
 

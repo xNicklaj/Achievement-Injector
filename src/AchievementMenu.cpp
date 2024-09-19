@@ -35,27 +35,20 @@ namespace Scaleform {
     }
 
     void AchievementMenu::Register() {
-        logger::info("Register: 0");
         auto ui = RE::UI::GetSingleton();
-        logger::info("Register: 0.5");
         static AchievementMenu singleton;
-        logger::info("Register: 1");
         auto eventSource = SKSE::GetModCallbackEventSource();
         if (!eventSource) {
             logger::error("EventSource not found!");
             return;
         }
-        logger::info("Register: 2");
         if (ui) {
             ui->Register(AchievementMenu::MENU_NAME, Creator);
             logger::debug("Registered {}", AchievementMenu::MENU_NAME);
-            logger::info("Register: 3");
             eventSource->AddEventSink(&singleton);
             ui->AddEventSink<RE::MenuOpenCloseEvent>(&singleton);
-            logger::info("Register: 4");
             RE::BSInputDeviceManager::GetSingleton()->AddEventSink<RE::InputEvent*>(&singleton);
         }
-        logger::info("Register: 5");
     }
 
     void AchievementMenu::Show() {
