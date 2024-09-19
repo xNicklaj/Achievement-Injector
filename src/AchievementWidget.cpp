@@ -23,7 +23,7 @@ namespace Scaleform {
         inputContext = Context::kNone;
         depthPriority = 0;
         menuFlags.set(RE::UI_MENU_FLAGS::kAllowSaving, RE::UI_MENU_FLAGS::kCustomRendering,
-            RE::UI_MENU_FLAGS::kAssignCursorToRenderer, RE::UI_MENU_FLAGS::kTopmostRenderedMenu);
+            RE::UI_MENU_FLAGS::kAssignCursorToRenderer);
     }
 
     void AchievementWidget::Register() {
@@ -96,7 +96,7 @@ namespace Scaleform {
             showArgs[0] = true;
             showArgs[1] = !Settings::GetSingleton()->GetMute();
             showArgs[2] = Settings::GetSingleton()->GetNotificationSound();
-           // logger::debug("Invoking ActionScript with parameters ({}, {})", name, description);
+            logger::debug("Invoking ActionScript with parameters ({}, {}) on AchievementWidget", name, description);
             widget.Invoke("setName", nullptr, nameArgs.data(), nameArgs.size());
             widget.Invoke("setDescription", nullptr, descriptionArgs.data(), descriptionArgs.size());
             widget.Invoke("ShowNotification", nullptr, showArgs.data(), showArgs.size());
