@@ -10,6 +10,7 @@ set(headers ${headers}
 	src/Conditions/BaseActorDeath/BaseActorDeathCondition.h
 	src/Conditions/BookRead/BookReadCondition.h
 	src/Conditions/Condition.h
+	src/Conditions/ObjectState/ObjectStateCondition.h
 	src/Conditions/DragonSoulAbsorbed/DragonSoulsAbsorbedCondition.h
 	src/Conditions/DungeonCleared/DungeonClearedCondition.h
 	src/Conditions/GlobalVariableState/GlobalVariableStateCondition.h

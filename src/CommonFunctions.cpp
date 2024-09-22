@@ -24,7 +24,7 @@ uint16_t CheckQuestStage(std::string FormID, std::string baseEsp) {
 }
 
 template <typename T>
-RE::TESForm* GetFormOfType(std::string FormID, std::string baseEsp = "Skyrim.esm") {
+T GetFormOfType(std::string FormID, std::string baseEsp = "Skyrim.esm") {
     // Get the TESDataHandler instance
     auto dataHandler = RE::TESDataHandler::GetSingleton();
     if (!dataHandler) {
@@ -32,7 +32,6 @@ RE::TESForm* GetFormOfType(std::string FormID, std::string baseEsp = "Skyrim.esm
         return nullptr;
     }
 
-    // Get the quest form using the Editor Form ID
     RE::FormID actualFormID;
     std::istringstream converter(FormID);
     converter >> std::hex >> actualFormID;

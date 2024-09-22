@@ -38,6 +38,7 @@ enum ConditionType {
 	ActorDeath, // Done
 	BaseActorDeath, // Done
 	SpellLearned, // Done
+	ObjectState,
 	NotSet // Done
 };
 
@@ -54,6 +55,7 @@ public:
 	virtual void SetConditionParameters(std::string);
 	virtual void SetConditionParameters(std::string, std::string);
 	virtual void SetConditionParameters(std::string, float);
+    virtual void SetConditionParameters(std::string, bool);
 	virtual bool CheckCondition();
 	virtual void Localize(std::string);
 	virtual int Serialize(void);

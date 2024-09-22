@@ -30,6 +30,7 @@
 #include "Conditions/DungeonCleared/DungeonClearedCondition.h"
 #include "Conditions/QuestObjectiveDone/QuestObjectiveDoneCondition.h"
 #include "Conditions/AchievementUnlocked/AchievementUnlockedCondition.h"
+#include "Conditions/ObjectState/ObjectStateCondition.h"
 #include "AchievementManager.h"
 
 Achievement::Achievement(json& jsonData, std::string plugin, std::string groupName)
@@ -128,7 +129,22 @@ Achievement::Achievement(json& jsonData, std::string plugin, std::string groupNa
                 BaseActorDeathConditionFactory* baseActorDeathConditionFactory = new BaseActorDeathConditionFactory();
                 a_condition = baseActorDeathConditionFactory->createCondition();
                 std::string id = condition.value("formID", "");
-                if (id == "") id = condition.value("name", "");
+                std::string editorid = condition.value("editorID", "");
+                if (id == "") {
+                    id = condition.value("name", "");
+                    if (editorid != "")
+                    {
+                        if (GetModuleHandleA("po3_Tweaks") == nullptr) {
+                            logger::error("PO3 Tweaks not loaded. Cannot use editorID for condition.");
+                            logger::error("Skipping condition in achievement {}.", this->achievementName);
+                            continue;
+                        }
+                        id = editorid;
+                        static_cast<BaseActorDeathCondition*>(a_condition)->SetEditorID(true);
+                    }
+                        
+                }
+                
                 a_condition->SetConditionParameters(id, condition.value("quantity", 1));
             }
             else if (type == "SpellLearned") {
@@ -155,6 +171,11 @@ Achievement::Achievement(json& jsonData, std::string plugin, std::string groupNa
                 AchievementUnlockedConditionFactory* achievementUnlockedConditionFactory = new AchievementUnlockedConditionFactory();
                 a_condition = achievementUnlockedConditionFactory->createCondition();
                 a_condition->SetConditionParameters(condition["achievement"].get<std::string>(), condition.value("group", this->groupName));
+            } 
+            else if (type == "ObjectState") {
+                ObjectStateConditionFactory* objectStateConditionFactory = new ObjectStateConditionFactory();
+                a_condition = objectStateConditionFactory->createCondition();
+                a_condition->SetConditionParameters(condition["formID"].get<std::string>(), condition["enabled"].get<bool>());
             }
             else {
                 logger::warn("Unknown condition type {} in {}.", type, this->achievementName);

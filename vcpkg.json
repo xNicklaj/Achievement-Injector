@@ -13,7 +13,8 @@
             "boost-algorithm",
             "simpleini",
             "nlohmann-json",
-            "eventpp"
+            "eventpp",
+            "clib-util"
         ]
     }
   },

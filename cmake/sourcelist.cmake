@@ -4,6 +4,7 @@ set(sources ${sources}
 	src/AchievementMenu.cpp
 	src/AchievementWidget.cpp
 	src/CommonFunctions.cpp
+	src/Conditions/ObjectState/ObjectStateCondition.cpp
 	src/Conditions/AchievementUnlocked/AchievementUnlockedCondition.cpp
 	src/Conditions/ActorDeath/ActorDeathCondition.cpp
 	src/Conditions/BaseActorDeath/BaseActorDeathCondition.cpp

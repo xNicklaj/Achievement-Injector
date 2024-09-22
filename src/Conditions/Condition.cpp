@@ -21,6 +21,7 @@ void Condition::SetConditionParameters(std::string, std::string, int) {}
 void Condition::SetConditionParameters(std::string) {}
 void Condition::SetConditionParameters(std::string, std::string) {}
 void Condition::SetConditionParameters(std::string, float) {}
+void Condition::SetConditionParameters(std::string, bool) {}
 bool Condition::CheckCondition() { return false; }
 void Condition::SetEventManager(eventpp::EventDispatcher<std::string, void()>* eventManager_a) {
 	this->eventManager = eventManager_a;

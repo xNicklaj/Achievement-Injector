@@ -69,7 +69,7 @@ void ReadAchievementDirectory(std::vector<AchievementFile>* achievementFiles, st
                     ReadJson(entry.path().string(), &tmp);
                 } catch (const std::exception& e) {
                     logger::error("Error reading JSON file: {}", e.what());
-                    logger::error("Skipping file.");
+                    logger::error("Skipping file {}.", entry.path().string());
                     continue;
                 }
                 achievementFile.useNewDirectory = entry.path().string().find("SKSE/Plugins/AchievementsData") != std::string::npos;
@@ -94,7 +94,7 @@ void ReadAchievementDirectory(std::vector<AchievementFile>* achievementFiles, st
                 (*achievementFiles).push_back(achievementFile);
             }
         } else {
-            logger::error("Path does not exist or is not a directory.");
+            logger::warn("Path {} does not exist or is not a directory.", directoryPath);
         }
     } catch (const fs::filesystem_error& e) {
         logger::error("Filesystem error: {}", e.what());
@@ -119,6 +119,7 @@ void WaitForDebugger(void) {
 void MessageHandler(SKSE::MessagingInterface::Message* a_msg) {
     switch (a_msg->type) {
         case SKSE::MessagingInterface::kDataLoaded:
+            LocalizationManager::GetSingleton();  // Load localizations
             ReadAchievementFiles(&(AchievementManager::GetSingleton()->achievementFiles));
             for (auto& achievementFile: (AchievementManager::GetSingleton()->achievementFiles)) {
                 AchievementGroup ag(achievementFile.groupName, achievementFile.plugin, achievementFile.iconPath);
@@ -158,12 +159,13 @@ void MessageHandler(SKSE::MessagingInterface::Message* a_msg) {
 }
 
 extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const LoadInterface* skse) {
+    //WaitForDebugger();
     Init(skse);
     SetupLog(true);
     Settings::GetSingleton()->LoadSettings();
     SetupLog();
     Settings::GetSingleton()->PrintSettings();
-    LocalizationManager::GetSingleton();  // Load localizations
+    
 
     if (Settings::GetSingleton()->GetUseDebugger())
         WaitForDebugger();
