@@ -17,6 +17,7 @@ set(headers ${headers}
 	src/Conditions/ItemCrafted/ItemCraftedCondition.h
 	src/Conditions/ItemInInventory/ItemInInventoryCondition.h
 	src/Conditions/LocationDiscovery/LocationDiscoveryCondition.h
+	src/Conditions/PapyrusBinding/PapyrusBindingCondition.h
 	src/Conditions/PlayerActivation/PlayerActivationCondition.h
 	src/Conditions/PlayerFirstEnterCell/PlayerFirstEnterCellCondition.h
 	src/Conditions/PlayerLevel/PlayerLevelCondition.h

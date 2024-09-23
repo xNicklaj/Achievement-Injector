@@ -75,7 +75,7 @@ void ReadAchievementDirectory(std::vector<AchievementFile>* achievementFiles, st
                 achievementFile.useNewDirectory = entry.path().string().find("SKSE/Plugins/AchievementsData") != std::string::npos;
                 achievementFile.FileData = tmp["achievements"];
                 achievementFile.groupName = tmp["groupName"];
-                achievementFile.showInMenu = tmp.value("showAchievements", true);
+                achievementFile.showInMenu = tmp.value("showInMenu", true);
                 achievementFile.path = entry.path().filename().string();
                 std::string iconPath = StripExtension(entry.path().filename().string()) + ".dds";
                 std::ifstream file("Data/AchievementsData/Icons/" + iconPath);
@@ -124,6 +124,7 @@ void MessageHandler(SKSE::MessagingInterface::Message* a_msg) {
             for (auto& achievementFile: (AchievementManager::GetSingleton()->achievementFiles)) {
                 AchievementGroup ag(achievementFile.groupName, achievementFile.plugin, achievementFile.iconPath);
                 ag.SetShowInMenu(achievementFile.showInMenu);
+                ag.SetId(StripExtension(achievementFile.path));
                 for (json achievement: achievementFile.FileData) {
                     ag.achievements.push_back(new Achievement(achievement, ag.plugin, StripExtension(achievementFile.path)));
                 }
@@ -139,7 +140,7 @@ void MessageHandler(SKSE::MessagingInterface::Message* a_msg) {
             Scaleform::AchievementMenuInjector::Register();
             Scaleform::AchievementMenu::Register();
             //Serializer::GetSingleton()->CreateFileIfNotExists();
-            //AchievementManager::GetSingleton()->UpdateCache();
+            AchievementManager::GetSingleton()->UpdateCache();
             EventProcessor::GetSingleton()->eventHandler.appendListener("PostLoadGame", InitializePostLoad);
             break;
         case SKSE::MessagingInterface::kPostLoad:

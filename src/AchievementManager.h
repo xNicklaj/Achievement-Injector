@@ -23,14 +23,17 @@ class AchievementGroup
 public:
 	std::string name;
 	std::string plugin;
+    std::string groupid;
 	std::vector<Achievement*> achievements;
 	std::string iconPath = "";
 	short priority;
 	bool showInMenu;
 
 	AchievementGroup(std::string name, std::string plugin, std::string iconPath);
+    void ForceUnlock(std::string achievementName);
 	void SetShowInMenu(bool showInMenu_p) { this->showInMenu = showInMenu_p; }
 	void ToGFxValue(RE::GFxValue* gfxValue);
+    void SetId(std::string id) { groupid = id; }
 	json ToJson();
 };
 
@@ -51,6 +54,7 @@ public:
 	void UpdateCache();
 	void AddEventSink(std::function<void(AchievementUnlockedEvent*)> callback);
 	void RemoveEventSink(std::function<void(AchievementUnlockedEvent*)> callback);
+    void ForceUnlock(std::string achievementName, std::string group);
 	void Dispatch(AchievementUnlockedEvent*);
 private:
 	eventpp::EventDispatcher<std::string, void(AchievementUnlockedEvent*)> eventHandler;

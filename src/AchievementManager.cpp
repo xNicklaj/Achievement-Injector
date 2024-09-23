@@ -41,10 +41,21 @@ json AchievementGroup::ToJson() {
     data["image"] = this->iconPath;
     data["AchievementData"];
     for (const auto& achievement : this->achievements) {
+        if (!achievement->showInMenu)
+            continue;
 		data["AchievementData"].push_back(achievement->ToJson());
 	}
     return data;
 };
+
+void AchievementGroup::ForceUnlock(std::string achievementName) {
+    for (const auto& achievement: this->achievements) {
+        if (achievement->achievementName == achievementName) {
+            achievement->ForceUnlock();
+            return;
+        }
+    }
+}
 
 json AchievementManager::ToJson() {
     json data = json::array();
@@ -63,6 +74,15 @@ json AchievementManager::ToJson() {
 void AchievementManager::UpdateCache() {
     cache = AchievementManager::GetSingleton()->ToJson();
 };
+
+void AchievementManager::ForceUnlock(std::string achievementName, std::string group_a) {
+    for (auto& group: this->achievementGroups) {
+        if (group.groupid == group_a) {
+            group.ForceUnlock(achievementName);
+            return;
+        }
+    }
+}
 
 void AchievementManager::AddEventSink(std::function<void(AchievementUnlockedEvent*)> callback) {
     this->eventHandler.appendListener("AchievementUnlocked", callback);

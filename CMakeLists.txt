@@ -30,8 +30,7 @@ if(Boost_FOUND)
     target_include_directories(${PROJECT_NAME} PRIVATE ${Boost_INCLUDE_DIRS})
 endif()
 
-find_path(CLIB_UTIL_INCLUDE_DIRS "ClibUtil/editorID.h" "ClibUtil/utils.hpp")
-target_include_directories(${PROJECT_NAME} PRIVATE ${CLIBUTIL_INCLUDE_DIRS})
+find_path(CLIB_UTIL_INCLUDE_DIRS "ClibUtil/utils.hpp")
 
 # If you're not using a mod manager, you probably want the SKSE plugin to go
 # inside of your Skyrim "Data" folder.

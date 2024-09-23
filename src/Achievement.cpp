@@ -14,6 +14,7 @@
 #include "Conditions/DragonSoulAbsorbed/DragonSoulsAbsorbedCondition.h"
 #include "Conditions/ItemInInventory/ItemInInventoryCondition.h"
 #include "Conditions/LocationDiscovery/LocationDiscoveryCondition.h"
+#include "Conditions/PapyrusBinding/PapyrusBindingCondition.h"
 #include "Conditions/PlayerActivation/PlayerActivationCondition.h"
 #include "Conditions/PlayerLevel/PlayerLevelCondition.h"
 #include "Conditions/SkillLevel/SkillLevelCondition.h"
@@ -44,6 +45,7 @@ Achievement::Achievement(json& jsonData, std::string plugin, std::string groupNa
     else this->joinType = ConditionsJoinType::AND;
     
     this->showPopup = jsonData.value("showPopup", true);
+    this->showInMenu = jsonData.value("showInMenu", true);
     this->hidden = jsonData.value("hideDescription", false);
     this->notificationSound = jsonData.value("notificationSound", "");
 
@@ -108,7 +110,10 @@ Achievement::Achievement(json& jsonData, std::string plugin, std::string groupNa
             else if (type == "BookRead") {
                 BookReadConditionFactory* bookReadConditionFactory = new BookReadConditionFactory();
                 a_condition = bookReadConditionFactory->createCondition();
-                a_condition->SetConditionParameters(condition["bookID"].get<std::string>());
+                std::string identifier = condition.value("formID", "");
+                if (identifier == "")
+                    identifier = condition["bookID"].get<std::string>();
+                a_condition->SetConditionParameters(identifier);
             }
             else if (type == "ActorDeath") {
                 ActorDeathConditionFactory* actorDeathConditionFactory = new ActorDeathConditionFactory();
@@ -176,6 +181,9 @@ Achievement::Achievement(json& jsonData, std::string plugin, std::string groupNa
                 ObjectStateConditionFactory* objectStateConditionFactory = new ObjectStateConditionFactory();
                 a_condition = objectStateConditionFactory->createCondition();
                 a_condition->SetConditionParameters(condition["formID"].get<std::string>(), condition["enabled"].get<bool>());
+            } else if (type == "PapyrusBinding") {
+                PapyrusBindingConditionFactory* papyrusBindingConditionFactory = new PapyrusBindingConditionFactory();
+                a_condition = papyrusBindingConditionFactory->createCondition();
             }
             else {
                 logger::warn("Unknown condition type {} in {}.", type, this->achievementName);
@@ -204,6 +212,13 @@ Achievement::Achievement(json& jsonData, std::string plugin, std::string groupNa
 		logger::error("Error in Achievement constructor: {}", e.what());
 	}
 
+}
+
+void Achievement::ForceUnlock() {
+    for (Condition* condition: conditions) {
+        condition->isMet = true;
+    }
+    this->eventHandler.dispatch("ConditionMet");
 }
 
 void Achievement::EnableListener(void) {

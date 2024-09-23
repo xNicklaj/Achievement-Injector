@@ -38,6 +38,7 @@ enum ConditionType {
 	ActorDeath, // Done
 	BaseActorDeath, // Done
 	SpellLearned, // Done
+	PapyrusBinding,
 	ObjectState,
 	NotSet // Done
 };

@@ -1,11 +1,13 @@
 
 namespace NativePapyrus {
-	inline constexpr auto MCM = "AchievementInjectorMcmScript"sv;
-	void OnConfigClose(RE::TESQuest*);
-	bool Register(RE::BSScript::IVirtualMachine* a_vm);
+	using VM = RE::BSScript::Internal::VirtualMachine;
+    using StackID = RE::VMStackID;
 
-	std::string OnPowerLearned(RE::StaticFunctionTag*);
-	float QueryStat(std::string);
+	inline constexpr auto MCM = "AchievementInjectorMcmScript"sv;
+    inline constexpr auto script = "AchievementInjectorScripts"sv;
+	void OnConfigClose(RE::TESQuest*);
+
+	bool Register(VM* a_vm);
 }
 
 	

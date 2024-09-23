@@ -1,15 +1,30 @@
 #include "Papyrus.h"
 #include "settings.h"
 #include "log.h"
+#include "AchievementManager.h"
 
 #undef PlaySound
 
 
 
 namespace NativePapyrus {
-	std::string OnPowerLearned(RE::StaticFunctionTag*) {
-		return "Hello from C++!";
+#define BIND(a_method, ...) a_vm.RegisterFunction(#a_method##sv, script, a_method)
+#define BIND_EVENT(a_method, ...) a_vm.RegisterFunction(#a_method##sv, script, a_method __VA_OPT__(, ) __VA_ARGS__)
+#define STATIC_ARGS [[maybe_unused]] VM *a_vm, [[maybe_unused]] StackID a_stackID, RE::StaticFunctionTag *
+
+    void UnlockAchievement(STATIC_ARGS, std::string name, std::string group) {
+        logger::debug("UnlockAchievement called with parameters name: {}, group: {}", name, group);
+        AchievementManager::GetSingleton()->ForceUnlock(name, group);
 	}
+
+	std::vector<int> GetVersion(STATIC_ARGS) {
+        std::vector<int> response = std::vector<int>();
+        response.push_back(1);
+        response.push_back(1);
+        response.push_back(0);
+
+        return response;
+    }
 
 	void OnConfigClose(RE::TESQuest*)
 	{
@@ -26,7 +41,14 @@ namespace NativePapyrus {
 		}
 	}
 
-	bool Register(RE::BSScript::IVirtualMachine* a_vm)
+	bool Bind(VM& a_vm) {
+        BIND(UnlockAchievement);
+        BIND(GetVersion);
+        logger::debug("Binding Papyrus Static functions...");
+        return true;
+    }
+
+	bool Register(VM* a_vm)
 	{
 		if (!a_vm) {
 
@@ -35,81 +57,7 @@ namespace NativePapyrus {
 
 		a_vm->RegisterFunction("OnConfigClose", MCM, OnConfigClose);
 		a_vm->RegisterFunction("OnSettingChange", MCM, OnSettingChange);
+        Bind(*a_vm);
 		return true;
-	}
-
-	class QueryStatShort_Callback : public RE::BSScript::IStackCallbackFunctor
-	{
-	public:
-		QueryStatShort_Callback() {}
-		void operator()(RE::BSScript::Variable a_result)
-		{
-			this->result = a_result.Unpack<short>();
-		}
-		bool CanSave() {
-			return false;
-		}
-		void SetObject(const RE::BSTSmartPointer<RE::BSScript::Object>&) {
-
-		}
-		float GetResult() {
-			return this->result;
-		}
-	private:
-		float result = 0.0;
-	};
-
-
-	class QueryStatFloat_Callback : public RE::BSScript::IStackCallbackFunctor
-	{
-	public:
-		QueryStatFloat_Callback() {}
-		void operator()(RE::BSScript::Variable a_result)
-		{
-			this->result = a_result.Unpack<float>();
-		}
-		bool CanSave() {
-			return false;
-		}
-		void SetObject(const RE::BSTSmartPointer<RE::BSScript::Object>&) {
-
-		}
-		float GetResult() {
-			return this->result;
-		}
-	private:
-		float result = 0.0;
-	};
-
-	class QueryStat_Callback : public RE::BSScript::IStackCallbackFunctor
-	{
-	public:
-		QueryStat_Callback() {}
-		void operator()(RE::BSScript::Variable a_result)
-		{
-			this->result = a_result;
-		}
-		bool CanSave() {
-			return false;
-		}
-		void SetObject(const RE::BSTSmartPointer<RE::BSScript::Object>&) {
-
-		}
-		template <typename T>
-		T GetResult() {
-			return this->result.Unpack<T>();
-		}
-	private:
-		RE::BSScript::Variable result;
-	};
-
-	float QueryStat(std::string stat) {
-		RE::BSScript::IVirtualMachine* vm = RE::BSScript::Internal::VirtualMachine::GetSingleton();
-		QueryStatShort_Callback* cb = new QueryStatShort_Callback();
-		RE::BSTSmartPointer<RE::BSScript::IStackCallbackFunctor> callback(cb);
-		auto args = RE::MakeFunctionArguments(std::move(stat));
-		vm->DispatchStaticCall("Game", "QueryStat", args, callback);
-		cb->GetResult();
-		return 0;
 	}
 }

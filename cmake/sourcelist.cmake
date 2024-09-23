@@ -16,6 +16,7 @@ set(sources ${sources}
 	src/Conditions/ItemCrafted/ItemCraftedCondition.cpp
 	src/Conditions/ItemInInventory/ItemInInventoryCondition.cpp
 	src/Conditions/LocationDiscovery/LocationDiscoveryCondition.cpp
+	src/Conditions/PapyrusBinding/PapyrusBindingCondition.cpp
 	src/Conditions/PlayerActivation/PlayerActivationCondition.cpp
 	src/Conditions/PlayerFirstEnterCell/PlayerFirstEnterCellCondition.cpp
 	src/Conditions/PlayerLevel/PlayerLevelCondition.cpp

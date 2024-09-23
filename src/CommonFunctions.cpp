@@ -107,10 +107,6 @@ void ReadJson(const std::string& filePath, json* jsonData) {
     file.close();
     return;
 }
-bool BindPapyrusFunctions(RE::BSScript::IVirtualMachine* vm) {
-    vm->RegisterFunction("OnPowerLearned", "NativePapyrusFunctions", NativePapyrus::OnPowerLearned);
-    return true;
-}
 
 std::string GetPlayerName() {
     RE::PlayerCharacter* pc = RE::PlayerCharacter::GetSingleton();

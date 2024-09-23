@@ -9,7 +9,7 @@ public:
 	bool CheckCondition() override;
 	void Localize(std::string path) override;
 
-	std::string bookName;
+	std::string identifier;
 private:
 	RE::BSEventNotifyControl ProcessEvent(const RE::BooksRead::Event* a_event, RE::BSTEventSource<RE::BooksRead::Event>*) override;
 };

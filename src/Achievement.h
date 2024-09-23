@@ -25,6 +25,7 @@ public:
     void OnConditionMet(void);
     void OnSerializationRequested(void);
     std::vector<int> GetConditionsState(void);
+    void ForceUnlock();
     void Localize();
     void ToGFxValue(RE::GFxValue* gfxValue);
     json ToJson();
@@ -41,6 +42,7 @@ public:
     bool hooked = false;
     bool showPopup = true;
     bool hidden = false;
+    bool showInMenu = true;
     std::vector<bool> conditionMet;
 private:
     ConditionsJoinType joinType;

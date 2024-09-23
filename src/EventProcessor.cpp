@@ -50,6 +50,8 @@ RE::BSEventNotifyControl EventProcessor::ProcessEvent(const RE::MenuOpenCloseEve
         Settings::GetSingleton()->bIsNewGame = false;
         this->eventHandler.dispatch("PostLoadGame");
     }
+    if (!event->opening && event->menuName == "Loading Menu")
+        Scaleform::AchievementWidget::Show();
     return RE::BSEventNotifyControl::kContinue;
 }
 
