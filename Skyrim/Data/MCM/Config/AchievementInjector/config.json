@@ -28,6 +28,34 @@
             }
         },
         {
+            "id": "iWidgetYOffset:Main",
+            "type": "slider",
+            "text": "Widget vertical offset",
+            "help": "Set the vertical offset of the popup widget.",
+            "valueOptions": {
+                "sourceType": "ModSettingInt",
+                "min": -10,
+                "max": 565,
+                "step": 1,
+                "defaultValue": 0
+            }
+
+        },
+        {
+            "id": "fWidgetScale:Main",
+            "type": "slider",
+            "text": "Widget scale",
+            "help": "Set the scale of the popup widget.",
+            "valueOptions": {
+                "sourceType": "ModSettingFloat",
+                "min": 0.1,
+                "max": 2.0,
+                "step": 0.1,
+                "defaultValue": 1.0
+            }
+
+        },
+        {
             "id": "bShowHidden:Main",
             "type": "toggle",
             "text": "Show hidden achievements",

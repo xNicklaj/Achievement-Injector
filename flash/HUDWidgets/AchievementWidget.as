@@ -48,7 +48,7 @@ class AchievementWidget extends MovieClip
 		this._x = a_x;
 		this._y = a_y;
 	}
-	function setScale(a_scale:Number)
+	function setScale(a_scale)
 	{
 		this._width = this._width * a_scale;
 		this._height = this._height * a_scale;

@@ -25,6 +25,8 @@ public:
 	bool GetShowHidden() const { return bShowHidden; }
 	std::string GetNotificationSound() const { return sNotificationSound; }
 	bool GetDelayNewGameAlert() const { return bDelayNewGameAlert; }
+    int GetWidgetYOffset() const { return iWidgetYOffset; }
+    float GetWidgetScale() const { return fWidgetScale; }
 
 	void SetDebug(bool a_val) { bDebug = a_val; }
 	void SetGlobal(bool a_val) { bGlobal = a_val; }
@@ -35,6 +37,8 @@ public:
 	void SetOverrideNotificationSounds(bool a_val) { bOverrideNotificationSound = a_val; }
 	void SetShowHidden(bool a_val) { bShowHidden = a_val; }
 	void SetDelayNewGameAlert(bool a_val) { bDelayNewGameAlert = a_val; }
+    void SetWidgetYOffset(int a_val) { iWidgetYOffset = a_val; }
+    void SetWidgetScale(float a_val) { fWidgetScale = a_val; }
 
 	void PrintSettings() const {
 		logger::debug("bDebug: {}, bGlobal: {}, bUseDebugger: {}, bUsePopup: {}, bMute: {}, bDelayNewGameAlert: {}, bShowHidden: {}, iNotificationSound: {}", bDebug, bGlobal, bUseDebugger, bUsePopup, bMute, bDelayNewGameAlert, bShowHidden, sNotificationSound);
@@ -72,5 +76,7 @@ private:
 	bool bShowHidden{ false };
 	bool bOverrideNotificationSound{ false };
 	bool bDelayNewGameAlert{ false };
+    float fWidgetScale{1.0f};
+    int iWidgetYOffset{0};
 	std::string sNotificationSound{ "UISkillIncreaseSD" };
 };

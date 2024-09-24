@@ -2,6 +2,7 @@
 #include "settings.h"
 #include "log.h"
 #include "AchievementManager.h"
+#include "Utility.h"
 
 #undef PlaySound
 
@@ -38,7 +39,11 @@ namespace NativePapyrus {
 		SetupLog(false);
 		if (a_id == "iNotificationSound:Sound") {
 			RE::PlaySound(Settings::GetSingleton()->GetNotificationSound().c_str());
-		}
+		} 
+		else if (a_id == "iWidgetYOffset:Main" || a_id == "fWidgetScale:Main") {
+			// TODO fix fire multiple times
+            DisplayEntryWithWait(std::make_tuple("Test Notification", "This is a test notification.", ""));
+		} 
 	}
 
 	bool Bind(VM& a_vm) {

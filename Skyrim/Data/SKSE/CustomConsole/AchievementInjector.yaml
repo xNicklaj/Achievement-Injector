@@ -1,0 +1,20 @@
+name: achievementinjector
+alias: ai
+script: AchievementInjectorScripts
+help: Achievement Injector commands
+subs:
+  - name: unlockachievement
+    alias: uach
+    func: UnlockAchievement
+    help: Unlock an achievement
+    args:
+      - name: --name
+        alias: -n
+        type: string
+        required: true
+        help: Achievement name
+      - name: --group
+        alias: -g
+        type: string
+        required: true
+        help: Achievement group

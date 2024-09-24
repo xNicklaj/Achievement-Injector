@@ -68,6 +68,8 @@ void Settings::LoadMCMSettings() const
 		Settings::GetSingleton()->AssignValue<bool>(&ini, &(Settings::GetSingleton()->bUsePopup), "Main", "bUsePopup");
 		Settings::GetSingleton()->AssignValue<bool>(&ini, &(Settings::GetSingleton()->bDelayNewGameAlert), "Main", "bDelayNewGameAlert");
 		Settings::GetSingleton()->AssignValue<bool>(&ini, &(Settings::GetSingleton()->bShowHidden), "Main", "bShowHidden");
+        Settings::GetSingleton()->AssignValue<int>(&ini, &(Settings::GetSingleton()->iWidgetYOffset), "Main", "iWidgetYOffset");
+        Settings::GetSingleton()->AssignValue<float>(&ini, &(Settings::GetSingleton()->fWidgetScale), "Main", "fWidgetScale");
 
 		Settings::GetSingleton()->AssignValue<bool>(&ini, &(Settings::GetSingleton()->bOverrideNotificationSound), "Sound", "bOverrideNotificationSound");
 		Settings::GetSingleton()->AssignValue<bool>(&ini, &(Settings::GetSingleton()->bMute), "Sound", "bMute");

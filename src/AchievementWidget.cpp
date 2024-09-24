@@ -95,8 +95,17 @@ namespace Scaleform {
             std::array<RE::GFxValue, 1> nameArgs;
             std::array<RE::GFxValue, 1> descriptionArgs;
             std::array<RE::GFxValue, 3> showArgs;
+            std::array<RE::GFxValue, 2> posArgs;
+            std::array<RE::GFxValue, 1> scaleArgs;
             nameArgs[0] = name;
             descriptionArgs[0] = description;
+            
+            posArgs[0] = 1280.6;
+            posArgs[1] = 70.40 + Settings::GetSingleton()->GetWidgetYOffset();
+            scaleArgs[0] = Settings::GetSingleton()->GetWidgetScale();
+            widget.Invoke("setPosition", nullptr, posArgs.data(), posArgs.size());
+            widget.Invoke("setScale", nullptr, scaleArgs.data(), scaleArgs.size());
+
             showArgs[0] = true;
             showArgs[1] = !Settings::GetSingleton()->GetMute();
             showArgs[2] = Settings::GetSingleton()->GetNotificationSound();

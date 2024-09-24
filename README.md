@@ -1,71 +1,32 @@
-
+﻿
 # Achievement Injector
 
-Because this uses [CommonLibSSE NG](https://github.com/CharmedBaryon/CommonLibSSE-NG), it supports Skyrim SE, AE, GOG, and VR. 
+This skyrim mod allows modders to create custom in-game achievements that can be unlocked by the player. Releases and more informations about the mod can be found on nexusmods.
+If you're developing your addon for this mod and you need help, feel free to join the discord in the nexusmods page.
 
-Hook IDs and offsets must still be found manually for each version.
+# DESCRIPTION
 
-# Requirements
+## INTRODUCTION
+This mod has been inspired by the last few years of gameplay mod development in skyrim and the fact that after 8 years and 800 hours in the game I only have something like 15 achievements.
 
-- [Visual Studio 2022](https://visualstudio.microsoft.com/) (_the free Community edition_) or [Visual Studio Code](https://code.visualstudio.com/)
-- [`vcpkg`](https://github.com/microsoft/vcpkg)
-  - 1. Clone the repository using git OR [download it as a .zip](https://github.com/microsoft/vcpkg/archive/refs/heads/master.zip)
-  - 2. Go into the `vcpkg` folder and double-click on `bootstrap-vcpkg.bat`
-  - 3. Edit your system or user Environment Variables and add a new one:
-    - Name: `VCPKG_ROOT`  
-      Value: `C:\path\to\wherever\your\vcpkg\folder\is`
-  - The latest version of vcpkg needs a default repository defined in the json. If you're using an older version of vcpkg, simply delete the default repository definition in `vcpkg-configuration.json`
+## FEATURES
+This framework introduces a new menu which allows you to check all the achievements registered, which you have unlocked and which you haven't unlocked. Moreover, it featuers a popup widget that will show up whenever you unlock an achievement, similarly to how steam, xbox and ps show it.
+﻿
 
-## Opening the project
+Via the MCM Settings or ini file you will be able to choose whether you want a popup to appear (for immersion puposes) upon achievement unlock, whether you want to disable the popup sound and if you do use a sound, you will be able to select between some pre-determined sounds to play - similarly to how you can select ringtones in your phone, with the default being the skill levelup sound as I found it fitting.
 
-Once you have Visual Studio 2022 installed, you can open this folder in basically any C++ editor, e.g. [VS Code](https://code.visualstudio.com/) or [CLion](https://www.jetbrains.com/clion/) or [Visual Studio](https://visualstudio.microsoft.com/)
-- > _for VS Code, if you are not automatically prompted to install the [C++](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools) and [CMake Tools](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools) extensions, please install those and then close VS Code and then open this project as a folder in VS Code_
+You can also choose whether to use per-character achievements or global achievements. In the first case the mod will generate a file for each character you have, while in the second case, the achievements will be shared between characters. 
+NOTE: if you have multiple characters with the same name (firstly: why would you?) the framework will use the same json file for the achievements, which means that you will have the same achievements unlocked for both characters.
 
-You may need to click `OK` on a few windows, but the project should automatically run CMake!
+The framework is also somewhat able to check whether you have completed an achievement previously to its installation, although not for all achievements.
 
-It will _automatically_ download [CommonLibSSE NG](https://github.com/CharmedBaryon/CommonLibSSE-NG) and everything you need to get started making your new plugin!
+## REQUIREMENTS
+This mod has very few requirements:
 
-# Project setup
+[SKSE64](https://skse.silverlock.org)
+[Address Library for SKSE Plugins](https://www.nexusmods.com/skyrimspecialedition/mods/32444)
 
-By default, when this project compiles it will output a `.dll` for your SKSE plugin into the `build/` folder.
+While not a requirement, I still recommend Achievements Mods Enabler if you want the base game achievements to be also counted by steam, and in case you want to reset your steam achievements to reacquire them, [Steam Achievement Manager](https://github.com/gibbed/SteamAchievementManager/releases/tag/7.0.25) allows you to do just that with a simple interface.
 
-If you want to configure this project to output your plugin files
-into your Skyrim Special Edition's "`Data`" folder:
-
-- Set the `SKYRIM_FOLDER` environment variable to the path of your Skyrim installation  
-  e.g. `C:\Program Files (x86)\Steam\steamapps\common\Skyrim Special Edition`
-
-If you want to configure this project to output your plugin files
-into your "`mods`" folder:  
-(_for Mod Organizer 2 or Vortex_)
-
-- Set the `SKYRIM_MODS_FOLDER` environment variable to the path of your mods folder:  
-  e.g. `C:\Users\<user>\AppData\Local\ModOrganizer\Skyrim Special Edition\mods`  
-  e.g. `C:\Users\<user>\AppData\Roaming\Vortex\skyrimse\mods`
-
-# Debugging
-In order to attach a debugger, you must own a legal copy of Skyrim with the exe stripped using Steamless. Note that users with MO2 should have `-forcesteamloader` as an SKSE argument for plugins to load normally with a stub-removed exe.
-
-For VSCode users, they must have a `launch.json` file like the one below:
-
-```json
-
-{
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "C++ Debugger",
-            "type": "cppvsdbg",
-            "request": "attach"
-        },
-        {
-            "type": "cmake",
-            "request": "launch",
-            "name": "Debug portfile(s)",
-            "cmakeDebugType": "external",
-            "pipeName": "\\\\.\\pipe\\vcpkg_ext_portfile_dbg",
-            "preLaunchTask": "Debug vcpkg commands"
-        }
-    ]
-}
-```
+## FURTHER INFORMATIONS
+If you require further informations about this mod, please visit the nexus page at [https://www.nexusmods.com/skyrimspecialedition/mods/126220](https://www.nexusmods.com/skyrimspecialedition/mods/126220?tab=description).
