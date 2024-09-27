@@ -164,3 +164,19 @@ std::string StripExtension(const std::string& filename) {
     }
     return filename; // Return the original string if no dot is found
 }
+
+std::string utf16to8(const std::string path) {
+    std::ifstream fin(path, std::ios::binary);
+    fin.seekg(0, std::ios::end);
+    size_t size = (size_t) fin.tellg();
+
+    //skip BOM
+    fin.seekg(2, std::ios::beg);
+    size -= 2;
+
+    std::u16string u16((size / 2) + 1, '\0');
+    fin.read((char*) &u16[0], size);
+
+    std::string utf8 = std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}.to_bytes(u16);
+    return utf8;
+}

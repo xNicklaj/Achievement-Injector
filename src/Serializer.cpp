@@ -123,7 +123,11 @@ struct SerializedAchievement Serializer::DeserializeAchievementData(std::string 
 		DeserializeAchievementData_GLOBAL(name);
 
 	try {
-		std::ifstream inFile(GetFilename(false));
+        std::string filename = GetFilename(false);
+        if (!std::filesystem::exists(filename)) {
+            return SerializedAchievement("NULL", false, -1);
+        }
+		std::ifstream inFile(filename);
 		inFile >> jsonData;
 		inFile.close();
 	}

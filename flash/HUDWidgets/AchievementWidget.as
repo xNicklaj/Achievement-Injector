@@ -10,7 +10,8 @@ class AchievementWidget extends MovieClip
   	var WidgetClip:MovieClip;
 	var achievementName;
 	var achievementDescription;
-	var notificationSound;
+	var initialW;
+	var initialH;
   
   
   /* INITIALIZATION */
@@ -22,6 +23,9 @@ class AchievementWidget extends MovieClip
 		
 		this.achievementName = "Initial";
 		this.achievementDescription = "Initial";
+		
+		this.initialW = this._width;
+		this.initialH = this._height;
 		
 		this._visible = true;
 		this.gotoAndStop("widgetHidden");
@@ -48,10 +52,14 @@ class AchievementWidget extends MovieClip
 		this._x = a_x;
 		this._y = a_y;
 	}
-	function setScale(a_scale)
+	function setYPosition(a_y)
 	{
-		this._width = this._width * a_scale;
-		this._height = this._height * a_scale;
+		this._y = a_y;
+	}
+	function setScale(a_scale:Number)
+	{
+		this._width = this.initialW * a_scale;
+		this._height = this.initialH * a_scale;
 	}
 	
 	// @Papyrus
@@ -65,15 +73,11 @@ class AchievementWidget extends MovieClip
 		achievementDescription = a_description;
 	}
 	
-	function ShowNotification(a_show, useAudio, notificationSound)
+	function ShowNotification(a_show)
 	{
 		if (a_show == true)
 		{
-			if (useAudio)
-			{
-				this.notificationSound = notificationSound;
-				//GameDelegate.call("PlaySound",["UISkillIncreaseSD"]);
-			}
+			GameDelegate.call("PlaySound",["UISkillIncreaseSD"]);
 			this.gotoAndPlay("widgetShow");
 		}
 		else

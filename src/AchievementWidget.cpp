@@ -59,13 +59,13 @@ namespace Scaleform {
             return;
         }
         RE::GFxValue widget;
-        std::array<RE::GFxValue, 2> posArgs;
+        std::array<RE::GFxValue, 1> posArgs;
         std::array<RE::GFxValue, 1> scaleArgs;
         //posArgs[0] = widgetX;
         //posArgs[1] = widgetY;
         //scaleArgs[0] = widgetScale;
         ui->GetMenu(AchievementWidget::MENU_NAME)->uiMovie->GetVariable(&widget, "_root.BestiaryWidget_mc");
-        widget.Invoke("setPosition", nullptr, posArgs.data(), posArgs.size());
+        widget.Invoke("setYPosition", nullptr, posArgs.data(), posArgs.size());
         widget.Invoke("setScale", nullptr, scaleArgs.data(), scaleArgs.size());
 
         //logger::info("Set widget position to X {} and Y {}, scale to {}", widgetX, widgetY, widgetScale);
@@ -95,15 +95,14 @@ namespace Scaleform {
             std::array<RE::GFxValue, 1> nameArgs;
             std::array<RE::GFxValue, 1> descriptionArgs;
             std::array<RE::GFxValue, 3> showArgs;
-            std::array<RE::GFxValue, 2> posArgs;
+            std::array<RE::GFxValue, 1> posArgs;
             std::array<RE::GFxValue, 1> scaleArgs;
             nameArgs[0] = name;
             descriptionArgs[0] = description;
             
-            posArgs[0] = 1280.6;
-            posArgs[1] = 70.40 + Settings::GetSingleton()->GetWidgetYOffset();
+            posArgs[0] = 63.70 + Settings::GetSingleton()->GetWidgetYOffset();
             scaleArgs[0] = Settings::GetSingleton()->GetWidgetScale();
-            widget.Invoke("setPosition", nullptr, posArgs.data(), posArgs.size());
+            widget.Invoke("setYPosition", nullptr, posArgs.data(), posArgs.size());
             widget.Invoke("setScale", nullptr, scaleArgs.data(), scaleArgs.size());
 
             showArgs[0] = true;

@@ -48,6 +48,7 @@ Achievement::Achievement(json& jsonData, std::string plugin, std::string groupNa
     this->showInMenu = jsonData.value("showInMenu", true);
     this->hidden = jsonData.value("hideDescription", false);
     this->notificationSound = jsonData.value("notificationSound", "");
+    this->icon = jsonData.value("icon", "");
 
     this->eventHandler.appendListener("ConditionMet", [this]() {
         this->OnConditionMet();
@@ -340,11 +341,21 @@ void Achievement::ToGFxValue(RE::GFxValue* gfxValue) {
     gfxValue->SetMember("unlockDatetime", &unlockDatetimeVal);
 }
 
+static bool checkIcon(std::string group, std::string name) {
+    if (name == "")
+        return false;
+    if (!std::filesystem::exists("Data\\SKSE\\Plugins\\AchievementsData\\Icons\\" + group + "\\" + name)) {
+        logger::warn("Icon {} from {} was declared but doesn't exist at path", name, group, "Data\\SKSE\\Plugins\\AchievementsData\\Icons\\" + group + "\\");
+        return false;
+    }
+    return true;
+}
+
 json Achievement::ToJson() {
     json data = json::object();
 
     std::string desc = this->description;
-    if (!this->unlocked && this->hidden && !Settings::GetSingleton()->GetShowHidden()) desc = "Hidden Description.";
+    if (!this->unlocked && this->hidden && !Settings::GetSingleton()->GetShowHidden()) desc = LocalizationManager::GetSingleton()->GetHiddenAchievementString();
 
     if (Settings::GetSingleton()->GetGlobal()) {
         SerializedAchievement sa = Serializer::GetSingleton()->DeserializeAchievementData_GLOBAL(this->achievementName);
@@ -352,6 +363,7 @@ json Achievement::ToJson() {
         data["Description"] = desc;
         data["UnlockDatetime"] = sa.unlockDatetime;
         data["Unlocked"] = this->unlocked;
+        data["Icon"] = checkIcon(this->groupName, this->icon) ? "..\\SKSE\\Plugins\\AchievementsData\\Icons\\" + this->groupName + "\\" + this->icon : "";
     }
     else {
         SerializedAchievement sa = Serializer::GetSingleton()->DeserializeAchievementData(this->achievementName);
@@ -359,6 +371,7 @@ json Achievement::ToJson() {
         data["Description"] = desc;
         data["UnlockDatetime"] = sa.unlockDatetime;
         data["Unlocked"] = sa.unlocked;
+        data["Icon"] = checkIcon(this->groupName, this->icon)  ? "..\\SKSE\\Plugins\\AchievementsData\\Icons\\" + this->groupName + "\\" + this->icon : "";
     }
     return data;
 }

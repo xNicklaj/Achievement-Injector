@@ -37,6 +37,7 @@ public:
     std::string plugin;
     std::string notificationSound = "";
     std::string groupName = "";
+    std::string icon;
 
     bool unlocked;
     bool hooked = false;

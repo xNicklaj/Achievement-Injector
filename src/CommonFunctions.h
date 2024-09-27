@@ -23,6 +23,7 @@ float GetGlobalVariableValue(RE::FormID formid);
 std::string GetPlayerName();
 bool isHex(const std::string& str);
 std::string StripExtension(const std::string& filename);
+std::string utf16to8(const std::string path);
 
 //Taken from https://github.com/powerof3/CLibUtil/blob/master/include/CLIBUtil/editorID.hpp
 namespace clib_util::editorID {

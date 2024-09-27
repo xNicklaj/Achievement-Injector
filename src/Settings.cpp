@@ -40,6 +40,9 @@ bool Settings::AssignValue(CSimpleIniA* ini, T* setting, std::string section, st
 	}
 	else if constexpr (std::is_same<T, int>::value) {
 		*setting = ini->GetLongValue(section.c_str(), key.c_str());
+    } 
+	else if constexpr (std::is_same<T, float>::value) {
+        *setting = std::stof(std::string(value));
 	}
 	else if constexpr (std::is_same<T, std::string>::value) {
 		*setting = *value;

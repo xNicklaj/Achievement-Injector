@@ -61,7 +61,7 @@ void ReadAchievementDirectory(std::vector<AchievementFile>* achievementFiles, st
     try {
         if (fs::exists(directoryPath) && fs::is_directory(directoryPath)) {
             for (const auto& entry: fs::directory_iterator(directoryPath)) {
-                if (fs::is_directory(entry.path().string()))
+                if (fs::is_directory(entry.path().string()) || !entry.path().string().ends_with(".json"))
                     continue;
                 struct AchievementFile achievementFile;
                 // Read JSON files
@@ -80,13 +80,15 @@ void ReadAchievementDirectory(std::vector<AchievementFile>* achievementFiles, st
                 std::string iconPath = StripExtension(entry.path().filename().string()) + ".dds";
                 std::ifstream file("Data/AchievementsData/Icons/" + iconPath);
                 if (file.good())
-                    achievementFile.iconPath = "AchievementsData/Icons/" + iconPath;
+                    achievementFile.iconPath = "..\\AchievementsData\\Icons\\" + iconPath;
                 else {
                     std::ifstream file2("Data/SKSE/Plugins/AchievementsData/Icons/" + iconPath);
                     if (file2.good())
-                        achievementFile.iconPath = "SKSE/Plugins/AchievementsData/Icons/" + iconPath;
+                        achievementFile.iconPath =
+                            "..\\SKSE\\Plugins\\AchievementsData\\Icons\\" + iconPath;
                     else {
-                        achievementFile.iconPath = "SKSE/Plugins/AchievementsData/Icons/Default.dds";
+                        achievementFile.iconPath =
+                            "..\\SKSE\\Plugins\\AchievementsData\\Icons\\Default.dds";
                     }
                 }
 
