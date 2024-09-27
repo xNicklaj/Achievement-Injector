@@ -11,6 +11,7 @@
     public var imagePlaceholder_mc:MovieClip;
 
     private var sidePadding:Number = 5;
+    private var lockStatusPadding:Number = 3;
     private var data:Object;
 
     function onLoad(): Void {
@@ -62,10 +63,10 @@
             date_tf.autoSize = 'right';
             AchievementUtils.setText( date_tf, unlockText );
             Unlock_mc._visible = true;
-            UnlockBg_mc._x = date_tf._x - sidePadding;
+            UnlockBg_mc._x = date_tf._x - lockStatusPadding;
             UnlockBg_mc.beginFill(0xffffff);
-            var w = ( UnlockHighlight_mc._x + UnlockHighlight_mc._width + sidePadding ) - date_tf._x;
-            drawRectangle(UnlockBg_mc, w, date_tf._height + sidePadding, 5);
+            var w = ( UnlockHighlight_mc._x + UnlockHighlight_mc._width ) - date_tf._x;
+            drawRectangle(UnlockBg_mc, w, date_tf._height + lockStatusPadding, 5);
             UnlockBg_mc.endFill();
         } else {
             // AchievementUtils.setText( date_tf, '$ACH_LOCKED' );
