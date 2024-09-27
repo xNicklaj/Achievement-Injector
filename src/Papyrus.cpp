@@ -43,7 +43,9 @@ namespace NativePapyrus {
 		else if (a_id == "iWidgetYOffset:Main" || a_id == "fWidgetScale:Main") {
 			// TODO fix fire multiple times
             DisplayEntryWithWait(std::make_tuple("Test Notification", "This is a test notification.", ""));
-		} 
+        } else if (a_id == "bShowHidden:Main") {
+            AchievementManager::GetSingleton()->UpdateCache();
+		}
 	}
 
 	bool Bind(VM& a_vm) {
