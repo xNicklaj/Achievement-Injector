@@ -5,6 +5,7 @@
         {
             "achievementName": "$NAME_Outlander",
             "description": "$DESC_Outlander",
+            "icon": "ACH_Outlander.dds",
             "joinType": "OR",
             "conditions": [
                 {
@@ -48,6 +49,7 @@
         {
             "achievementName": "$NAME_The Temple of Miraak",
             "description": "$DESC_The Temple of Miraak",
+            "icon": "ACH_TheTempleofMiraak.dds",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -59,6 +61,7 @@
         {
             "achievementName": "$NAME_The Path of Knowledge",
             "description": "$DESC_The Path of Knowledge",
+            "icon": "ACH_ThePathofKnowledge.dds",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -70,6 +73,7 @@
         {
             "achievementName": "$NAME_At the Summit of Apocrypha",
             "description": "$DESC_At the Summit of Apocrypha",
+            "icon": "ACH_AttheSummitofApocrypha.dds",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -81,6 +85,7 @@
         {
             "achievementName": "$NAME_Dragon Aspect",
             "description": "$DESC_Dragon Aspect",
+            "icon": "ACH_DragonAspect.dds",
             "conditions": [
                 {
                     "type": "ShoutLearned",
@@ -92,11 +97,13 @@
         {
             "achievementName": "$NAME_Hidden Knowledge",
             "description": "$DESC_Hidden Knowledge",
+            "icon": "ACH_HiddenKnowledge.dds",
             "conditions": []
         },
         {
             "achievementName": "$NAME_Stalhrim Crafter",
             "description": "$DESC_Stalhrim Crafter",
+            "icon": "ACH_StalhrimCrafter.dds",
             "joinCondition": "OR",
             "conditions": [
                 {
@@ -172,11 +179,13 @@
         {
             "achievementName": "$NAME_Dragonrider",
             "description": "$DESC_Dragonrider",
+            "icon": "ACH_Dragonrider.dds",
             "conditions": []
         },
         {
             "achievementName": "$NAME_Raven Rock Owner",
             "description": "$DESC_Raven Rock Owner",
+            "icon": "ACH_RavenRockOwner.dds",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -188,6 +197,7 @@
         {
             "achievementName": "$NAME_Solstheim Explorer",
             "description": "$DESC_Solstheim Explorer",
+            "icon": "ACH_SolstheimExplorer.dds",
             "conditions": []
         }
     ]

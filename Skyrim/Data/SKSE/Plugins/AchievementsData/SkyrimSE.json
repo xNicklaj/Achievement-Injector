@@ -5,6 +5,7 @@
         {
             "achievementName": "$NAME_Unbound",
             "description": "$DESC_Unbound",
+            "icon": "ACH_Unbound.dds",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -16,6 +17,7 @@
         {
             "achievementName": "$NAME_Bleak Falls Barrow",
             "description": "$DESC_Bleak Falls Barrow",
+            "icon": "ACH_BleakFallsBarrow.dds",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -27,6 +29,7 @@
         {
             "achievementName": "$NAME_The Way of the Voice",
             "description": "$DESC_The Way of the Voice",
+            "icon": "ACH_TheWayoftheVoice.dds",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -38,6 +41,7 @@
         {
             "achievementName": "$NAME_Diplomatic Immunity",
             "description": "$DESC_Diplomatic Immunity",
+            "icon": "ACH_DiplomaticImmunity.dds",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -49,6 +53,7 @@
         {
             "achievementName": "$NAME_Alduin's Wall",
             "description": "$DESC_Alduin's Wall",
+            "icon": "ACH_AlduinsWall.dds",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -60,6 +65,7 @@
         {
             "achievementName": "$NAME_Elder Knowledge",
             "description": "$DESC_Elder Knowledge",
+            "icon": "ACH_ElderKnowledge.dds",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -71,6 +77,7 @@
         {
             "achievementName": "$NAME_The Fallen",
             "description": "$DESC_The Fallen",
+            "icon": "ACH_TheFallen.dds",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -82,6 +89,7 @@
         {
             "achievementName": "$NAME_Dragonslayer",
             "description": "$DESC_Dragonslayer",
+            "icon": "ACH_Dragonslayer.dds",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -93,6 +101,7 @@
         {
             "achievementName": "$NAME_Take Up Arms",
             "description": "$DESC_Take Up Arms",
+            "icon": "ACH_TakeUpArms.dds",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -104,6 +113,7 @@
         {
             "achievementName": "$NAME_Blood Oath",
             "description": "$DESC_Blood Oath",
+            "icon": "ACH_BloodOath.dds",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -115,6 +125,7 @@
         {
             "achievementName": "$NAME_Glory of the Dead",
             "description": "$DESC_Glory of the Dead",
+            "icon": "ACH_GloryoftheDead.dds",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -126,6 +137,7 @@
         {
             "achievementName": "$NAME_Gatekeeper",
             "description": "$DESC_Gatekeeper",
+            "icon": "ACH_Gatekeeper.dds",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -137,6 +149,7 @@
         {
             "achievementName": "$NAME_Revealing the Unseen",
             "description": "$DESC_Revealing the Unseen",
+            "icon": "ACH_RevealingtheUnseen.dds",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -148,6 +161,7 @@
         {
             "achievementName": "$NAME_The Eye of Magnus",
             "description": "$DESC_The Eye of Magnus",
+            "icon": "ACH_TheEyeofMagnus.dds",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -159,6 +173,7 @@
         {
             "achievementName": "$NAME_Taking Care of Business",
             "description": "$DESC_Taking Care of Business",
+            "icon": "ACH_TakingCareofBusiness.dds",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -170,6 +185,7 @@
         {
             "achievementName": "$NAME_Darkness Returns",
             "description": "$DESC_Darkness Returns",
+            "icon":  "ACH_DarknessReturns.dds",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -181,6 +197,7 @@
         {
             "achievementName": "$NAME_One with the Shadows",
             "description": "$DESC_One with the Shadows",
+            "icon": "ACH_OnewiththeShadows.dds",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -192,6 +209,7 @@
         {
             "achievementName": "$NAME_With Friends Like These",
             "description": "$DESC_With Friends Like These",
+            "icon": "ACH_WithFriendsLikeThese.dds",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -203,6 +221,7 @@
         {
             "achievementName": "$NAME_Bound Until Death",
             "description": "$DESC_Bound Until Death",
+            "icon": "ACH_BoundUntilDeath.dds",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -214,6 +233,7 @@
         {
             "achievementName": "$NAME_Hail Sithis!",
             "description": "$DESC_Hail Sithis!",
+            "icon": "ACH_HailSithis.dds",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -225,6 +245,7 @@
         {
             "achievementName": "$NAME_Taking Sides",
             "description": "$DESC_Taking Sides",
+            "icon": "ACH_TakingSides.dds",
             "joinType": "OR",
             "conditions": [
                 {
@@ -242,6 +263,7 @@
         {
             "achievementName": "$NAME_War Hero",
             "description": "$DESC_War Hero",
+            "icon": "ACH_WarHero.dds",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -253,6 +275,7 @@
         {
             "achievementName": "$NAME_Hero of Skyrim",
             "description": "$DESC_Hero of Skyrim",
+            "icon": "ACH_HeroofSkyrim.dds",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -264,6 +287,7 @@
         {
             "achievementName": "$NAME_Sideways",
             "description": "$DESC_Sideways",
+            "icon": "ACH_Sideways.dds",
             "conditions": [
                 {
                     "type": "GlobalVariableState",
@@ -275,6 +299,7 @@
         {
             "achievementName": "$NAME_Hero of the People",
             "description": "$DESC_Hero of the People",
+            "icon": "ACH_HeroofthePeople.dds",
             "conditions": [
                 {
                     "type": "GlobalVariableState",
@@ -286,6 +311,7 @@
         {
             "achievementName": "$NAME_Hard Worker",
             "description": "$DESC_Hard Worker",
+            "icon": "ACH_HardWorker.dds",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -297,6 +323,7 @@
         {
             "achievementName": "$NAME_Thief",
             "description": "$DESC_Thief",
+            "icon": "ACH_Thief.dds",
             "joinType": "AND",
             "conditions": [
                 {
@@ -314,6 +341,7 @@
         {
             "achievementName": "$NAME_Snake Tongue",
             "description": "$DESC_Snake Tongue",
+            "icon": "ACH_SnakeTongue.dds",
             "joinType": "AND",
             "conditions": [
                 {
@@ -336,6 +364,7 @@
         {
             "achievementName": "$NAME_Blessed",
             "description": "$DESC_Blessed",
+            "icon": "ACH_Blessed.dds",
             "joinType": "OR",
             "conditions": [
                 {
@@ -395,6 +424,7 @@
         {
             "achievementName": "$NAME_Standing Stones",
             "description": "$DESC_Standing Stones",
+            "icon": "ACH_StandingStones.dds",
             "joinType": "AND",
             "conditions": [
                 {
@@ -467,6 +497,7 @@
         {
             "achievementName": "$NAME_Citizen",
             "description": "$DESC_Citizen",
+            "icon": "ACH_Citizen.dds",
             "joinType": "OR",
             "conditions": [
                 {
@@ -510,6 +541,7 @@
         {
             "achievementName": "$NAME_Wanted",
             "description": "$DESC_Wanted",
+            "icon": "ACH_Wanted.dds",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -522,6 +554,7 @@
         {
             "achievementName": "$NAME_Married",
             "description": "$DESC_Married",
+            "icon": "ACH_Married.dds",
             "conditions": [
                 {
                     "type": "QuestStageDone",
@@ -533,6 +566,7 @@
         {
             "achievementName": "$NAME_Artificer",
             "description": "$DESC_Artificer",
+            "icon": "ACH_Artificier.dds",
             "joinType": "AND",
             "conditions": [
                 {
@@ -545,6 +579,7 @@
         {
             "achievementName": "$NAME_Master Criminal",
             "description": "$DESC_Master Criminal",
+            "icon": "ACH_MasterCriminal.dds",
             "joinType": "AND",
             "conditions": [
                 {
@@ -597,6 +632,7 @@
         {
             "achievementName": "$NAME_Golden Touch",
             "description": "$DESC_Golden Touch",
+            "icon": "ACH_GoldenTouch.dds",
             "conditions": [
                 {
                     "type": "ItemInInventory",
@@ -608,6 +644,7 @@
         {
             "achievementName": "$NAME_Delver",
             "description": "$DESC_Delver",
+            "icon": "ACH_Delver.dds",
             "conditions": [
                 {
                     "type": "QueryStatValue",
@@ -619,6 +656,7 @@
         {
             "achievementName": "$NAME_Skill Master",
             "description": "$DESC_Skill Master",
+            "icon": "ACH_SkillMaster.dds",
             "joinType": "OR",
             "conditions": [
                 {
@@ -716,6 +754,7 @@
         {
             "achievementName": "$NAME_Explorer",
             "description": "$DESC_Explorer",
+            "icon": "ACH_Explorer.dds",
             "conditions": [
                 {
                     "type": "QueryStatValue",
@@ -727,6 +766,7 @@
         {
             "achievementName": "$NAME_Reader",
             "description": "$DESC_Reader",
+            "icon": "ACH_Reader.dds",
             "conditions": [
                 {
                     "type": "QueryStatValue",
@@ -738,6 +778,7 @@
         {
             "achievementName": "$NAME_Daedric Influence",
             "description": "$DESC_Daedric Influence",
+            "icon": "ACH_DaedricInfluence.dds",
             "joinType": "OR",
             "conditions": [
                 {
@@ -830,6 +871,7 @@
         {
             "achievementName": "$NAME_Oblivion Walker",
             "description": "$DESC_Oblivion Walker",
+            "icon": "ACH_OblivionWalker.dds",
             "joinType": "AND",
             "conditions": [
                 {
@@ -912,6 +954,7 @@
         {
             "achievementName": "$NAME_Dragon Soul",
             "description": "$DESC_Dragon Soul",
+            "icon":  "ACH_DragonSoul.dds",
             "conditions": [
                 {
                     "type": "DragonSoulAbsorbed",
@@ -922,6 +965,7 @@
         {
             "achievementName": "$NAME_Dragon Hunter",
             "description": "$DESC_Dragon Hunter",
+            "icon": "ACH_DragonHunter.dds",
             "conditions": [
                 {
                     "type": "DragonSoulAbsorbed",
@@ -932,6 +976,7 @@
         {
             "achievementName": "$NAME_Words of Power",
             "description": "$DESC_Words of Power",
+            "icon": "ACH_WordsofPower.dds",
             "joinType": "OR",
             "conditions": [
                 {
@@ -1081,6 +1126,7 @@
         {
             "achievementName": "$NAME_Thu'um Master",
             "description": "$DESC_Thu'um Master",
+            "icon": "ACH_ThuumMaster.dds",
             "joinCondition": "AND",
             "conditions": [
                 {
@@ -1188,6 +1234,7 @@
         {
             "achievementName": "$NAME_Apprentice",
             "description": "$DESC_Apprentice",
+            "icon": "ACH_Apprentice.dds",
             "conditions": [
                 {
                     "type": "PlayerLevel",
@@ -1198,6 +1245,7 @@
         {
             "achievementName": "$NAME_Adept",
             "description": "$DESC_Adept",
+            "icon": "ACH_Adept.dds",
             "conditions": [
                 {
                     "type": "PlayerLevel",
@@ -1208,6 +1256,7 @@
         {
             "achievementName": "$NAME_Expert",
             "description": "$DESC_Expert",
+            "icon": "ACH_Expert.dds",
             "conditions": [
                 {
                     "type": "PlayerLevel",
@@ -1218,6 +1267,7 @@
         {
             "achievementName": "$NAME_Master",
             "description": "$DESC_Master",
+            "icon": "ACH_Master.dds",
             "conditions": [
                 {
                     "type": "PlayerLevel",

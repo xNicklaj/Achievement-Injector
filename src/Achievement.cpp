@@ -356,7 +356,7 @@ json Achievement::ToJson() {
 
     std::string desc = this->description;
     if (!this->unlocked && this->hidden && !Settings::GetSingleton()->GetShowHidden()) 
-        desc = LocalizationManager::GetSingleton()->GetHiddenAchievementString();
+        desc = "$ACH_HIDDEN";
 
     if (Settings::GetSingleton()->GetGlobal()) {
         SerializedAchievement sa = Serializer::GetSingleton()->DeserializeAchievementData_GLOBAL(this->achievementName);

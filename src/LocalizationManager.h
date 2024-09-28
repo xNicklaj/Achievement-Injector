@@ -15,12 +15,12 @@ public:
 	static std::map<std::string, std::string> ReadLocalizationFile(const std::string& filename, bool);
 	std::string GetLocalizedText(std::string group, std::string locale, std::string key);
 	std::string CurrentLocale() { return currentLocale; }
-    std::string GetHiddenAchievementString() { return Ach_Hidden; }
+    //std::string GetHiddenAchievementString() { return Ach_Hidden; }
 
 private:
 	std::map<std::tuple<std::string, std::string>, std::map<std::string, std::string>> localizations;
 	std::string currentLocale;
-    std::string Ach_Hidden;
+    //std::string Ach_Hidden;
 };
 
 #endif

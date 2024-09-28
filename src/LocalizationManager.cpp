@@ -37,7 +37,7 @@ void LocalizationManager::LoadLocalizations() {
         }
     }
 
-    std::string lang = RE::GetINISetting("sLanguage:General")->GetString();
+    /*std::string lang = RE::GetINISetting("sLanguage:General")->GetString();
     std::transform(lang.begin(), lang.end(), lang.begin(), [](unsigned char c) { return std::tolower(c); });
 
     std::map<std::string, std::string> tempMap;
@@ -61,7 +61,7 @@ void LocalizationManager::LoadLocalizations() {
         }
     }
     
-    if (!found) this->Ach_Hidden = "Hidden Description";
+    if (!found) this->Ach_Hidden = "Hidden Description";*/
 }
 
 std::map<std::string, std::string> LocalizationManager::ReadLocalizationFile(const std::string& filename, bool utf16) {

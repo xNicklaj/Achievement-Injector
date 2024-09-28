@@ -5,6 +5,7 @@ extern void RegisterPostLoadFunction(Condition* condition);
 // --- Exergist Code ---
 // Retrieve all map markers in the game
 RE::BSTArray<RE::ObjectRefHandle>* GetPlayerMapMarkers() {
+    logger::debug("Entered GetPlayerMapMarkers");
     RE::PlayerCharacter* player = RE::PlayerCharacter::GetSingleton();
     std::uint32_t offset = 0;
     if (REL::Module::IsAE())
@@ -13,11 +14,13 @@ RE::BSTArray<RE::ObjectRefHandle>* GetPlayerMapMarkers() {
         offset = 0x4F8;
     else
         offset = 0xAE8;
+    logger::debug("Loaded offset");
     return reinterpret_cast<RE::BSTArray<RE::ObjectRefHandle>*>((uintptr_t)player + offset);
 }
 
 // Check if targetLocation is known (map marker visible and enabled)
 bool CheckKnownLocation(std::string targetLocation) {
+    logger::debug("Entered CheckKnownLocation");
     auto* playerMapMarkers = GetPlayerMapMarkers();
     for (auto playerMapMarker : *playerMapMarkers) {
         const auto refr = playerMapMarker.get().get();
@@ -42,11 +45,16 @@ bool CheckKnownLocation(std::string targetLocation) {
 
 LocationDiscoveryCondition::LocationDiscoveryCondition() : Condition(ConditionType::LocationDiscovery) {}
 void LocationDiscoveryCondition::OnDataLoaded(void) {
-    if (CheckKnownLocation(this->locationName)) {
-        logger::info("Player met condition found {} in {}.", this->locationName, this->worldspaceID);
-        this->UnlockNotify();
-        RE::LocationDiscovery::GetEventSource()->RemoveEventSink(this);
-    };
+    try {
+        if (CheckKnownLocation(this->locationName)) {
+            logger::info("Player met condition found {} in {}.", this->locationName, this->worldspaceID);
+            this->UnlockNotify();
+            RE::LocationDiscovery::GetEventSource()->RemoveEventSink(this);
+        };
+    } catch (const std::exception&) {
+        logger::error("An error occurred in OnDataLoaded of LocationDiscoveryCondition, with parameters ({}, {})", this->locationName, this->worldspaceID);
+    }
+    
 }
 void LocationDiscoveryCondition::Localize(std::string path) {
     if(this->locationName[0] == '$')
