@@ -141,7 +141,7 @@ void MessageHandler(SKSE::MessagingInterface::Message* a_msg) {
             Scaleform::AchievementWidget::Register();
             Scaleform::AchievementMenuInjector::Register();
             Scaleform::AchievementMenu::Register();
-            //Serializer::GetSingleton()->CreateFileIfNotExists();
+            Serializer::GetSingleton()->CreateFileIfNotExists();
             AchievementManager::GetSingleton()->UpdateCache();
             EventProcessor::GetSingleton()->eventHandler.appendListener("PostLoadGame", InitializePostLoad);
             break;
@@ -168,7 +168,10 @@ extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const LoadInterface* skse) {
     Settings::GetSingleton()->LoadSettings();
     SetupLog();
     Settings::GetSingleton()->PrintSettings();
-    
+    logger::info("Detected {} version {}.{}.{}", REL::Module::IsAE() ? "AE" : (REL::Module::IsSE() ? "SE" : "VR"),
+                 REL::Module::get().version().major(),
+                 REL::Module::get().version().minor(),
+                 REL::Module::get().version().patch());
 
     if (Settings::GetSingleton()->GetUseDebugger())
         WaitForDebugger();

@@ -22,7 +22,7 @@ namespace NativePapyrus {
         std::vector<int> response = std::vector<int>();
         response.push_back(1);
         response.push_back(1);
-        response.push_back(0);
+        response.push_back(2);
 
         return response;
     }

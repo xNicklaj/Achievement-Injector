@@ -29,6 +29,7 @@ public:
     void Localize();
     void ToGFxValue(RE::GFxValue* gfxValue);
     json ToJson();
+    std::string ToString();
 
     eventpp::EventDispatcher<std::string, void()> eventHandler;
     std::string achievementName;

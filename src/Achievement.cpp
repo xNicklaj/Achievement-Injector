@@ -58,6 +58,7 @@ Achievement::Achievement(json& jsonData, std::string plugin, std::string groupNa
     });
 
     this->Localize();
+    logger::debug("Analyzing achievement {}.", this->achievementName);
 
     for (json condition : jsonData["conditions"]) {
         Condition* a_condition = nullptr;
@@ -375,4 +376,27 @@ json Achievement::ToJson() {
         data["Icon"] = checkIcon(this->groupName, this->icon)  ? "..\\SKSE\\Plugins\\AchievementsData\\Icons\\" + this->groupName + "\\" + this->icon : "";
     }
     return data;
+}
+
+std::string Achievement::ToString() {
+    std::string output = "";
+
+    std::string desc = this->description;
+    if (!this->unlocked && this->hidden && !Settings::GetSingleton()->GetShowHidden())
+        desc = "$ACH_HIDDEN";
+
+    // TODO convert \n to something else
+
+    if (Settings::GetSingleton()->GetGlobal()) {
+        SerializedAchievement sa = Serializer::GetSingleton()->DeserializeAchievementData_GLOBAL(this->achievementName);
+        output =
+            this->achievementName + "||" + this->achievementName + "||" + this->description + "||" +
+            std::to_string(sa.unlocked ? sa.unlockDatetime : -1) + "||" +
+            (checkIcon(this->groupName, this->icon) ? "..\\SKSE\\Plugins\\AchievementsData\\Icons\\" + this->groupName + "\\" + this->icon : "");
+    } else {
+        SerializedAchievement sa = Serializer::GetSingleton()->DeserializeAchievementData(this->achievementName);
+        output = this->achievementName + "||" + this->achievementName + "||" + this->description + "||" +
+            std::to_string(sa.unlocked ? sa.unlockDatetime : -1) + "||" + (checkIcon(this->groupName, this->icon) ? "..\\SKSE\\Plugins\\AchievementsData\\Icons\\" + this->groupName + "\\" + this->icon : "");
+    }
+    return output;
 }

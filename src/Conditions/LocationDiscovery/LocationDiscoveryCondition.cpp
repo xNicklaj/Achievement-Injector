@@ -5,22 +5,19 @@ extern void RegisterPostLoadFunction(Condition* condition);
 // --- Exergist Code ---
 // Retrieve all map markers in the game
 RE::BSTArray<RE::ObjectRefHandle>* GetPlayerMapMarkers() {
-    logger::debug("Entered GetPlayerMapMarkers");
     RE::PlayerCharacter* player = RE::PlayerCharacter::GetSingleton();
     std::uint32_t offset = 0;
-    if (REL::Module::IsAE())
+    if (REL::Module::IsAE() && REL::Module::get().version().patch() >= 629)
         offset = 0x500;
-    else if (REL::Module::IsSE())
+    else if (REL::Module::IsSE() || (REL::Module::IsAE() && REL::Module::get().version().patch() < 629))
         offset = 0x4F8;
     else
         offset = 0xAE8;
-    logger::debug("Loaded offset");
-    return reinterpret_cast<RE::BSTArray<RE::ObjectRefHandle>*>((uintptr_t)player + offset);
+    return reinterpret_cast<RE::BSTArray<RE::ObjectRefHandle>*>((uintptr_t) player + offset);
 }
 
 // Check if targetLocation is known (map marker visible and enabled)
 bool CheckKnownLocation(std::string targetLocation) {
-    logger::debug("Entered CheckKnownLocation");
     auto* playerMapMarkers = GetPlayerMapMarkers();
     for (auto playerMapMarker : *playerMapMarkers) {
         const auto refr = playerMapMarker.get().get();
