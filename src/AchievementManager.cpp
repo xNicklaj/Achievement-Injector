@@ -76,6 +76,13 @@ void AchievementManager::UpdateCache() {
 };
 
 void AchievementManager::ForceUnlock(std::string achievementName, std::string group_a) {
+    LocalizationManager* lm = LocalizationManager::GetSingleton();
+    if (achievementName.starts_with("$")) {
+        std::string prev = achievementName;
+        achievementName = lm->GetLocalizedText(group_a, lm->CurrentLocale(), achievementName);
+        logger::debug("Achievement {} was localized to {} to be unlocked.", prev, achievementName);
+    }
+    logger::debug("Forcing unlock of achievement {} in group {}.", achievementName, group_a);
     for (auto& group: this->achievementGroups) {
         if (group.groupid == group_a) {
             group.ForceUnlock(achievementName);
