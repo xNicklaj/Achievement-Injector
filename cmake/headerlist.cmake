@@ -30,6 +30,7 @@ set(headers ${headers}
 	src/ConditionsJoinType.h
 	src/CustomRE.h
 	src/EventProcessor.h
+	src/Interface.h
 	src/KeyMapping.h
 	src/LocalizationManager.h
 	src/MessageBox.h

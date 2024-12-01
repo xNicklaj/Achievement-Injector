@@ -35,6 +35,7 @@ public:
 	void ToGFxValue(RE::GFxValue* gfxValue);
     void SetId(std::string id) { groupid = id; }
 	json ToJson();
+    std::string ToString();
 };
 
 struct AchievementUnlockedEvent {
@@ -48,9 +49,10 @@ public:
 	std::vector<AchievementFile> achievementFiles;
 	std::vector<AchievementGroup> achievementGroups;
 	std::string lastUsedPlayerName = "";
-	json cache;
+	std::string cache;
 
 	json ToJson();
+    std::string ToString();
 	void UpdateCache();
 	void AddEventSink(std::function<void(AchievementUnlockedEvent*)> callback);
 	void RemoveEventSink(std::function<void(AchievementUnlockedEvent*)> callback);

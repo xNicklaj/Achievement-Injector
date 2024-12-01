@@ -24,6 +24,7 @@ std::string tutorialMessage;
 std::string resistanceModConfig;
 bool hintShown = false;
 
+
 std::string GetKeyNameFromScanCode(int scanCode) {
     auto it = kKeyMap.find(scanCode);
     if (it != kKeyMap.end()) {

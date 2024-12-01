@@ -2,6 +2,7 @@
 #include "Scaleform.h"
 #include "Utility.h"
 #include "AchievementManager.h"
+#include "Interface.h"
 #include "SKSE/SKSE.h"
 #include "KeyMapping.h"
 
@@ -17,17 +18,29 @@ namespace Scaleform {
             auto logger = new Logger<AchievementMenu>();
             a_def->SetState(StateType::kLog, logger);
             logger->Release();
-            });
+        });
 
         inputContext = Context::kMenuMode;
         depthPriority = 3;
+
+        auto& view = this->uiMovie;
+        //view->SetMouseCursorCount(0);
+        Internal::Interface::FunctionManager::AttachSKSEFunctions(view);
         
         //RE::UIBlurManager::GetSingleton()->blurCount = 0;
-        menuFlags.set(RE::UI_MENU_FLAGS::kPausesGame, RE::UI_MENU_FLAGS::kDisablePauseMenu,
-             RE::UI_MENU_FLAGS::kModal,
-            RE::UI_MENU_FLAGS::kUsesMenuContext, RE::UI_MENU_FLAGS::kTopmostRenderedMenu,
-            RE::UI_MENU_FLAGS::kUsesMovementToDirection);
+
         
+        bool isSkyrimSoulsLoaded = GetModuleHandleA("SkyrimSoulsRE.dll") != NULL;
+        if (isSkyrimSoulsLoaded) {
+            // Skyrim Souls COMPAT
+            menuFlags.set(RE::UI_MENU_FLAGS::kDisablePauseMenu, RE::UI_MENU_FLAGS::kModal,
+                          RE::UI_MENU_FLAGS::kUsesMenuContext, RE::UI_MENU_FLAGS::kTopmostRenderedMenu);
+        } else {
+            menuFlags.set(RE::UI_MENU_FLAGS::kPausesGame, RE::UI_MENU_FLAGS::kDisablePauseMenu, RE::UI_MENU_FLAGS::kModal,
+                          RE::UI_MENU_FLAGS::kUsesMenuContext, RE::UI_MENU_FLAGS::kTopmostRenderedMenu,
+                          RE::UI_MENU_FLAGS::kUsesMovementToDirection);
+        }
+
         if (!RE::BSInputDeviceManager::GetSingleton()->IsGamepadEnabled()) {
             menuFlags |= RE::UI_MENU_FLAGS::kUsesCursor;
         }
@@ -68,25 +81,6 @@ namespace Scaleform {
         }
     }
 
-    void AchievementMenu::UpdateAchievementList() {
-        auto ui = RE::UI::GetSingleton();
-        RE::GFxValue widget;
-        // Check if menu is found
-        if (ui->GetMenu(AchievementMenu::MENU_NAME)->uiMovie->GetVariable(&widget, "_root.MenuFader_mc.Menu_mc")) {
-            std::array<RE::GFxValue, 1> functionArgs;
-            functionArgs[0] = RE::GFxValue(); // This will be an implicit array
-            ui->GetMovieView(AchievementMenu::MENU_NAME)->CreateArray(&functionArgs[0]);
-            // Loop through all achievement groups and push them to the function arguments
-            for (auto& achievementGroup : AchievementManager::GetSingleton()->achievementGroups) {
-                RE::GFxValue gfxAchievementGroup;
-                ui->GetMovieView(AchievementMenu::MENU_NAME)->CreateObject(&gfxAchievementGroup);
-                achievementGroup.ToGFxValue(&gfxAchievementGroup);
-                functionArgs[0].PushBack(&gfxAchievementGroup);
-            }
-            widget.Invoke("UpdateAchievementList", nullptr, functionArgs.data(), functionArgs.size());
-        }
-    }
-
     void AchievementMenu::UpdateAchievementList(std::string data) {
         auto ui = RE::UI::GetSingleton();
         RE::GFxValue widget;
@@ -97,6 +91,7 @@ namespace Scaleform {
         }
         if (ui->GetMenu(AchievementMenu::MENU_NAME)->uiMovie->GetVariable(&widget, "_root.MenuFader_mc.Menu_mc")) {
             std::array<RE::GFxValue, 1> args;
+            json test = AchievementManager::GetSingleton()->ToJson();
             args[0] = data;
             widget.Invoke("setData", nullptr, args.data(), args.size());
             args[0] = 1;
@@ -109,7 +104,7 @@ namespace Scaleform {
             if (a_event->menuName == Scaleform::AchievementMenu::MENU_NAME) {
                 auto* ui = RE::UI::GetSingleton();
                 if (ui != nullptr && ui->GetMenu(Scaleform::AchievementMenu::MENU_NAME) != nullptr) {
-                    AchievementMenu::UpdateAchievementList(AchievementManager::GetSingleton()->cache.dump());
+                    AchievementMenu::UpdateAchievementList(AchievementManager::GetSingleton()->cache);
                 }
             }
         }

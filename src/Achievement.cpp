@@ -3,6 +3,7 @@
 #include <string>
 #include <memory>
 #include "ConditionsJoinType.h"
+#include "CommonFunctions.h"
 #include "settings.h"
 #include "Serializer.h"
 #include "Utility.h"
@@ -390,12 +391,13 @@ std::string Achievement::ToString() {
     if (Settings::GetSingleton()->GetGlobal()) {
         SerializedAchievement sa = Serializer::GetSingleton()->DeserializeAchievementData_GLOBAL(this->achievementName);
         output =
-            this->achievementName + "||" + this->achievementName + "||" + this->description + "||" +
+            this->groupName + "||" + this->achievementName + "||" + replaceAll(this->description, "\n", " ") + "||" +
             std::to_string(sa.unlocked ? sa.unlockDatetime : -1) + "||" +
             (checkIcon(this->groupName, this->icon) ? "..\\SKSE\\Plugins\\AchievementsData\\Icons\\" + this->groupName + "\\" + this->icon : "");
     } else {
         SerializedAchievement sa = Serializer::GetSingleton()->DeserializeAchievementData(this->achievementName);
-        output = this->achievementName + "||" + this->achievementName + "||" + this->description + "||" +
+        output =
+            this->groupName + "||" + this->achievementName + "||" + replaceAll(this->description, "\n", " ") + "||" +
             std::to_string(sa.unlocked ? sa.unlockDatetime : -1) + "||" + (checkIcon(this->groupName, this->icon) ? "..\\SKSE\\Plugins\\AchievementsData\\Icons\\" + this->groupName + "\\" + this->icon : "");
     }
     return output;

@@ -17,6 +17,8 @@ class AchievementMenu extends MovieClip {
     private var focusIndex:Number = -1;
     private var mouseListener:Object;
     private var currentGroupIndex:Number = 0;
+	
+	private var useJsonDecoding:Boolean = false; // ONLY ENABLE FOR DEBUG
 
     function onLoad(): Void {
         BottomBar_mc = _root.BottomBar_mc;
@@ -78,7 +80,7 @@ class AchievementMenu extends MovieClip {
             }
         }
         var percent = Math.ceil( ( completed / achievements.length ) * 100 ),
-            progressText = AchievementUtils.get_i18n( '$ACH_PROGRESS' );
+           progressText = AchievementUtils.get_i18n( '$ACH_PROGRESS' );
         progressText = AchievementUtils.str_replace( '<completed>', completed, progressText );
         progressText = AchievementUtils.str_replace( '<all>', achievements.length, progressText );
         progressText = AchievementUtils.str_replace( '<percent>', percent, progressText );
@@ -136,8 +138,48 @@ class AchievementMenu extends MovieClip {
 
     // @api
     function setData( dataString:String ) {
-        var decodedData = JSON.parse( dataString );
-        data = decodedData;
+		if(this.useJsonDecoding) {
+			// OLD SYSTEM, DO NOT ENABLE
+			var decodedData = JSON.parse( dataString );
+			data = decodedData;
+		} else {
+			var decodedData:Array = []
+			// Split the input into lines
+			var lines:Array = dataString.split("\n");
+			
+			var groupCount:Number = parseInt(lines[0]); // First line gives us the number of groups
+			
+			// Process groups and store in `data` as an Object
+			for (var i:Number = 1; i <= groupCount; i++) {
+				var groupLine:Array = lines[i].split("||");
+				var groupId:String = groupLine[0];
+				var newObject:Object = {
+					image: groupLine[2],
+					groupName: groupLine[1],
+					AchievementData: [],
+					groupId: groupId
+				};
+				
+				// Process achievements
+				for (var j:Number = groupCount + 1; j < lines.length; j++) {
+					var achievementLine:Array = lines[j].split("||");
+					var groupId:String = achievementLine[0];
+					if(groupId != newObject.groupId) continue;
+					if (newObject != undefined) {
+						var achievement:Object = {
+							Unlocked: parseInt(achievementLine[3]) > 0,
+							UnlockDatetime: parseInt(achievementLine[3]),
+							Icon: achievementLine[4],
+							Description: achievementLine[2],
+							AchievementName: achievementLine[1]
+						};
+						newObject.AchievementData.push(achievement);
+					}
+				}
+				decodedData.push(newObject);
+			}
+			data = decodedData;
+		}
         render();
         _parent.play();
     }

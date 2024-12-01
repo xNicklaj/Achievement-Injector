@@ -48,6 +48,14 @@ json AchievementGroup::ToJson() {
     return data;
 };
 
+std::string AchievementGroup::ToString() {
+    std::string ret = "";
+    for (const auto& achievement : this->achievements) {
+        ret += achievement->ToString() + "\n";
+    }
+    return ret;
+}
+
 void AchievementGroup::ForceUnlock(std::string achievementName) {
     for (const auto& achievement: this->achievements) {
         if (achievement->achievementName == achievementName) {
@@ -71,8 +79,33 @@ json AchievementManager::ToJson() {
     return data;
 };
 
+std::string AchievementManager::ToString() {
+    std::string ret = "";
+    int num_displayed = 0;
+    // TODO: redo this shit
+
+    std::sort(this->achievementGroups.begin(), this->achievementGroups.end(), [](const AchievementGroup& a, const AchievementGroup& b) {
+        return a.priority < b.priority;
+    });
+
+    for (auto& achievementGroup: this->achievementGroups) {
+        if (!achievementGroup.showInMenu || !CheckIfModIsLoaded(achievementGroup.plugin)) continue;
+        num_displayed++;
+    }
+    ret += NumToString(num_displayed) + "\n";
+    for (auto& achievementGroup: this->achievementGroups) {
+        if (!achievementGroup.showInMenu || !CheckIfModIsLoaded(achievementGroup.plugin)) continue;
+        ret += achievementGroup.groupid + "||" + achievementGroup.name + "||" + achievementGroup.iconPath + "\n";
+    }
+    for (auto& achievementGroup : this->achievementGroups) {
+        if (!achievementGroup.showInMenu || !CheckIfModIsLoaded(achievementGroup.plugin)) continue;
+        ret += achievementGroup.ToString();
+    }
+    return ret;
+}
+
 void AchievementManager::UpdateCache() {
-    cache = AchievementManager::GetSingleton()->ToJson();
+    cache = AchievementManager::GetSingleton()->ToString();
 };
 
 void AchievementManager::ForceUnlock(std::string achievementName, std::string group_a) {

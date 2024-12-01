@@ -10,7 +10,8 @@
 
 using json = nlohmann::json;
 
-
+std::string replaceAll(std::string, const std::string&, const std::string&);
+std::string NumToString(long);
 uint16_t CheckQuestStage(std::string FormID, std::string baseEsp);
 RE::ActorValue StringToActorValue(std::string value);
 std::string FormIDToString(RE::FormID formID);
