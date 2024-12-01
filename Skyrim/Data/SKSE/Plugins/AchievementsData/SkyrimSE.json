@@ -117,8 +117,8 @@
             "conditions": [
                 {
                     "type": "QuestStageDone",
-                    "formID": "01CEF5",
-                    "stage": 25
+                    "formID": "01CEF4",
+                    "stage": 200
                 }
             ]
         },
