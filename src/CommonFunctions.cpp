@@ -60,6 +60,16 @@ RE::TESForm* GetForm(std::string FormID, std::string baseEsp = "Skyrim.esm") {
 	return form;
 }
 
+// Load-order formID without needing the form in memory: references in unloaded cells have no TESForm yet
+RE::FormID GetFormID(std::string FormID, std::string baseEsp) {
+    auto dataHandler = RE::TESDataHandler::GetSingleton();
+    if (!dataHandler) return 0;
+    RE::FormID localFormID = 0;
+    std::istringstream converter(FormID);
+    converter >> std::hex >> localFormID;
+    return dataHandler->LookupFormID(localFormID, baseEsp);
+}
+
 std::string FormIDToString(RE::FormID formID) {
     std::stringstream ss;
     ss << std::hex << std::uppercase << std::setw(8) << std::setfill('0') << formID;

@@ -6,10 +6,9 @@ extern void RegisterPostLoadFunction(Condition* condition);
 ActorDeathCondition::ActorDeathCondition() : Condition(ConditionType::ActorDeath){};
 void ActorDeathCondition::OnDataLoaded(void) {
 	// TODO check if actor is already dead
-	this->cachedForm = GetForm(this->formID, this->plugin);
-	auto* target = this->cachedForm;
-	if (target == NULL) return;
-	RE::TESObjectREFR* targetREFR = RE::TESObjectREFR::LookupByID<RE::TESObjectREFR>(target->formID);
+	this->cachedFormID = GetFormID(this->formID, this->plugin);
+	if (!this->cachedFormID) return;
+	RE::TESObjectREFR* targetREFR = RE::TESObjectREFR::LookupByID<RE::TESObjectREFR>(this->cachedFormID);
 	if(targetREFR && targetREFR->IsDead()) {
 		this->UnlockNotify();
 		RE::ScriptEventSourceHolder::GetSingleton()->RemoveEventSink(this);
@@ -27,14 +26,12 @@ bool ActorDeathCondition::CheckCondition(RE::FormID) {
 };
 RE::BSEventNotifyControl ActorDeathCondition::ProcessEvent(const RE::TESDeathEvent* a_event, RE::BSTEventSource<RE::TESDeathEvent>*) {
 	// 013BB9
-	if (!a_event->actorDying->IsDead()) return RE::BSEventNotifyControl::kContinue;
-	auto* target = this->cachedForm;
-
-	if (target == NULL) {
+	if (!a_event || !a_event->actorDying || !a_event->actorDying->IsDead()) return RE::BSEventNotifyControl::kContinue;
+	if (!this->cachedFormID) {
 		logger::error("Form {} not found.", this->formID);
 		return RE::BSEventNotifyControl::kContinue;
 	}
-	if (a_event->actorDying->formID == target->formID) {
+	if (a_event->actorDying->formID == this->cachedFormID) {
 		logger::info("Player met condition actor {} dead.", this->formID);
 		this->UnlockNotify();
 		RE::ScriptEventSourceHolder::GetSingleton()->RemoveEventSink(this);

@@ -4,6 +4,7 @@ extern void RegisterPostLoadFunction(Condition* condition);
 
 PlayerActivationCondition::PlayerActivationCondition() : Condition(PlayerActivation) {}
 void PlayerActivationCondition::OnDataLoaded(void) {
+	this->cachedFormID = GetFormID(this->formid, this->plugin);
 };
 void PlayerActivationCondition::EnableListener(void) {
 	RegisterPostLoadFunction(this);
@@ -16,7 +17,7 @@ bool PlayerActivationCondition::CheckCondition() {
 	return false;
 };
 RE::BSEventNotifyControl PlayerActivationCondition::ProcessEvent(const RE::TESActivateEvent* a_event, RE::BSTEventSource<RE::TESActivateEvent>*) {
-	if (this->cachedForm && a_event->objectActivated && a_event->objectActivated->GetFormID() == this->cachedForm->formID) {
+	if (this->cachedFormID && a_event->objectActivated && a_event->objectActivated->GetFormID() == this->cachedFormID) {
 		logger::info("Player met condition activation {}", this->formid);
 		this->UnlockNotify();
 	}

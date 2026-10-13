@@ -31,6 +31,7 @@ T* GetFormOfType(const std::string& FormID, const std::string& baseEsp) {
                       RE::FormTypeToString(form->GetFormType()), RE::FormTypeToString(T::FORMTYPE));
     return typed;
 }
+RE::FormID GetFormID(std::string FormID, std::string baseEsp);
 bool BindPapyrusFunctions(RE::BSScript::IVirtualMachine* vm);
 float GetGlobalVariableValue(RE::FormID formid);
 std::string GetPlayerName();
