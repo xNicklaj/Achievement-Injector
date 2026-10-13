@@ -39,6 +39,7 @@ public:
     std::string notificationSound = "";
     std::string groupName = "";
     std::string icon;
+    std::string iconPath = "";  // menu-relative path, empty when the icon file is missing
 
     bool unlocked;
     bool showPopup = true;

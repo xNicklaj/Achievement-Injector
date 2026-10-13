@@ -39,6 +39,16 @@
 #include "Conditions/WorldspaceDiscovery/WorldspaceDiscoveryCondition.h"
 #include "AchievementManager.h"
 
+static bool checkIcon(std::string group, std::string name) {
+    if (name == "")
+        return false;
+    if (!std::filesystem::exists("Data\\SKSE\\Plugins\\AchievementsData\\Icons\\" + group + "\\" + name)) {
+        logger::warn("Icon {} from {} was declared but doesn't exist at path", name, group, "Data\\SKSE\\Plugins\\AchievementsData\\Icons\\" + group + "\\");
+        return false;
+    }
+    return true;
+}
+
 Achievement::Achievement(json& jsonData, std::string plugin, std::string groupName)
     : Runnable(jsonData.value("onUnlock", json::array())), achievementName(jsonData["achievementName"].get<std::string>()),
     description(jsonData["description"].get<std::string>()),
@@ -54,6 +64,8 @@ Achievement::Achievement(json& jsonData, std::string plugin, std::string groupNa
     this->hidden = jsonData.value("hideDescription", false);
     this->notificationSound = jsonData.value("notificationSound", "");
     this->icon = jsonData.value("icon", "");
+    // Resolved once: the menu list is rebuilt often and must not hit the disk per achievement
+    if (checkIcon(groupName, this->icon)) this->iconPath = "..\\SKSE\\Plugins\\AchievementsData\\Icons\\" + groupName + "\\" + this->icon;
 
     this->eventHandler.appendListener("ConditionMet", [this]() {
         this->OnConditionMet();
@@ -380,16 +392,6 @@ void Achievement::ToGFxValue(RE::GFxValue* gfxValue) {
     gfxValue->SetMember("unlockDatetime", &unlockDatetimeVal);
 }
 
-static bool checkIcon(std::string group, std::string name) {
-    if (name == "")
-        return false;
-    if (!std::filesystem::exists("Data\\SKSE\\Plugins\\AchievementsData\\Icons\\" + group + "\\" + name)) {
-        logger::warn("Icon {} from {} was declared but doesn't exist at path", name, group, "Data\\SKSE\\Plugins\\AchievementsData\\Icons\\" + group + "\\");
-        return false;
-    }
-    return true;
-}
-
 json Achievement::ToJson() {
     json data = json::object();
 
@@ -406,7 +408,7 @@ json Achievement::ToJson() {
         data["Description"] = desc;
         data["UnlockDatetime"] = sa.unlockDatetime;
         data["Unlocked"] = this->unlocked;
-        data["Icon"] = checkIcon(this->groupName, this->icon) ? "..\\SKSE\\Plugins\\AchievementsData\\Icons\\" + this->groupName + "\\" + this->icon : "";
+        data["Icon"] = this->iconPath;
     }
     else {
         SerializedAchievement sa = Serializer::GetSingleton()->DeserializeAchievementData(this->achievementName);
@@ -414,7 +416,7 @@ json Achievement::ToJson() {
         data["Description"] = desc;
         data["UnlockDatetime"] = sa.unlockDatetime;
         data["Unlocked"] = sa.unlocked;
-        data["Icon"] = checkIcon(this->groupName, this->icon)  ? "..\\SKSE\\Plugins\\AchievementsData\\Icons\\" + this->groupName + "\\" + this->icon : "";
+        data["Icon"] = this->iconPath;
     }
     return data;
 }
@@ -436,12 +438,12 @@ std::string Achievement::ToString() {
         output =
             this->groupName + "||" + this->achievementName + "||" + replaceAll(desc, "\n", " ") + "||" +
             std::to_string(sa.unlocked ? sa.unlockDatetime : -1) + "||" +
-            (checkIcon(this->groupName, this->icon) ? "..\\SKSE\\Plugins\\AchievementsData\\Icons\\" + this->groupName + "\\" + this->icon : "");
+            this->iconPath;
     } else {
         SerializedAchievement sa = Serializer::GetSingleton()->DeserializeAchievementData(this->achievementName);
         output =
             this->groupName + "||" + this->achievementName + "||" + replaceAll(desc, "\n", " ") + "||" +
-            std::to_string(sa.unlocked ? sa.unlockDatetime : -1) + "||" + (checkIcon(this->groupName, this->icon) ? "..\\SKSE\\Plugins\\AchievementsData\\Icons\\" + this->groupName + "\\" + this->icon : "");
+            std::to_string(sa.unlocked ? sa.unlockDatetime : -1) + "||" + this->iconPath;
     }
     return output;
 }
