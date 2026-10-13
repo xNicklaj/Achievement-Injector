@@ -113,8 +113,3 @@ RE::BSEventNotifyControl LocationDiscoveryCondition::ProcessEvent(const RE::Loca
     }
     return RE::BSEventNotifyControl::kContinue;
 }
-
-LocationDiscoveryConditionFactory::LocationDiscoveryConditionFactory() : ConditionFactory() {};
-Condition* LocationDiscoveryConditionFactory::createCondition() {
-	return new LocationDiscoveryCondition();
-};

@@ -32,9 +32,3 @@ RE::BSEventNotifyControl GlobalVariableStateCondition::ProcessEvent(const RE::Po
 	if (!this->isMet) CheckCondition();
 	return RE::BSEventNotifyControl::kContinue;
 }
-
-// GlobalVariableStateConditionFactory
-GlobalVariableStateConditionFactory::GlobalVariableStateConditionFactory() : ConditionFactory() {};
-Condition* GlobalVariableStateConditionFactory::createCondition() {
-	return new GlobalVariableStateCondition();
-};

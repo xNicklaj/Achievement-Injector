@@ -14,10 +14,3 @@ public:
 private:
 	RE::BSEventNotifyControl ProcessEvent(const RE::SpellsLearned::Event* a_event, RE::BSTEventSource<RE::SpellsLearned::Event>*) override;
 };
-
-class SpellLearnedConditionFactory : public ConditionFactory
-{
-public:
-	SpellLearnedConditionFactory();
-	Condition* createCondition() override;
-};

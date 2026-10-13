@@ -13,9 +13,3 @@ public:
 private:
 	RE::BSEventNotifyControl ProcessEvent(const RE::TESDeathEvent * a_event, RE::BSTEventSource<RE::TESDeathEvent>*) override;
 };
-
-class ActorDeathConditionFactory : public ConditionFactory {
-public:
-	ActorDeathConditionFactory();
-	Condition* createCondition() override;
-};

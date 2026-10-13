@@ -19,10 +19,4 @@ private:
     bool registered = false;
 };
 
-class AchievementUnlockedConditionFactory : public ConditionFactory {
-public:
-    AchievementUnlockedConditionFactory();
-    Condition* createCondition() override;
-};
-
 #endif // QUERY_STAT_VALUE_CONDITION_H

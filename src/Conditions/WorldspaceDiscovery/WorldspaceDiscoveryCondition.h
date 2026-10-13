@@ -18,10 +18,4 @@ public:
 	int requiredCount;
 };
 
-class WorldspaceDiscoveryConditionFactory : public ConditionFactory {
-public:
-	WorldspaceDiscoveryConditionFactory();
-	Condition* createCondition() override;
-};
-
 #endif

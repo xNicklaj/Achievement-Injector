@@ -63,9 +63,3 @@ RE::BSEventNotifyControl HasPerksCondition::ProcessEvent(const RE::MenuOpenClose
 	}
 	return RE::BSEventNotifyControl::kContinue;
 }
-
-HasPerksConditionFactory::HasPerksConditionFactory() : ConditionFactory() {}
-
-Condition* HasPerksConditionFactory::createCondition() {
-	return new HasPerksCondition();
-}

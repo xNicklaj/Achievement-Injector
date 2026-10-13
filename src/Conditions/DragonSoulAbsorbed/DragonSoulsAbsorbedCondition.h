@@ -12,9 +12,3 @@ public:
 private:
 	RE::BSEventNotifyControl ProcessEvent(const RE::DragonSoulsGained::Event* a_event, RE::BSTEventSource<RE::DragonSoulsGained::Event>*) override;
 };
-
-class DragonSoulAbsorbedConditionFactory : public ConditionFactory {
-public:
-	DragonSoulAbsorbedConditionFactory();
-	Condition* createCondition() override;
-};

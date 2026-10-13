@@ -28,8 +28,3 @@ RE::BSEventNotifyControl ItemCraftedCondition::ProcessEvent(const RE::ItemCrafte
 	CheckCondition(a_event->item->formID);
 	return RE::BSEventNotifyControl::kContinue;
 }
-
-ItemCraftedConditionFactory::ItemCraftedConditionFactory() : ConditionFactory() {};
-Condition* ItemCraftedConditionFactory::createCondition() {
-	return new ItemCraftedCondition();
-};

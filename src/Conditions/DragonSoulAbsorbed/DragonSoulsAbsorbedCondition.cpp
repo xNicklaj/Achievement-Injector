@@ -29,8 +29,3 @@ RE::BSEventNotifyControl DragonSoulAbsorbedCondition::ProcessEvent(const RE::Dra
     CheckCondition();
     return RE::BSEventNotifyControl::kContinue;
 }
-
-DragonSoulAbsorbedConditionFactory::DragonSoulAbsorbedConditionFactory() : ConditionFactory() {};
-Condition* DragonSoulAbsorbedConditionFactory::createCondition() {
-    return new DragonSoulAbsorbedCondition();
-};

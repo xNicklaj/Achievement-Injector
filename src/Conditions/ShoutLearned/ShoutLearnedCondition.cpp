@@ -51,8 +51,3 @@ bool ShoutLearnedCondition::CheckCondition() {
     }
     return false;
 }
-
-ShoutLearnedConditionFactory::ShoutLearnedConditionFactory() : ConditionFactory() {};
-Condition* ShoutLearnedConditionFactory::createCondition() {
-    return new ShoutLearnedCondition();
-}

@@ -42,8 +42,3 @@ bool QuestStageDoneCondition::CheckCondition() {
     }
     return false;
 }
-
-QuestStageDoneConditionFactory::QuestStageDoneConditionFactory() : ConditionFactory() {};
-Condition* QuestStageDoneConditionFactory::createCondition() {
-    return new QuestStageDoneCondition();
-};

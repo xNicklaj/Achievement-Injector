@@ -15,9 +15,3 @@ public:
 private:
 	RE::BSEventNotifyControl ProcessEvent(const RE::TESContainerChangedEvent* a_event, RE::BSTEventSource<RE::TESContainerChangedEvent>*) override;
 };
-
-class ItemInInventoryConditionFactory : public ConditionFactory {
-public:
-	ItemInInventoryConditionFactory();
-	Condition* createCondition() override;
-};

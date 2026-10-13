@@ -50,8 +50,3 @@ bool SpellLearnedCondition::CheckCondition() {
     }
     return false;
 }
-
-SpellLearnedConditionFactory::SpellLearnedConditionFactory() : ConditionFactory() {};
-Condition* SpellLearnedConditionFactory::createCondition() {
-    return new SpellLearnedCondition();
-}

@@ -82,79 +82,65 @@ Achievement::Achievement(json& jsonData, std::string plugin, std::string groupNa
         std::string type = condition["type"].get<std::string>();
         try {
             if (type == "QuestStageDone") {
-                QuestStageDoneConditionFactory* questStageDoneConditionFactory = new QuestStageDoneConditionFactory();
-                a_condition = questStageDoneConditionFactory->createCondition();
+                a_condition = new QuestStageDoneCondition();
                 a_condition->SetConditionParameters(condition["formID"].get<std::string>(), condition.value("operation", ">="), condition["stage"].get<int>());
             }
             else if (type == "PlayerLevel") {
-                PlayerLevelConditionFactory* playerLevelConditionFactory = new PlayerLevelConditionFactory();
-                a_condition = playerLevelConditionFactory->createCondition();
+                a_condition = new PlayerLevelCondition();
                 a_condition->SetConditionParameters(condition["level"].get<int>());
             }
             else if (type == "SkillLevel") {
-                PlayerSkillLevelConditionFactory* skillLevelConditionFactory = new PlayerSkillLevelConditionFactory();
-                a_condition = skillLevelConditionFactory->createCondition();
+                a_condition = new PlayerSkillLevelCondition();
                 a_condition->SetConditionParameters(condition["skill"].get<std::string>(), condition["level"].get<int>());
             }
             else if (type == "ItemInInventory") {
-                ItemInInventoryConditionFactory* itemInInventoryConditionFactory = new ItemInInventoryConditionFactory();
-                a_condition = itemInInventoryConditionFactory->createCondition();
+                a_condition = new ItemInInventoryCondition();
                 a_condition->SetConditionParameters(condition["formID"].get<std::string>(), condition["quantity"].get<int>());
             }
             else if (type == "LocationDiscovery") {
-                LocationDiscoveryConditionFactory* locationDiscoveryConditionFactory = new LocationDiscoveryConditionFactory();
-                a_condition = locationDiscoveryConditionFactory->createCondition();
+                a_condition = new LocationDiscoveryCondition();
                 std::string locID = condition.value("locationID", "");
                 std::string formID = condition.value("formID", "");
                 std::string worldspaceID = condition.value("worldspaceID", "");
                 a_condition->SetConditionParameters(locID, worldspaceID, formID);
             }
             else if (type == "DragonSoulAbsorbed") {
-                DragonSoulAbsorbedConditionFactory* dragonSoulAbsorbedConditionFactory = new DragonSoulAbsorbedConditionFactory();
-                a_condition = dragonSoulAbsorbedConditionFactory->createCondition();
+                a_condition = new DragonSoulAbsorbedCondition();
                 a_condition->SetConditionParameters(condition["quantity"].get<int>());
             }
             else if (type == "PlayerActivation") {
-                PlayerActivationConditionFactory* playerActivationConditionFactory = new PlayerActivationConditionFactory();
-                a_condition = playerActivationConditionFactory->createCondition();
+                a_condition = new PlayerActivationCondition();
                 a_condition->SetConditionParameters(condition["formID"].get<std::string>());
             }
             else if (type == "FirstEnterCell") {
-                PlayerFirstEnterCellConditionFactory* playerFirstEnterCellConditionFactory = new PlayerFirstEnterCellConditionFactory();
-                a_condition = playerFirstEnterCellConditionFactory->createCondition();
+                a_condition = new PlayerFirstEnterCellCondition();
                 a_condition->SetConditionParameters(condition["cellID"].get<std::string>());
             }
             else if (type == "ItemCrafted") {
-                ItemCraftedConditionFactory* itemCraftedConditionFactory = new ItemCraftedConditionFactory();
-                a_condition = itemCraftedConditionFactory->createCondition();
+                a_condition = new ItemCraftedCondition();
                 a_condition->SetConditionParameters(condition["formID"].get<std::string>());
             }
             else if (type == "BookRead") {
-                BookReadConditionFactory* bookReadConditionFactory = new BookReadConditionFactory();
-                a_condition = bookReadConditionFactory->createCondition();
+                a_condition = new BookReadCondition();
                 std::string identifier = condition.value("formID", "");
                 if (identifier == "")
                     identifier = condition["bookID"].get<std::string>();
                 a_condition->SetConditionParameters(identifier);
             }
             else if (type == "ActorDeath") {
-                ActorDeathConditionFactory* actorDeathConditionFactory = new ActorDeathConditionFactory();
-                a_condition = actorDeathConditionFactory->createCondition();
+                a_condition = new ActorDeathCondition();
                 a_condition->SetConditionParameters(condition["formID"].get<std::string>());
             }
             else if (type == "GlobalVariableState") {
-                GlobalVariableStateConditionFactory* globalVariableStateConditionFactory = new GlobalVariableStateConditionFactory();
-                a_condition = globalVariableStateConditionFactory->createCondition();
+                a_condition = new GlobalVariableStateCondition();
                 a_condition->SetConditionParameters(condition["formID"].get<std::string>(), condition["value"].get<float>());
             }
             else if (type == "QueryStatValue") {
-                QueryStatValueConditionFactory* queryStatValueConditionFactory = new QueryStatValueConditionFactory();
-                a_condition = queryStatValueConditionFactory->createCondition();
+                a_condition = new QueryStatValueCondition();
                 a_condition->SetConditionParameters(condition["stat"].get<std::string>(), condition["value"].get<float>());
             }
             else if (type == "BaseActorDeath") {
-                BaseActorDeathConditionFactory* baseActorDeathConditionFactory = new BaseActorDeathConditionFactory();
-                a_condition = baseActorDeathConditionFactory->createCondition();
+                a_condition = new BaseActorDeathCondition();
                 std::string id = condition.value("formID", "");
                 std::string editorid = condition.value("editorID", "");
                 if (id == "") {
@@ -175,56 +161,45 @@ Achievement::Achievement(json& jsonData, std::string plugin, std::string groupNa
                 a_condition->SetConditionParameters(id, condition.value("quantity", 1));
             }
             else if (type == "SpellLearned") {
-                SpellLearnedConditionFactory* spellLearnedConditionFactory = new SpellLearnedConditionFactory();
-                a_condition = spellLearnedConditionFactory->createCondition();
+                a_condition = new SpellLearnedCondition();
                 a_condition->SetConditionParameters(condition["formID"].get<std::string>());
             }
             else if (type == "LocationCleared") {
-                DungeonClearedConditionFactory* dungeonClearedConditionFactory = new DungeonClearedConditionFactory();
-                a_condition = dungeonClearedConditionFactory->createCondition();
+                a_condition = new DungeonClearedCondition();
                 a_condition->SetConditionParameters(condition["formID"].get<std::string>());
             }
             else if (type == "ShoutLearned") {
-                ShoutLearnedConditionFactory* shoutLearnedConditionFactory = new ShoutLearnedConditionFactory();
-                a_condition = shoutLearnedConditionFactory->createCondition();
+                a_condition = new ShoutLearnedCondition();
                 a_condition->SetConditionParameters(condition["formID"].get<std::string>(), condition["words"].get<int>());
             }
             else if (type == "QuestObjectiveDone") {
-                QuestObjectiveDoneConditionFactory* questObjectiveDoneConditionFactory = new QuestObjectiveDoneConditionFactory();
-                a_condition = questObjectiveDoneConditionFactory->createCondition();
+                a_condition = new QuestObjectiveDoneCondition();
                 a_condition->SetConditionParameters(condition["formID"].get<std::string>(), condition["objective"].get<int>());
             }
             else if (type == "AchievementUnlocked") {
-                AchievementUnlockedConditionFactory* achievementUnlockedConditionFactory = new AchievementUnlockedConditionFactory();
-                a_condition = achievementUnlockedConditionFactory->createCondition();
+                a_condition = new AchievementUnlockedCondition();
                 a_condition->SetConditionParameters(condition["achievement"].get<std::string>(), condition.value("group", this->groupName));
             } 
             else if (type == "ObjectState") {
-                ObjectStateConditionFactory* objectStateConditionFactory = new ObjectStateConditionFactory();
-                a_condition = objectStateConditionFactory->createCondition();
+                a_condition = new ObjectStateCondition();
                 a_condition->SetConditionParameters(condition["formID"].get<std::string>(), condition["enabled"].get<bool>());
             } else if (type == "PapyrusBinding") {
-                PapyrusBindingConditionFactory* papyrusBindingConditionFactory = new PapyrusBindingConditionFactory();
-                a_condition = papyrusBindingConditionFactory->createCondition();
+                a_condition = new PapyrusBindingCondition();
             } else if (type == "PlayerCrime") {
-                PlayerCrimeConditionFactory* playerCrimeConditionFactory = new PlayerCrimeConditionFactory();
-                a_condition = playerCrimeConditionFactory->createCondition();
+                a_condition = new PlayerCrimeCondition();
                 std::vector<std::string> factions;
                 for (auto& factionID : condition["factions"]) {
                     factions.push_back(factionID.get<std::string>());
                 }
                 a_condition->SetConditionParameters(factions, condition["threshold"].get<int>());
             } else if (type == "WorldspaceDiscovery") {
-                WorldspaceDiscoveryConditionFactory* worldspaceDiscoveryConditionFactory = new WorldspaceDiscoveryConditionFactory();
-                a_condition = worldspaceDiscoveryConditionFactory->createCondition();
+                a_condition = new WorldspaceDiscoveryCondition();
                 a_condition->SetConditionParameters(condition["worldspaceID"].get<std::string>(), condition["requiredCount"].get<int>());
             } else if (type == "HasPerk") {
-                HasPerkConditionFactory* hasPerkConditionFactory = new HasPerkConditionFactory();
-                a_condition = hasPerkConditionFactory->createCondition();
+                a_condition = new HasPerkCondition();
                 a_condition->SetConditionParameters(condition["formID"].get<std::string>());
             } else if (type == "HasPerks") {
-                HasPerksConditionFactory* hasPerksConditionFactory = new HasPerksConditionFactory();
-                a_condition = hasPerksConditionFactory->createCondition();
+                a_condition = new HasPerksCondition();
                 std::vector<std::string> perks;
                 for (auto& perkID : condition["perks"]) {
                     perks.push_back(perkID.get<std::string>());

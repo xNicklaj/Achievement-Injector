@@ -16,9 +16,3 @@ private:
 	RE::BSEventNotifyControl ProcessEvent(const RE::PositionPlayerEvent* a_event, RE::BSTEventSource<RE::PositionPlayerEvent>*) override;
 	RE::TESQuest* quest = nullptr;
 };
-
-class QuestObjectiveDoneConditionFactory : public ConditionFactory {
-public:
-	QuestObjectiveDoneConditionFactory();
-	Condition* createCondition() override;
-};

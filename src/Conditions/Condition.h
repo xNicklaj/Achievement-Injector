@@ -78,11 +78,5 @@ protected:
 	eventpp::EventDispatcher<std::string, void()>* eventManager;
 };
 
-class ConditionFactory {
-public:
-	virtual Condition* createCondition() = 0;
-	virtual ~ConditionFactory() {};
-};
-
 
 #endif

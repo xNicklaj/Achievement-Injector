@@ -18,10 +18,4 @@ private:
     RE::BSEventNotifyControl ProcessEvent(const RE::PositionPlayerEvent* a_event, RE::BSTEventSource<RE::PositionPlayerEvent>*) override;
 };
 
-class ObjectStateConditionFactory : public ConditionFactory {
-    public:
-        ObjectStateConditionFactory();
-        Condition* createCondition() override;
-};
-
 #endif

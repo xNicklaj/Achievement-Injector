@@ -26,8 +26,3 @@ bool PlayerFirstEnterCellCondition::CheckCondition() {
 
     return false;
 }
-
-PlayerFirstEnterCellConditionFactory::PlayerFirstEnterCellConditionFactory() : ConditionFactory() {};
-Condition* PlayerFirstEnterCellConditionFactory::createCondition() {
-    return new PlayerFirstEnterCellCondition();
-};

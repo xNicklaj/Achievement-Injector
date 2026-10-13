@@ -20,10 +20,4 @@ private:
 	RE::BSEventNotifyControl ProcessEvent(const RE::MenuOpenCloseEvent* a_event, RE::BSTEventSource<RE::MenuOpenCloseEvent>*) override;
 };
 
-class HasPerksConditionFactory : public ConditionFactory {
-public:
-	HasPerksConditionFactory();
-	Condition* createCondition() override;
-};
-
 #endif // HASPERKS_CONDITION_H

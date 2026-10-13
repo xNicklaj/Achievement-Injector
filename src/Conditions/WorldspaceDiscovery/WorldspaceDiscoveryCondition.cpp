@@ -57,9 +57,3 @@ RE::BSEventNotifyControl WorldspaceDiscoveryCondition::ProcessEvent(const RE::Lo
 	}
 	return RE::BSEventNotifyControl::kContinue;
 }
-
-WorldspaceDiscoveryConditionFactory::WorldspaceDiscoveryConditionFactory() : ConditionFactory() {}
-
-Condition* WorldspaceDiscoveryConditionFactory::createCondition() {
-	return new WorldspaceDiscoveryCondition();
-}

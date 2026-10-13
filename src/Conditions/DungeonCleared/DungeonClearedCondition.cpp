@@ -33,8 +33,3 @@ RE::BSEventNotifyControl DungeonClearedCondition::ProcessEvent(const RE::TESTrac
     }
     return RE::BSEventNotifyControl::kContinue;
 }
-
-DungeonClearedConditionFactory::DungeonClearedConditionFactory() : ConditionFactory() {};
-Condition* DungeonClearedConditionFactory::createCondition() {
-    return new DungeonClearedCondition();
-};

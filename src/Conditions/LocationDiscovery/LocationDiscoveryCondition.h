@@ -22,10 +22,4 @@ private:
 	RE::BSEventNotifyControl ProcessEvent(const RE::LocationDiscovery::Event* a_event, RE::BSTEventSource<RE::LocationDiscovery::Event>*) override;
 };
 
-class LocationDiscoveryConditionFactory : public ConditionFactory {
-public:
-	LocationDiscoveryConditionFactory();
-	Condition* createCondition() override;
-};
-
 #endif

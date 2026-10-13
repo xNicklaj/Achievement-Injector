@@ -14,8 +14,3 @@ public:
 private:
 	RE::BSEventNotifyControl ProcessEvent(const RE::BooksRead::Event* a_event, RE::BSTEventSource<RE::BooksRead::Event>*) override;
 };
-class BookReadConditionFactory : public ConditionFactory {
-public:
-	BookReadConditionFactory();
-	Condition* createCondition() override;
-};

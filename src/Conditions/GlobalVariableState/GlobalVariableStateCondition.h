@@ -18,10 +18,4 @@ private:
     RE::BSEventNotifyControl ProcessEvent(const RE::PositionPlayerEvent* a_event, RE::BSTEventSource<RE::PositionPlayerEvent>*) override;
 };
 
-class GlobalVariableStateConditionFactory : public ConditionFactory {
-public:
-	GlobalVariableStateConditionFactory();
-	Condition* createCondition() override;
-};
-
 #endif // GLOBAL_VARIABLE_STATE_CONDITION_H

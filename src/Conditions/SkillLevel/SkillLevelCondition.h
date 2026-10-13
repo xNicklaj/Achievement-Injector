@@ -16,9 +16,3 @@ public:
 private:
 	RE::BSEventNotifyControl ProcessEvent(const RE::SkillIncrease::Event* a_event, RE::BSTEventSource<RE::SkillIncrease::Event>*) override;
 };
-
-class PlayerSkillLevelConditionFactory : public ConditionFactory {
-public:
-	PlayerSkillLevelConditionFactory();
-	Condition* createCondition() override;
-};

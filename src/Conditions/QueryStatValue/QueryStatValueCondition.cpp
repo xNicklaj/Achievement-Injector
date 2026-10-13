@@ -29,9 +29,3 @@ RE::BSEventNotifyControl QueryStatValueCondition::ProcessEvent(const RE::TESTrac
 	}
 	return RE::BSEventNotifyControl::kContinue;
 };
-
-// GlobalVariableStateConditionFactory
-QueryStatValueConditionFactory::QueryStatValueConditionFactory() : ConditionFactory() {};
-Condition* QueryStatValueConditionFactory::createCondition() {
-	return new QueryStatValueCondition();
-};

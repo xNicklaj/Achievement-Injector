@@ -19,10 +19,4 @@ public:
 	std::vector<RE::TESFaction*> cachedFactions;
 };
 
-class PlayerCrimeConditionFactory : public ConditionFactory {
-public:
-	PlayerCrimeConditionFactory();
-	Condition* createCondition() override;
-};
-
 #endif

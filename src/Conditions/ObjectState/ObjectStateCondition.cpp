@@ -34,9 +34,3 @@ RE::BSEventNotifyControl ObjectStateCondition::ProcessEvent(const RE::PositionPl
         CheckCondition();
     return RE::BSEventNotifyControl::kContinue;
 }
-
-ObjectStateConditionFactory::ObjectStateConditionFactory()
-    : ConditionFactory(){};
-Condition* ObjectStateConditionFactory::createCondition() {
-    return new ObjectStateCondition();
-};

@@ -13,9 +13,3 @@ public:
 private:
 	RE::BSEventNotifyControl ProcessEvent(const RE::TESActivateEvent* a_event, RE::BSTEventSource<RE::TESActivateEvent>*) override;
 };
-
-class PlayerActivationConditionFactory : public ConditionFactory {
-public:
-	PlayerActivationConditionFactory();
-	Condition* createCondition() override;
-};

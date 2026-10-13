@@ -24,9 +24,3 @@ private:
 	bool isFormID = false;
     bool isEditorID = false;
 };
-
-class BaseActorDeathConditionFactory : public ConditionFactory {
-public:
-	BaseActorDeathConditionFactory();
-	Condition* createCondition() override;
-};

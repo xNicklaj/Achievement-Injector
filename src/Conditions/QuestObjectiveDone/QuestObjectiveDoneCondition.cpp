@@ -60,8 +60,3 @@ bool QuestObjectiveDoneCondition::CheckCondition() {
 	logger::debug("Objective {} for quest {} not found or not displayed.", this->objective, this->formID);
     return false;
 }
-
-QuestObjectiveDoneConditionFactory::QuestObjectiveDoneConditionFactory() : ConditionFactory() {};
-Condition* QuestObjectiveDoneConditionFactory::createCondition() {
-    return new QuestObjectiveDoneCondition();
-};

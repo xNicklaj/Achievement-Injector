@@ -32,8 +32,3 @@ bool PlayerSkillLevelCondition::CheckCondition() {
     }
     return false;
 }
-
-PlayerSkillLevelConditionFactory::PlayerSkillLevelConditionFactory() : ConditionFactory() {};
-Condition* PlayerSkillLevelConditionFactory::createCondition() {
-    return new PlayerSkillLevelCondition();
-}

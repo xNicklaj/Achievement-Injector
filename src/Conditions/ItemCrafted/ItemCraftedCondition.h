@@ -13,9 +13,3 @@ public:
 private:
 	RE::BSEventNotifyControl ProcessEvent(const RE::ItemCrafted::Event* a_event, RE::BSTEventSource<RE::ItemCrafted::Event>*) override;
 };
-
-class ItemCraftedConditionFactory : public ConditionFactory {
-	public:
-	ItemCraftedConditionFactory();
-	Condition* createCondition() override;
-};

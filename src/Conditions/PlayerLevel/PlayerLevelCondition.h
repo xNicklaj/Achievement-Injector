@@ -13,9 +13,3 @@ public:
 private:
 	RE::BSEventNotifyControl ProcessEvent(const RE::LevelIncrease::Event* a_event, RE::BSTEventSource<RE::LevelIncrease::Event>*) override;
 };
-
-class PlayerLevelConditionFactory : public ConditionFactory {
-public:
-	PlayerLevelConditionFactory();
-	Condition* createCondition() override;
-};

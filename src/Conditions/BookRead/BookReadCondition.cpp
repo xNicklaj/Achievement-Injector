@@ -32,8 +32,3 @@ RE::BSEventNotifyControl BookReadCondition::ProcessEvent(const RE::BooksRead::Ev
 	}
 	return RE::BSEventNotifyControl::kContinue;
 }
-
-BookReadConditionFactory::BookReadConditionFactory() : ConditionFactory() {};
-Condition* BookReadConditionFactory::createCondition() {
-	return new BookReadCondition();
-};

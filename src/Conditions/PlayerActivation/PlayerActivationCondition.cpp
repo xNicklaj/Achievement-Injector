@@ -24,8 +24,3 @@ RE::BSEventNotifyControl PlayerActivationCondition::ProcessEvent(const RE::TESAc
 	}
 	return RE::BSEventNotifyControl::kContinue;
 };
-
-PlayerActivationConditionFactory::PlayerActivationConditionFactory() : ConditionFactory() {};
-Condition* PlayerActivationConditionFactory::createCondition() {
-	return new PlayerActivationCondition();
-};

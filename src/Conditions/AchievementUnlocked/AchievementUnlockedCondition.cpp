@@ -46,9 +46,3 @@ void AchievementUnlockedCondition::ProcessEvent(AchievementUnlockedEvent* a_even
 		this->UnlockNotify();
 	}
 }
-
-// GlobalVariableStateConditionFactory
-AchievementUnlockedConditionFactory::AchievementUnlockedConditionFactory() : ConditionFactory() {};
-Condition* AchievementUnlockedConditionFactory::createCondition() {
-	return new AchievementUnlockedCondition();
-};

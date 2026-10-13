@@ -56,9 +56,3 @@ RE::BSEventNotifyControl PlayerCrimeCondition::ProcessEvent(const RE::TESTracked
 	}
 	return RE::BSEventNotifyControl::kContinue;
 }
-
-PlayerCrimeConditionFactory::PlayerCrimeConditionFactory() : ConditionFactory() {}
-
-Condition* PlayerCrimeConditionFactory::createCondition() {
-	return new PlayerCrimeCondition();
-}

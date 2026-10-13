@@ -18,10 +18,4 @@ private:
     RE::BSEventNotifyControl ProcessEvent(const RE::TESTrackedStatsEvent* a_event, RE::BSTEventSource<RE::TESTrackedStatsEvent>* a_eventSource) override;
 };
 
-class QueryStatValueConditionFactory : public ConditionFactory {
-public:
-    QueryStatValueConditionFactory();
-    Condition* createCondition() override;
-};
-
 #endif // QUERY_STAT_VALUE_CONDITION_H

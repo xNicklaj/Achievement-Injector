@@ -29,8 +29,3 @@ bool PlayerLevelCondition::CheckCondition() {
     }
     return false;
 }
-
-PlayerLevelConditionFactory::PlayerLevelConditionFactory() : ConditionFactory() {};
-Condition* PlayerLevelConditionFactory::createCondition() {
-    return new PlayerLevelCondition();
-};

@@ -37,8 +37,3 @@ RE::BSEventNotifyControl ActorDeathCondition::ProcessEvent(const RE::TESDeathEve
 	}
 	return RE::BSEventNotifyControl::kContinue;
 };
-
-ActorDeathConditionFactory::ActorDeathConditionFactory() : ConditionFactory() {};
-Condition* ActorDeathConditionFactory::createCondition() {
-	return new ActorDeathCondition();
-};

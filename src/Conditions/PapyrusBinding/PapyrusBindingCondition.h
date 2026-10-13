@@ -8,10 +8,4 @@ public:
 	PapyrusBindingCondition();
 };
 
-class PapyrusBindingConditionFactory : public ConditionFactory {
-public:
-    PapyrusBindingConditionFactory();
-    Condition* createCondition() override;
-};
-
 #endif  // PAPYRUSBINDING_CONDITION_H

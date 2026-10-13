@@ -42,8 +42,3 @@ bool ItemInInventoryCondition::CheckCondition() {
     }
     return false;
 }
-
-ItemInInventoryConditionFactory::ItemInInventoryConditionFactory() : ConditionFactory() {};
-Condition* ItemInInventoryConditionFactory::createCondition() {
-    return new ItemInInventoryCondition();
-};

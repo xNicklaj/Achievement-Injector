@@ -16,9 +16,3 @@ public:
 private:
 	RE::BSEventNotifyControl ProcessEvent(const RE::TESQuestStageEvent* a_event, RE::BSTEventSource<RE::TESQuestStageEvent>*) override;
 };
-
-class QuestStageDoneConditionFactory : public ConditionFactory {
-public:
-	QuestStageDoneConditionFactory();
-	Condition* createCondition() override;
-};

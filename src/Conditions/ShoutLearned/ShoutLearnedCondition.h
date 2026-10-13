@@ -15,10 +15,3 @@ public:
 private:
 	RE::BSEventNotifyControl ProcessEvent(const RE::TESTrackedStatsEvent* a_event, RE::BSTEventSource<RE::TESTrackedStatsEvent>*) override;
 };
-
-class ShoutLearnedConditionFactory : public ConditionFactory
-{
-public:
-	ShoutLearnedConditionFactory();
-	Condition* createCondition() override;
-};

@@ -14,9 +14,3 @@ public:
 private:
 	RE::BSEventNotifyControl ProcessEvent(const RE::TESTrackedStatsEvent* a_event, RE::BSTEventSource<RE::TESTrackedStatsEvent>*) override;
 };
-
-class DungeonClearedConditionFactory : public ConditionFactory {
-public:
-	DungeonClearedConditionFactory();
-	Condition* createCondition() override;
-};

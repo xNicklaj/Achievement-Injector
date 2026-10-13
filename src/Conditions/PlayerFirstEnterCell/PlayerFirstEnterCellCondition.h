@@ -12,9 +12,3 @@ public:
 private:
 	RE::BSEventNotifyControl ProcessEvent(const RE::BGSActorCellEvent* a_event, RE::BSTEventSource<RE::BGSActorCellEvent>*) override;
 };
-
-class PlayerFirstEnterCellConditionFactory : public ConditionFactory {
-public:
-	PlayerFirstEnterCellConditionFactory();
-	Condition* createCondition() override;
-};
