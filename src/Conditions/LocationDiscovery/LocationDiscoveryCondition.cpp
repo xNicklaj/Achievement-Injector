@@ -87,7 +87,8 @@ void LocationDiscoveryCondition::SetConditionParameters(std::string locationName
     this->formID = formID_a;
 }
 bool LocationDiscoveryCondition::CheckCondition(std::string locationName_l, std::string worldspaceID_l) {
-    if (locationName_l == this->locationName && worldspaceID_l == this->worldspaceID) {
+    // No worldspaceID in the JSON means any worldspace, as in the check at load
+    if (locationName_l == this->locationName && (this->worldspaceID.empty() || worldspaceID_l == this->worldspaceID)) {
         logger::info("Player met condition found {} in {}.", this->locationName, this->worldspaceID);
         this->UnlockNotify();
         KeyedSink<RE::LocationDiscovery::Event>::GetSingleton()->Unsubscribe(this);
