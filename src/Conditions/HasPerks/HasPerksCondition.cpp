@@ -1,5 +1,7 @@
 #include "HasPerksCondition.h"
 
+extern void RegisterPostLoadFunction(Condition* condition);
+
 HasPerksCondition::HasPerksCondition(void) : Condition(ConditionType::HasPerks) {}
 
 void HasPerksCondition::SetConditionParameters(std::vector<std::string> formIDs_a, int threshold_a) {
@@ -8,6 +10,7 @@ void HasPerksCondition::SetConditionParameters(std::vector<std::string> formIDs_
 }
 
 void HasPerksCondition::EnableListener(void) {
+	RegisterPostLoadFunction(this);
 	RE::UI::GetSingleton()->AddEventSink(this);
 }
 

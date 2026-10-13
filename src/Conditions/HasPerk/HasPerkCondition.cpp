@@ -1,5 +1,7 @@
 #include "HasPerkCondition.h"
 
+extern void RegisterPostLoadFunction(Condition* condition);
+
 HasPerkCondition::HasPerkCondition(void) : Condition(ConditionType::HasPerk) {}
 
 void HasPerkCondition::SetConditionParameters(std::string formID) {
@@ -7,6 +9,7 @@ void HasPerkCondition::SetConditionParameters(std::string formID) {
 }
 
 void HasPerkCondition::EnableListener(void) {
+	RegisterPostLoadFunction(this);
 	RE::UI::GetSingleton()->AddEventSink(this);
 }
 
