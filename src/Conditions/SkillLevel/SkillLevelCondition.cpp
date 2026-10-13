@@ -15,6 +15,7 @@ void PlayerSkillLevelCondition::SetConditionParameters(std::string skill_a, int 
     this->level = level_a;
     this->skill = skill_a;
     this->cachedSkill = StringToActorValue(skill_a);
+    if (this->cachedSkill == RE::ActorValue::kNone) logger::error("SkillLevel: unknown skill \"{}\", this condition can never be met.", skill_a);
 }
 RE::BSEventNotifyControl PlayerSkillLevelCondition::ProcessEvent(const RE::SkillIncrease::Event* a_event, RE::BSTEventSource<RE::SkillIncrease::Event>*) {
     if (this->cachedSkill == a_event->actorValue) this->CheckCondition();

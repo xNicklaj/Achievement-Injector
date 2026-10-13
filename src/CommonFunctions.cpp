@@ -77,6 +77,7 @@ std::string FormIDToString(RE::FormID formID) {
 }
 
 RE::ActorValue StringToActorValue(std::string value) {
+    std::transform(value.begin(), value.end(), value.begin(), [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
     if (value == "alchemy") return RE::ActorValue::kAlchemy;
     else if (value == "alteration") return RE::ActorValue::kAlteration;
     else if (value == "marksman") return RE::ActorValue::kArchery;

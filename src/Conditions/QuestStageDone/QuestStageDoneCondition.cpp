@@ -7,6 +7,8 @@ void QuestStageDoneCondition::SetConditionParameters(std::string formID_a, std::
     this->formID = formID_a;
     this->OP = OP_a;
     this->stage = stage_a;
+    if (OP_a != ">=" && OP_a != "GT" && OP_a != "==" && OP_a != "EQ")
+        logger::error("QuestStageDone: unknown operation \"{}\" for quest {}, this condition can never be met. Use >= or ==.", OP_a, formID_a);
 }
 void QuestStageDoneCondition::OnDataLoaded(void) {
     this->cachedQuest = GetFormOfType<RE::TESQuest>(this->formID, this->plugin);
