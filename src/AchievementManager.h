@@ -49,7 +49,7 @@ public:
 	std::vector<AchievementFile> achievementFiles;
 	std::vector<AchievementGroup> achievementGroups;
 	std::string lastUsedPlayerName = "";
-	std::string cache;
+	const std::string& GetCache();
 
 	json ToJson();
     std::string ToString();
@@ -59,6 +59,8 @@ public:
     void ForceUnlock(std::string achievementName, std::string group);
 	void Dispatch(AchievementUnlockedEvent*);
 private:
+	std::string cache;
+	std::atomic<bool> cacheDirty = true;
 	eventpp::EventDispatcher<std::string, void(AchievementUnlockedEvent*)> eventHandler;
 };
 #endif

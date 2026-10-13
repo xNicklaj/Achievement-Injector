@@ -108,8 +108,14 @@ std::string AchievementManager::ToString() {
 }
 
 void AchievementManager::UpdateCache() {
-    cache = AchievementManager::GetSingleton()->ToString();
+    // Progress saves call this far more often than the menu opens: rebuild on demand in GetCache
+    cacheDirty = true;
 };
+
+const std::string& AchievementManager::GetCache() {
+    if (cacheDirty.exchange(false)) cache = this->ToString();
+    return cache;
+}
 
 void AchievementManager::ForceUnlock(std::string achievementName, std::string group_a) {
     LocalizationManager* lm = LocalizationManager::GetSingleton();
