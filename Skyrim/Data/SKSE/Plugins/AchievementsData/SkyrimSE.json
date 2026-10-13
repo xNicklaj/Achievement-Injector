@@ -46,7 +46,7 @@
                 {
                     "type": "QuestStageDone",
                     "formID": "035D5F",
-                    "stage": 255
+                    "stage": 250
                 }
             ]
         },
