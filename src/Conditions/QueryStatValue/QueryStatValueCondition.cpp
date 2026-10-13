@@ -5,11 +5,11 @@ extern void RegisterPostLoadFunction(Condition* condition);
 
 QueryStatValueCondition::QueryStatValueCondition(void) : Condition(ConditionType::QueryStatValue) {};
 void QueryStatValueCondition::OnDataLoaded(void) {
+	KeyedSink<RE::TESTrackedStatsEvent>::GetSingleton()->Subscribe(StatKey(this->stat), this);
 	CheckCondition();
 };
 void QueryStatValueCondition::EnableListener(void) {
 	RegisterPostLoadFunction(this);
-	RE::ScriptEventSourceHolder::GetSingleton()->AddEventSink(this);
 };
 void QueryStatValueCondition::SetConditionParameters(std::string stat_a, float value_a) {
 	this->stat = stat_a;

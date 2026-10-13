@@ -6,6 +6,7 @@
 #include "../CommonFunctions.h"
 #include "../log.h"
 #include "../Runnable.h"
+#include "../KeyedSink.h"
 #include <SKSE/SKSE.h>
 #include <RE/Skyrim.h>
 #include <nlohmann/json.hpp>

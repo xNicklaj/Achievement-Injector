@@ -5,12 +5,11 @@ extern void RegisterPostLoadFunction(Condition* condition);
 ItemInInventoryCondition::ItemInInventoryCondition() : Condition(ConditionType::ItemInInventory) {}
 void ItemInInventoryCondition::OnDataLoaded(void) {
 	this->cachedForm = GetForm(this->formid, this->plugin);
+    if (this->cachedForm) KeyedSink<RE::TESContainerChangedEvent>::GetSingleton()->Subscribe(this->cachedForm->formID, this);
     CheckCondition();
 }
 void ItemInInventoryCondition::EnableListener() {
     RegisterPostLoadFunction(this);
-    RE::ScriptEventSourceHolder* eventSourceHolder = RE::ScriptEventSourceHolder::GetSingleton();
-    eventSourceHolder->AddEventSink(this);
 }
 void ItemInInventoryCondition::SetConditionParameters(std::string formid_a, int quantity_a) {
     this->formid = formid_a;
@@ -38,7 +37,7 @@ bool ItemInInventoryCondition::CheckCondition() {
     if (quantity_l >= this->quantity) {
         logger::info("Player met condition item {} quantity {}", this->formid, this->quantity);
         this->UnlockNotify();
-        RE::ScriptEventSourceHolder::GetSingleton()->RemoveEventSink(this);
+        KeyedSink<RE::TESContainerChangedEvent>::GetSingleton()->Unsubscribe(this);
         return true;
     }
     return false;

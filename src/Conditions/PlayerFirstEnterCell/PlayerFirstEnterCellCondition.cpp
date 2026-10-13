@@ -7,24 +7,18 @@ void PlayerFirstEnterCellCondition::SetConditionParameters(std::string cellID_a)
     this->cellID = cellID_a;
 }
 void PlayerFirstEnterCellCondition::OnDataLoaded(void) {
-    // Check that quest hasn't been completed already
-    CheckCondition();
+    this->cachedFormID = GetFormID(this->cellID, this->plugin);
+    if (this->cachedFormID) KeyedSink<RE::BGSActorCellEvent>::GetSingleton()->Subscribe(this->cachedFormID, this);
 }
 void PlayerFirstEnterCellCondition::EnableListener(void)
 {
     RegisterPostLoadFunction(this);
-
-    // Bind sink for quest stage change event
-    RE::PlayerCharacter::GetSingleton()->AsBGSActorCellEventSource()->AddEventSink(this);
 }
 RE::BSEventNotifyControl PlayerFirstEnterCellCondition::ProcessEvent(const RE::BGSActorCellEvent* event, RE::BSTEventSource<RE::BGSActorCellEvent>*) {
-    logger::debug("Player entered cell {}", event->cellID);
-    RE::TESForm* target = GetForm(this->cellID, this->plugin);
-    if (target == NULL) return RE::BSEventNotifyControl::kContinue;
-    if (event->cellID == target->formID) {
+    if (event->cellID == this->cachedFormID) {
         logger::info("Player met condition entered cell {}.", this->cellID);
         this->UnlockNotify();
-        RE::PlayerCharacter::GetSingleton()->AsBGSActorCellEventSource()->RemoveEventSink(this);
+        KeyedSink<RE::BGSActorCellEvent>::GetSingleton()->Unsubscribe(this);
     }
     return RE::BSEventNotifyControl::kContinue;
 }

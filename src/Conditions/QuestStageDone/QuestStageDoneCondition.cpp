@@ -10,15 +10,12 @@ void QuestStageDoneCondition::SetConditionParameters(std::string formID_a, std::
 }
 void QuestStageDoneCondition::OnDataLoaded(void) {
     this->cachedQuest = GetFormOfType<RE::TESQuest>(this->formID, this->plugin);
+    if (this->cachedQuest) KeyedSink<RE::TESQuestStageEvent>::GetSingleton()->Subscribe(this->cachedQuest->formID, this);
     CheckCondition();
 }
 void QuestStageDoneCondition::EnableListener(void)
 {
     RegisterPostLoadFunction(this);
-
-    // Bind sink for quest stage change event
-    auto* eventSourceHolder = RE::ScriptEventSourceHolder::GetSingleton();
-    eventSourceHolder->AddEventSink(this);
 }
 RE::BSEventNotifyControl QuestStageDoneCondition::ProcessEvent(const RE::TESQuestStageEvent* event, RE::BSTEventSource<RE::TESQuestStageEvent>*) {
     if (!this->isMet && this->cachedQuest && event->formID == this->cachedQuest->formID) {
@@ -32,13 +29,13 @@ bool QuestStageDoneCondition::CheckCondition() {
     if ((this->OP == ">=" || this->OP == "GT") && (this->cachedQuest ? this->cachedQuest->GetCurrentStageID() : 0) >= stage) {
         logger::info("Quest {} met condition stage {}", this->formID, this->stage);
         this->UnlockNotify();
-        RE::ScriptEventSourceHolder::GetSingleton()->RemoveEventSink(this);
+        KeyedSink<RE::TESQuestStageEvent>::GetSingleton()->Unsubscribe(this);
         return true;
     }
     else if ((this->OP == "==" || this->OP == "EQ") && (this->cachedQuest ? this->cachedQuest->GetCurrentStageID() : 0) == stage) {
         logger::info("Quest {} met condition stage {}", this->formID, this->stage);
         this->UnlockNotify();
-        RE::ScriptEventSourceHolder::GetSingleton()->RemoveEventSink(this);
+        KeyedSink<RE::TESQuestStageEvent>::GetSingleton()->Unsubscribe(this);
         return true;
     }
     return false;

@@ -57,11 +57,17 @@ RE::TESObjectREFR* FindMapMarkerByData(RE::MapMarkerData* a_data) {
 LocationDiscoveryCondition::LocationDiscoveryCondition() : Condition(ConditionType::LocationDiscovery) {}
 void LocationDiscoveryCondition::OnDataLoaded(void) {
     try {
-        if (this->formID != "") this->cachedRef = GetFormOfType<RE::TESObjectREFR>(this->formID, this->plugin);
+        auto* sink = KeyedSink<RE::LocationDiscovery::Event>::GetSingleton();
+        if (this->formID != "") {
+            this->cachedRef = GetFormOfType<RE::TESObjectREFR>(this->formID, this->plugin);
+            if (this->cachedRef) sink->Subscribe(this->cachedRef->formID, this);
+        } else {
+            sink->Subscribe(StatKey(this->locationName), this);
+        }
         if (CheckKnownLocation(this->locationName, this->formID, this->plugin)) {
             logger::info("Player met condition found {} in {}.", this->formID != "" ? this->formID : this->locationName, this->worldspaceID);
             this->UnlockNotify();
-            RE::LocationDiscovery::GetEventSource()->RemoveEventSink(this);
+            KeyedSink<RE::LocationDiscovery::Event>::GetSingleton()->Unsubscribe(this);
         };
     } catch (const std::exception&) {
         logger::error("An error occurred in OnDataLoaded of LocationDiscoveryCondition, with parameters ({}, {})", this->locationName, this->worldspaceID);
@@ -74,7 +80,6 @@ void LocationDiscoveryCondition::Localize(std::string path) {
 }
 void LocationDiscoveryCondition::EnableListener() {
     RegisterPostLoadFunction(this);
-    RE::LocationDiscovery::GetEventSource()->AddEventSink(this);
 }
 void LocationDiscoveryCondition::SetConditionParameters(std::string locationName_a, std::string worldspaceID_a, std::string formID_a) {
     this->locationName = locationName_a;
@@ -85,7 +90,7 @@ bool LocationDiscoveryCondition::CheckCondition(std::string locationName_l, std:
     if (locationName_l == this->locationName && worldspaceID_l == this->worldspaceID) {
         logger::info("Player met condition found {} in {}.", this->locationName, this->worldspaceID);
         this->UnlockNotify();
-        RE::LocationDiscovery::GetEventSource()->RemoveEventSink(this);
+        KeyedSink<RE::LocationDiscovery::Event>::GetSingleton()->Unsubscribe(this);
         return true;
     }
     return false;
@@ -98,7 +103,7 @@ RE::BSEventNotifyControl LocationDiscoveryCondition::ProcessEvent(const RE::Loca
             if (targetRefr && targetRefr->formID == refr->formID) {
                 logger::info("Player met condition found {} in {}.", this->formID, this->worldspaceID);
                 this->UnlockNotify();
-                RE::LocationDiscovery::GetEventSource()->RemoveEventSink(this);
+                KeyedSink<RE::LocationDiscovery::Event>::GetSingleton()->Unsubscribe(this);
                 return RE::BSEventNotifyControl::kContinue;
             }
         }

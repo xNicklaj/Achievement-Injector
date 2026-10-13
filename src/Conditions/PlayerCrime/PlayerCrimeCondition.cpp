@@ -10,12 +10,13 @@ void PlayerCrimeCondition::OnDataLoaded(void) {
 		auto faction = GetFormOfType<RE::TESFaction>(id, this->plugin);
 		if(faction) this->cachedFactions.push_back(faction);
 	}
+	// Matches any stat whose name contains "Bounty", which no single key covers
+	KeyedSink<RE::TESTrackedStatsEvent>::GetSingleton()->SubscribeAll(this);
 	CheckCondition();
 }
 
 void PlayerCrimeCondition::EnableListener() {
 	RegisterPostLoadFunction(this);
-	RE::ScriptEventSourceHolder::GetSingleton()->AddEventSink(this);
 }
 
 void PlayerCrimeCondition::SetConditionParameters(std::vector<std::string> factionIDs_a, int bountyThreshold_a) {
@@ -40,7 +41,7 @@ bool PlayerCrimeCondition::CheckCondition() {
 	if (allMet && this->cachedFactions.size() > 0) {
 		logger::info("Player met condition: Faction bounties reached threshold.");
 		this->UnlockNotify();
-		RE::ScriptEventSourceHolder::GetSingleton()->RemoveEventSink(this);
+		KeyedSink<RE::TESTrackedStatsEvent>::GetSingleton()->Unsubscribe(this);
 		return true;
 	}
 

@@ -38,6 +38,7 @@ void InitializePostLoad() {
         AchievementManager::GetSingleton()->lastUsedPlayerName = GetPlayerName();
         // Conditions re-register themselves in EnableListener
         postLoadConditionRegistry.clear();
+        ClearKeyedSinks();
 
         for (auto& achievementGroup: AchievementManager::GetSingleton()->achievementGroups) {
             for (auto& achievement: achievementGroup.achievements) {

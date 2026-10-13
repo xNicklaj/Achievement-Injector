@@ -6,11 +6,17 @@ extern void RegisterPostLoadFunction(Condition* condition);
 
 BaseActorDeathCondition::BaseActorDeathCondition() : Condition(ConditionType::BaseActorDeath){};
 void BaseActorDeathCondition::OnDataLoaded(void) {
-	if (this->isFormID) this->cachedNPC = GetFormOfType<RE::TESNPC>(this->identifier, this->plugin);
+	// Names and editor IDs are not keys: those conditions see every death
+	if (this->isEditorID || !this->isFormID) {
+		KeyedSink<RE::TESDeathEvent>::GetSingleton()->SubscribeAll(this);
+		return;
+	}
+	this->cachedNPC = GetFormOfType<RE::TESNPC>(this->identifier, this->plugin);
+	if (this->cachedNPC) KeyedSink<RE::TESDeathEvent>::GetSingleton()->Subscribe(this->cachedNPC->formID, this);
+	else logger::error("Form {} not found.", this->identifier);
 }
 void BaseActorDeathCondition::EnableListener(void) {
 	RegisterPostLoadFunction(this);
-	RE::ScriptEventSourceHolder::GetSingleton()->AddEventSink(this);
 };
 void BaseActorDeathCondition::SetConditionParameters(std::string identifier_a, int quantity_a) {
 	this->isFormID = isHex(identifier_a);
@@ -24,7 +30,7 @@ bool BaseActorDeathCondition::CheckCondition() {
 	if (this->currQuantity >= this->quantity) {
 		logger::info("Player met condition actor {} dead.", this->identifier);
 		this->UnlockNotify();
-		RE::ScriptEventSourceHolder::GetSingleton()->RemoveEventSink(this);
+		KeyedSink<RE::TESDeathEvent>::GetSingleton()->Unsubscribe(this);
 	}
 	return false;
 };

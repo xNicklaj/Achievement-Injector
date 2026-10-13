@@ -7,11 +7,11 @@ extern void RegisterPostLoadFunction(Condition* condition);
 DungeonClearedCondition::DungeonClearedCondition() : Condition(ConditionType::LocationCleared) {}
 void DungeonClearedCondition::OnDataLoaded(void) {
     this->cachedLoc = GetFormOfType<RE::BGSLocation>(this->formid, this->plugin);
+    if (this->cachedLoc) KeyedSink<RE::TESTrackedStatsEvent>::GetSingleton()->Subscribe(StatKey("Dungeons Cleared"), this);
     CheckCondition();
 }
 void DungeonClearedCondition::EnableListener() {
     RegisterPostLoadFunction(this);
-    RE::ScriptEventSourceHolder::GetSingleton()->AddEventSink(this);
 }
 void DungeonClearedCondition::SetConditionParameters(std::string formid_a) {
     this->formid = formid_a;
@@ -22,7 +22,7 @@ bool DungeonClearedCondition::CheckCondition() {
     if (target->IsCleared()) {
         logger::info("Player met condition location {} cleared.", this->formid);
         UnlockNotify();
-        RE::ScriptEventSourceHolder::GetSingleton()->AddEventSink(this);
+        KeyedSink<RE::TESTrackedStatsEvent>::GetSingleton()->Unsubscribe(this);
         return true;
     }
     return false;

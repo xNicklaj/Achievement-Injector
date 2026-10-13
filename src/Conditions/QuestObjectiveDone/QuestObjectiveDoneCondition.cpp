@@ -10,15 +10,13 @@ void QuestObjectiveDoneCondition::SetConditionParameters(std::string formID_a, i
 void QuestObjectiveDoneCondition::OnDataLoaded(void) {
     // Check that quest hasn't been completed already
     this->quest = GetFormOfType<RE::TESQuest>(this->formID, this->plugin);
+    if (this->quest) KeyedSink<RE::TESQuestStageEvent>::GetSingleton()->Subscribe(this->quest->formID, this);
     CheckCondition();
 }
 void QuestObjectiveDoneCondition::EnableListener(void)
 {
     RegisterPostLoadFunction(this);
 
-    // Bind sink for quest stage change event
-    auto* eventSourceHolder = RE::ScriptEventSourceHolder::GetSingleton();
-    eventSourceHolder->AddEventSink<RE::TESQuestStageEvent>(this);
     RE::PlayerCharacter::GetSingleton()->AsPositionPlayerEventSource()->AddEventSink<RE::PositionPlayerEvent>(this);
 }
 RE::BSEventNotifyControl QuestObjectiveDoneCondition::ProcessEvent(const RE::TESQuestStageEvent* event, RE::BSTEventSource<RE::TESQuestStageEvent>*) {
@@ -54,7 +52,7 @@ bool QuestObjectiveDoneCondition::CheckCondition() {
         if (objective_l->index == this->objective && (objective_l->state == RE::QUEST_OBJECTIVE_STATE::kDisplayed || objective_l->state == RE::QUEST_OBJECTIVE_STATE::kCompletedDisplayed )) {
             logger::info("Player met condition quest {} objective {}", this->formID, this->objective);
             this->UnlockNotify();
-            RE::ScriptEventSourceHolder::GetSingleton()->RemoveEventSink<RE::TESQuestStageEvent>(this);
+            KeyedSink<RE::TESQuestStageEvent>::GetSingleton()->Unsubscribe(this);
             RE::PlayerCharacter::GetSingleton()->AsPositionPlayerEventSource()->RemoveEventSink(this);
             return true;
         }
