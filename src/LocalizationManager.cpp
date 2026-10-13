@@ -115,17 +115,13 @@ std::map<std::string, std::string> LocalizationManager::ReadLocalizationFile(con
 }
 
 std::string LocalizationManager::GetLocalizedText(std::string group, std::string locale, std::string key) {
-    std::string localizedText = "NOTFOUND";
-	try {
-        std::tuple<std::string, std::string> keyTuple = std::tuple<std::string, std::string>(group, locale);
-        if (this->localizations.find(keyTuple) == this->localizations.end()) {
-            logger::error("Localization not found for group: {}, locale: {}, key: {}. Default to ENGLISH.", group, locale, key);
-            keyTuple = std::tuple<std::string, std::string>(group, "EN");
-        }
-        localizedText = this->localizations[keyTuple][key];
-	}
-	catch (const std::out_of_range&) {
-		logger::error("Localization not found for group: {}, locale: {}, key: {}", group, locale, key);
-	}
-	return localizedText;
+    // A missing key returns the key itself: an empty name would make every such achievement share one save entry
+    for (const std::string& loc : {locale, std::string("EN")}) {
+        const auto file = this->localizations.find(std::make_tuple(group, loc));
+        if (file == this->localizations.end()) continue;
+        const auto text = file->second.find(key);
+        if (text != file->second.end() && !text->second.empty()) return text->second;
+    }
+    logger::error("Localization not found for group: {}, locale: {}, key: {}", group, locale, key);
+    return key;
 }
