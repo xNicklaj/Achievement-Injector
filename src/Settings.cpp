@@ -8,13 +8,11 @@ void Settings::SerializeINI(const wchar_t* a_path, const std::function<void(CSim
 	ini.SetUnicode();
 
 	if (const auto rc = ini.LoadFile(a_path); !a_generate && rc < SI_OK) {
-		logger::error("Failed to load ini file.");
+		logger::debug("Ini file not found or unreadable, keeping current values.");
 		return;
 	}
 
 	a_func(ini);
-
-	(void)ini.SaveFile(a_path);
 }
 
 void Settings::SerializeINI(const wchar_t* a_defaultPath, const wchar_t* a_userPath, std::function<void(CSimpleIniA&)> a_func)
