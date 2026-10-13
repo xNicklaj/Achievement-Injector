@@ -60,6 +60,7 @@
         {
             "achievementName": "$NAME_Condemned to the Depths",
             "description": "$DESC_Condemned to the Depths",
+            "joinType": "AND",
             "conditions": [
                 {
                     "type": "LocationCleared",

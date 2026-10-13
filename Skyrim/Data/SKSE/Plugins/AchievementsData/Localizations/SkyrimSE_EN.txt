@@ -111,3 +111,4 @@ $Shadow Stone		The Shadow Stone
 $Steed Stone		The Steed Stone
 $Thief Stone		The Thief Stone
 $Tower Stone		The Tower Stone
+$Warrior Stone		The Warrior Stone

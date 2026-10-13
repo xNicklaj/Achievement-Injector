@@ -18,7 +18,7 @@
         {
             "achievementName": "$NAME_Landowner",
             "description": "$DESC_Landowner",
-            "conditionsJoinType": "OR",
+            "joinType": "OR",
             "icon": "ACH_Landowner.dds",
             "conditions": [
                 {
@@ -53,7 +53,7 @@
         {
             "achievementName": "$NAME_Land Baron",
             "description": "$DESC_Land Baron",
-            "conditionsJoinType": "AND",
+            "joinType": "AND",
             "icon": "ACH_LandBaron.dds",
             "conditions": [
                 {
@@ -77,7 +77,7 @@
             "achievementName": "$NAME_Master Architect",
             "description": "$DESC_Master Architect",
             "icon": "ACH_MasterArchitect.dds",
-            "conditionsJoinType": "AND",
+            "joinType": "AND",
             "conditions": [
                 {
                     "type": "QuestStageDone",

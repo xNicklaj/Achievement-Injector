@@ -5,7 +5,7 @@
 		{
 			"achievementName": "$NAME_Force of Nature",
 			"description": "$DESC_Force of Nature",
-			"conditionType": "AND",
+			"joinType": "AND",
 			"conditions": [
 				{
 					"type": "BaseActorDeath",
@@ -37,7 +37,7 @@
 		{
 			"achievementName": "$NAME_Some good family time",
 			"description": "$DESC_Some good family time",
-			"conditionType": "AND",
+			"joinType": "AND",
 			"conditions": [
 				{
 					"type": "BaseActorDeath",

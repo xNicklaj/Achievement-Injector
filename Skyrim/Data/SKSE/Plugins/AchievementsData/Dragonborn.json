@@ -131,7 +131,7 @@
             "achievementName": "$NAME_Stalhrim Crafter",
             "description": "$DESC_Stalhrim Crafter",
             "icon": "ACH_StalhrimCrafter.dds",
-            "joinCondition": "OR",
+            "joinType": "OR",
             "conditions": [
                 {
                     "type": "ItemCrafted",

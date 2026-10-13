@@ -290,9 +290,9 @@
             "icon": "ACH_Sideways.dds",
             "conditions": [
                 {
-                    "type": "GlobalVariableState",
-                    "formID": "0FC85C",
-                    "value": 10.0
+                    "type": "QueryStatValue",
+                    "stat": "Side Quests Completed",
+                    "value": 10
                 }
             ]
         },
@@ -302,9 +302,9 @@
             "icon": "ACH_HeroofthePeople.dds",
             "conditions": [
                 {
-                    "type": "GlobalVariableState",
-                    "formID": "0FC85C",
-                    "value": 50.0
+                    "type": "QueryStatValue",
+                    "stat": "Misc Objectives Completed",
+                    "value": 50
                 }
             ]
         },
@@ -517,12 +517,6 @@
                     "formID": "0A2C9B",
                     "stage": 15,
                     "_notes": "Produspire Manor - Solitude"
-                },
-                {
-                    "type": "QuestStageDone",
-                    "formID": "0A2C86",
-                    "stage": 15,
-                    "_notes": "Vlinder Hall - Markarth"
                 },
                 {
                     "type": "QuestStageDone",
@@ -802,7 +796,7 @@
                 },
                 {
                     "type": "ItemInInventory",
-                    "formID": "O1A332",
+                    "formID": "01A332",
                     "quantity": 1
                 },
                 {
@@ -861,7 +855,7 @@
                 {
                     "type": "QuestStageDone",
                     "formID": "04D8D6",
-                    "stage": 31
+                    "stage": 40
                 },
                 {
                     "type": "QuestStageDone",
@@ -1106,7 +1100,7 @@
             "achievementName": "$NAME_Thu'um Master",
             "description": "$DESC_Thu'um Master",
             "icon": "ACH_ThuumMaster.dds",
-            "joinCondition": "AND",
+            "joinType": "AND",
             "conditions": [
                 {
                     "type": "ShoutLearned",
