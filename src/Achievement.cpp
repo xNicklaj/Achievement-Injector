@@ -394,8 +394,11 @@ json Achievement::ToJson() {
     json data = json::object();
 
     std::string desc = this->description;
-    if (!this->unlocked && this->hidden && !Settings::GetSingleton()->GetShowHidden()) 
+    if (!this->unlocked && this->hidden && !Settings::GetSingleton()->GetShowHidden()) {
         desc = "$ACH_HIDDEN";
+        // The menu shows this text untranslated; desc keeps the key if the lookup fails
+        SKSE::Translation::Translate("$ACH_HIDDEN", desc);
+    }
 
     if (Settings::GetSingleton()->GetGlobal()) {
         SerializedAchievement sa = Serializer::GetSingleton()->DeserializeAchievementData_GLOBAL(this->achievementName);
@@ -420,21 +423,24 @@ std::string Achievement::ToString() {
     std::string output = "";
 
     std::string desc = this->description;
-    if (!this->unlocked && this->hidden && !Settings::GetSingleton()->GetShowHidden())
+    if (!this->unlocked && this->hidden && !Settings::GetSingleton()->GetShowHidden()) {
         desc = "$ACH_HIDDEN";
+        // The menu shows this text untranslated; desc keeps the key if the lookup fails
+        SKSE::Translation::Translate("$ACH_HIDDEN", desc);
+    }
 
     // TODO convert \n to something else
 
     if (Settings::GetSingleton()->GetGlobal()) {
         SerializedAchievement sa = Serializer::GetSingleton()->DeserializeAchievementData_GLOBAL(this->achievementName);
         output =
-            this->groupName + "||" + this->achievementName + "||" + replaceAll(this->description, "\n", " ") + "||" +
+            this->groupName + "||" + this->achievementName + "||" + replaceAll(desc, "\n", " ") + "||" +
             std::to_string(sa.unlocked ? sa.unlockDatetime : -1) + "||" +
             (checkIcon(this->groupName, this->icon) ? "..\\SKSE\\Plugins\\AchievementsData\\Icons\\" + this->groupName + "\\" + this->icon : "");
     } else {
         SerializedAchievement sa = Serializer::GetSingleton()->DeserializeAchievementData(this->achievementName);
         output =
-            this->groupName + "||" + this->achievementName + "||" + replaceAll(this->description, "\n", " ") + "||" +
+            this->groupName + "||" + this->achievementName + "||" + replaceAll(desc, "\n", " ") + "||" +
             std::to_string(sa.unlocked ? sa.unlockDatetime : -1) + "||" + (checkIcon(this->groupName, this->icon) ? "..\\SKSE\\Plugins\\AchievementsData\\Icons\\" + this->groupName + "\\" + this->icon : "");
     }
     return output;

@@ -49,11 +49,14 @@ json AchievementGroup::ToJson() {
 };
 
 std::string AchievementGroup::ToString() {
-    std::string ret = "";
+    std::string ret = "", locked = "";
     for (const auto& achievement : this->achievements) {
-        ret += achievement->ToString() + "\n";
+        if (!achievement->showInMenu) continue;
+        // Unlocked first, then locked, each keeping file order; a locked line carries -1 as its unlock time
+        std::string line = achievement->ToString() + "\n";
+        (line.find("||-1||") == std::string::npos ? ret : locked) += line;
     }
-    return ret;
+    return ret + locked;
 }
 
 void AchievementGroup::ForceUnlock(std::string achievementName) {
