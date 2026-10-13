@@ -31,6 +31,8 @@ bool BaseActorDeathCondition::CheckCondition() {
 RE::BSEventNotifyControl BaseActorDeathCondition::ProcessEvent(const RE::TESDeathEvent* a_event, RE::BSTEventSource<RE::TESDeathEvent>*) {
 	bool isTarget = false;
 	if (!a_event || !a_event->actorDying || !a_event->actorDying->IsDead()) return RE::BSEventNotifyControl::kContinue;
+	// Actors spawned from a leveled list die as a runtime copy: the record a JSON names is their template
+	RE::TESForm* templateBase = a_event->actorDying->GetTemplateActorBase();
 	if (!this->isFormID && !this->isEditorID && a_event->dead) {
         logger::debug("Actor {} is dead. Reference found using name {}", a_event->actorDying->GetName(), this->identifier);
 		if (a_event->actorDying->GetName() == this->identifier) {
@@ -41,7 +43,7 @@ RE::BSEventNotifyControl BaseActorDeathCondition::ProcessEvent(const RE::TESDeat
         std::string targetEditorID = clib_util::editorID::get_editorID(a_event->actorDying->GetBaseObject());
         logger::debug("Actor {} is dead. Reference found using editorID {}.", a_event->actorDying->GetName(), targetEditorID);
         
-        if (targetEditorID == this->identifier) {
+        if (targetEditorID == this->identifier || (templateBase && clib_util::editorID::get_editorID(templateBase) == this->identifier)) {
             currQuantity++;
             isTarget = true;
 		}        
@@ -54,7 +56,7 @@ RE::BSEventNotifyControl BaseActorDeathCondition::ProcessEvent(const RE::TESDeat
 		}
 		if (a_event->dead) {
             logger::debug("Actor {} is dead. Reference found using formID {}", a_event->actorDying->GetName(), this->identifier);
-			if (a_event->actorDying->data.objectReference->As<RE::TESNPC>()->GetFormID() == target->formID) {
+			if (a_event->actorDying->data.objectReference->As<RE::TESNPC>()->GetFormID() == target->formID || (templateBase && templateBase->formID == target->formID)) {
                 currQuantity++;
                 isTarget = true;
 			}

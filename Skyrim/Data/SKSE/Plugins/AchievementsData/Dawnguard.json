@@ -124,6 +124,26 @@
                     "type": "BaseActorDeath",
                     "name": "$Legendary Dragon",
                     "quantity": 1
+                },
+                {
+                    "type": "BaseActorDeath",
+                    "formID": "00C5F5",
+                    "quantity": 1
+                },
+                {
+                    "type": "BaseActorDeath",
+                    "formID": "00C5FD",
+                    "quantity": 1
+                },
+                {
+                    "type": "BaseActorDeath",
+                    "formID": "00C5FE",
+                    "quantity": 1
+                },
+                {
+                    "type": "BaseActorDeath",
+                    "formID": "00C5FF",
+                    "quantity": 1
                 }
             ]
         }
