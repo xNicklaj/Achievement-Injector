@@ -3,9 +3,7 @@ using namespace SKSE::log;
 using namespace SKSE::stl;
 
 #include "log.h"
-#include "GameEventHandler.h"
 #include "AchievementManager.h"
-#include "UIManager.h"
 #include "AchievementWidget.h"
 #include "Conditions/Condition.h"
 #include "EventProcessor.h"
