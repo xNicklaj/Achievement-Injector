@@ -6,6 +6,35 @@
 namespace fs = std::filesystem;
 using json = nlohmann::json;
 
+// Write to a temp file then rename, so a crash mid-write can't leave a truncated save
+static void WriteJson(const std::string& path, const json& data) {
+	const std::string text = data.dump(4, ' ', false, json::error_handler_t::replace);
+	std::ofstream out(path + ".tmp");
+	out << text;
+	out.close();
+	std::error_code ec;
+	if (out) fs::rename(path + ".tmp", path, ec);
+	if (out && !ec) return;
+	// Rename can be refused (locked target, virtual file systems): write in place rather than lose the save
+	std::ofstream direct(path);
+	direct << text;
+	direct.close();
+	if (!direct) logger::error("Failed to write {}.", path);
+}
+
+// An unreadable file must not throw into the game: keep it as .bak and start empty
+static void LoadJson(const std::string& path, json& out) {
+	std::ifstream in(path);
+	out = json::parse(in, nullptr, false);
+	in.close();
+	if (out.is_object() && out.contains("AchievementData") && out["AchievementData"].is_array()) return;
+	logger::error("{} is missing or unreadable, starting empty (previous copy kept as .bak).", path);
+	std::error_code ec;
+	fs::copy_file(path, path + ".bak", fs::copy_options::overwrite_existing, ec);
+	out = { {"SchemaVersion", 1}, {"AchievementData", json::array()} };
+	WriteJson(path, out);
+}
+
 Serializer::Serializer() {
 
 }
@@ -127,9 +156,7 @@ struct SerializedAchievement Serializer::DeserializeAchievementData(std::string 
         if (!std::filesystem::exists(filename)) {
             return SerializedAchievement("NULL", false, -1);
         }
-		std::ifstream inFile(filename);
-		inFile >> jsonData;
-		inFile.close();
+		LoadJson(filename, jsonData);
 	}
 	catch (const fs::filesystem_error& e) {
 		logger::error("Filesystem error: {}", e.what());
@@ -149,9 +176,7 @@ struct SerializedAchievement Serializer::DeserializeAchievementData(std::string 
 
 struct SerializedAchievement Serializer::DeserializeAchievementData_GLOBAL(std::string name) {
 	try {
-		std::ifstream inFile(GetFilename(true));
-		inFile >> jsonData_GLOBAL;
-		inFile.close();
+		LoadJson(GetFilename(true), jsonData_GLOBAL);
 	}
 	catch (const fs::filesystem_error& e) {
 		logger::error("Filesystem error: {}", e.what());
@@ -173,9 +198,7 @@ struct SerializedAchievement Serializer::DeserializeAchievementData_GLOBAL(std::
 void Serializer::Save() {
 	std::string filename = this->GetFilename(false);
 	try {
-		std::ofstream outFile(filename);
-		outFile << jsonData.dump(4);
-		outFile.close();
+		WriteJson(filename, jsonData);
 	}
 	catch (const fs::filesystem_error& e) {
 		logger::error("Filesystem error: {}", e.what());
@@ -184,9 +207,7 @@ void Serializer::Save() {
 void Serializer::Save_GLOBAL() {
 	std::string filename = this->GetFilename(true);
 	try {
-		std::ofstream outFile(filename);
-		outFile << jsonData_GLOBAL.dump(4);
-		outFile.close();
+		WriteJson(filename, jsonData_GLOBAL);
 	}
 	catch (const fs::filesystem_error& e) {
 		logger::error("Filesystem error: {}", e.what());
@@ -194,34 +215,15 @@ void Serializer::Save_GLOBAL() {
 }
 
 void Serializer::CreateFileIfNotExists() {
-	std::string fileName = GetFilename(false);
-	try {
-		if (!fs::exists(DIRECTORY_PATH)) {
-			fs::create_directories(DIRECTORY_PATH);
-		}
-		if (fs::exists(fileName)) return;
+	std::error_code ec;
+	fs::create_directories(DIRECTORY_PATH, ec);
+	// The two files are independent: one existing must not skip creating the other
+	if (!fs::exists(GetFilename(false), ec)) {
+		jsonData = { {"SchemaVersion", 1}, {"AchievementData", json::array()} };
+		this->Save();
 	}
-	catch (const fs::filesystem_error& e) {
-		logger::error("Filesystem error: {}", e.what());
+	if (!fs::exists(GetFilename(true), ec)) {
+		jsonData_GLOBAL = { {"SchemaVersion", 1}, {"AchievementData", json::array()} };
+		this->Save_GLOBAL();
 	}
-	jsonData["SchemaVersion"] = 1;
-	jsonData["AchievementData"] = json::array();
-	this->Save();
-
-	fileName = GetFilename(true);
-	try {
-		if (!fs::exists(DIRECTORY_PATH)) {
-			fs::create_directories(DIRECTORY_PATH);
-		}
-		if (fs::exists(fileName)) return;
-	}
-	catch (const fs::filesystem_error& e) {
-		logger::error("Filesystem error: {}", e.what());
-	}
-	jsonData_GLOBAL["SchemaVersion"] = 1;
-	jsonData_GLOBAL["AchievementData"] = json::array();
-
-
-	
-	this->Save_GLOBAL();
 }

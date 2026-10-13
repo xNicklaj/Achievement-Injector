@@ -2,6 +2,17 @@
 #include "CommonFunctions.h"
 #include "settings.h"
 
+// Scaleform and the save file both need UTF-8; accept ANSI-saved files by converting them
+static std::string ToUtf8(const std::string& s) {
+    const int len = static_cast<int>(s.size());
+    if (len == 0 || MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, s.data(), len, nullptr, 0) > 0) return s;
+    std::wstring wide(MultiByteToWideChar(CP_ACP, 0, s.data(), len, nullptr, 0), L'\0');
+    MultiByteToWideChar(CP_ACP, 0, s.data(), len, wide.data(), static_cast<int>(wide.size()));
+    std::string out(WideCharToMultiByte(CP_UTF8, 0, wide.data(), static_cast<int>(wide.size()), nullptr, 0, nullptr, nullptr), '\0');
+    WideCharToMultiByte(CP_UTF8, 0, wide.data(), static_cast<int>(wide.size()), out.data(), static_cast<int>(out.size()), nullptr, nullptr);
+    return out;
+}
+
 LocalizationManager::LocalizationManager() {
     this->currentLocale = std::string(RE::GetINISetting("sLanguage:General")->GetString()).substr(0,2);
     logger::info("Game settings is {}.", this->currentLocale);
@@ -80,7 +91,7 @@ std::map<std::string, std::string> LocalizationManager::ReadLocalizationFile(con
         fileString = utf16to8(filename);
     } else {
         buffer << file.rdbuf();
-        fileString = buffer.str();
+        fileString = ToUtf8(buffer.str());
     }
 
     std::istringstream iss(fileString);
