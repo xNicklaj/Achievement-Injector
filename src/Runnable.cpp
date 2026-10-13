@@ -25,6 +25,7 @@ void Runnable::push_back(json jsonData) {
 		}
 		else {
 			logger::warn("Found runnable with unknown type. Skipping.");
+			continue;
 
 		}
 
@@ -48,10 +49,9 @@ int Runnable::RunAll() {
 			logger::info("Running papyrus script: {} with function: {}", runnable.arg01, runnable.arg02);
 			RE::BSScript::IVirtualMachine* vm = RE::BSScript::Internal::VirtualMachine::GetSingleton();
 			RE::BSTSmartPointer<RE::BSScript::IStackCallbackFunctor> callback = nullptr;
-			RE::TESForm* form = GetForm("000D62", "testscript.esl");
-			RE::VMHandle handle = vm->GetObjectHandlePolicy()->GetHandleForObject(RE::FormType::Quest, form);
 			auto args = RE::MakeFunctionArguments();
-			vm->DispatchMethodCall(handle, runnable.arg01, runnable.arg02, args, callback);
+			// The JSON carries no form to bind to, so the function must be Global
+			vm->DispatchStaticCall(runnable.arg01, runnable.arg02, args, callback);
 			//NativePapyrus::RunScript(runnable.arg01, runnable.arg02);
 			i++;
 		}

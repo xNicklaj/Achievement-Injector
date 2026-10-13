@@ -67,7 +67,12 @@ void ReadAchievementDirectory(std::vector<AchievementFile>* achievementFiles, st
                 struct AchievementFile achievementFile;
                 // Read JSON files
                 try {
+                    tmp = json();
                     ReadJson(entry.path().string(), &tmp);
+                    // Fail here, where it is caught, if a required field is missing or mistyped
+                    (void) tmp.at("groupName").get<std::string>();
+                    (void) tmp.at("plugin").get<std::string>();
+                    (void) tmp.value("showInMenu", true);
                 } catch (const std::exception& e) {
                     logger::error("Error reading JSON file: {}", e.what());
                     logger::error("Skipping file {}.", entry.path().string());
@@ -99,7 +104,7 @@ void ReadAchievementDirectory(std::vector<AchievementFile>* achievementFiles, st
         } else {
             logger::warn("Path {} does not exist or is not a directory.", directoryPath);
         }
-    } catch (const fs::filesystem_error& e) {
+    } catch (const std::exception& e) {
         logger::error("Filesystem error: {}", e.what());
     }
 }
@@ -129,7 +134,11 @@ void MessageHandler(SKSE::MessagingInterface::Message* a_msg) {
                 ag.SetShowInMenu(achievementFile.showInMenu);
                 ag.SetId(StripExtension(achievementFile.path));
                 for (json achievement: achievementFile.FileData) {
-                    ag.achievements.push_back(new Achievement(achievement, ag.plugin, StripExtension(achievementFile.path)));
+                    try {
+                        ag.achievements.push_back(new Achievement(achievement, ag.plugin, StripExtension(achievementFile.path)));
+                    } catch (const std::exception& e) {
+                        logger::error("Skipping malformed achievement in {}: {}", achievementFile.path, e.what());
+                    }
                 }
                 AchievementManager::GetSingleton()->achievementGroups.push_back(ag);
             }
@@ -162,7 +171,7 @@ void MessageHandler(SKSE::MessagingInterface::Message* a_msg) {
     }
 }
 
-extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const LoadInterface* skse) {
+SKSEPluginLoad(const LoadInterface* skse) {
     //WaitForDebugger();
     Init(skse);
     SetupLog(true);
