@@ -429,67 +429,57 @@
             "conditions": [
                 {
                     "type": "LocationDiscovery",
-                    "locationID": "$Guardian Stones",
+                    "formID": "01BABD",
                     "worldspaceID": "Tamriel"
                 },
                 {
                     "type": "LocationDiscovery",
-                    "locationID": "$Apprentice Stone",
+                    "formID": "01BAB9",
                     "worldspaceID": "Tamriel"
                 },
                 {
                     "type": "LocationDiscovery",
-                    "locationID": "$Atronach Stone",
+                    "formID": "0E0F4C",
                     "worldspaceID": "Tamriel"
                 },
                 {
                     "type": "LocationDiscovery",
-                    "locationID": "$Lady Stone",
+                    "formID": "0DED90",
                     "worldspaceID": "Tamriel"
                 },
                 {
                     "type": "LocationDiscovery",
-                    "locationID": "$Lord Stone",
+                    "formID": "0E0F47",
                     "worldspaceID": "Tamriel"
                 },
                 {
                     "type": "LocationDiscovery",
-                    "locationID": "$Lover Stone",
+                    "formID": "01BABB",
                     "worldspaceID": "Tamriel"
                 },
                 {
                     "type": "LocationDiscovery",
-                    "locationID": "$Mage Stone",
+                    "formID": "0E0ED5",
                     "worldspaceID": "Tamriel"
                 },
                 {
                     "type": "LocationDiscovery",
-                    "locationID": "$Ritual Stone",
+                    "formID": "0DD9D5",
                     "worldspaceID": "Tamriel"
                 },
                 {
                     "type": "LocationDiscovery",
-                    "locationID": "$Serpent Stone",
+                    "formID": "0E0F69",
                     "worldspaceID": "Tamriel"
                 },
                 {
                     "type": "LocationDiscovery",
-                    "locationID": "$Shadow Stone",
+                    "formID": "0D3935",
                     "worldspaceID": "Tamriel"
                 },
                 {
                     "type": "LocationDiscovery",
-                    "locationID": "$Steed Stone",
-                    "worldspaceID": "Tamriel"
-                },
-                {
-                    "type": "LocationDiscovery",
-                    "locationID": "$Thief Stone",
-                    "worldspaceID": "Tamriel"
-                },
-                {
-                    "type": "LocationDiscovery",
-                    "locationID": "$Warrior Stone",
+                    "formID": "01BAC0",
                     "worldspaceID": "Tamriel"
                 }
             ]
