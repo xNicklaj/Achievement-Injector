@@ -223,16 +223,6 @@ Achievement::Achievement(json& jsonData, std::string plugin, std::string groupNa
         };
         if (a_condition) conditionMet.push_back(false);
     }
-    try {
-        for (auto& func : jsonData["onUnlock"]) {
-            if (func["type"].get<std::string>() == "command") {
-                this->rewardCommandList.push_back(func["command"].get<std::string>());
-            }
-        }
-    }catch(std::exception& e) {
-		logger::error("Error in Achievement constructor: {}", e.what());
-	}
-
 }
 
 void Achievement::ForceUnlock() {
@@ -330,9 +320,6 @@ void Achievement::OnConditionMet(void) {
         }
         this->RunAll();
 
-  //      for(std::string command : rewardCommandList) {
-  //          Papyrus::ConsoleUtil::ExecuteCommand(NULL, command);
-		//}
     }
     this->eventHandler.dispatch("SerializationRequested");
     //Serializer::GetSingleton()->SerializeAchievementData(this);
@@ -351,39 +338,6 @@ void Achievement::Localize() {
         this->achievementName = LocalizationManager::GetSingleton()->GetLocalizedText(this->groupName, LocalizationManager::GetSingleton()->CurrentLocale(), achievementName);
     if (description[0] == '$') 
         this->description = LocalizationManager::GetSingleton()->GetLocalizedText(this->groupName, LocalizationManager::GetSingleton()->CurrentLocale(), description);
-}
-
-void Achievement::ToGFxValue(RE::GFxValue* gfxValue) {
-    // Create GFxValues for each member
-    RE::GFxValue nameVal, descriptionVal, unlockDatetimeVal;
-
-    nameVal.SetString(this->achievementName.c_str());               // GFxValue for name
-    descriptionVal.SetString(this->description.c_str()); // GFxValue for description
-    unlockDatetimeVal.SetNumber(static_cast<double>(Serializer::GetSingleton()->DeserializeAchievementData(this->achievementName).unlockDatetime)); // GFxValue for unlockDatetime
-
-    // Add these values to the gfxValue object
-    gfxValue->SetMember("name", &nameVal);
-    gfxValue->SetMember("description", &descriptionVal);
-    gfxValue->SetMember("unlockDatetime", &unlockDatetimeVal);
-}
-
-json Achievement::ToJson() {
-    json data = json::object();
-
-    std::string desc = this->description;
-    if (!this->unlocked && this->hidden && !Settings::GetSingleton()->GetShowHidden()) {
-        desc = "$ACH_HIDDEN";
-        // The menu shows this text untranslated; desc keeps the key if the lookup fails
-        SKSE::Translation::Translate("$ACH_HIDDEN", desc);
-    }
-
-    SerializedAchievement sa = Serializer::GetSingleton()->DeserializeAchievementData(this->achievementName);
-    data["AchievementName"] = this->achievementName;
-    data["Description"] = desc;
-    data["UnlockDatetime"] = sa.unlockDatetime;
-    data["Unlocked"] = Settings::GetSingleton()->GetGlobal() ? this->unlocked : sa.unlocked;
-    data["Icon"] = this->iconPath;
-    return data;
 }
 
 std::string Achievement::ToString() {

@@ -12,7 +12,6 @@ using json = nlohmann::json;
 
 std::string replaceAll(std::string, const std::string&, const std::string&);
 std::string NumToString(long);
-uint16_t CheckQuestStage(std::string FormID, std::string baseEsp);
 RE::ActorValue StringToActorValue(std::string value);
 std::string FormIDToString(RE::FormID formID);
 void ReadJson(const std::string& filePath, json* jsonData);
@@ -32,12 +31,9 @@ T* GetFormOfType(const std::string& FormID, const std::string& baseEsp) {
     return typed;
 }
 RE::FormID GetFormID(std::string FormID, std::string baseEsp);
-bool BindPapyrusFunctions(RE::BSScript::IVirtualMachine* vm);
-float GetGlobalVariableValue(RE::FormID formid);
 std::string GetPlayerName();
 bool isHex(const std::string& str);
 std::string StripExtension(const std::string& filename);
-std::string utf16to8(const std::string path);
 
 //Taken from https://github.com/powerof3/CLibUtil/blob/master/include/CLIBUtil/editorID.hpp
 namespace clib_util::editorID {

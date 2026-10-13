@@ -24,21 +24,6 @@ std::string NumToString(long num) {
     return oss.str();
 };
 
-uint16_t CheckQuestStage(std::string FormID, std::string baseEsp) {
-    // TODO dynamic esp
-    // Get the quest form using the Editor Form ID
-    auto* target = GetForm(FormID, baseEsp);
-    if (!target) {
-        logger::error("Could not find quest with FormID {} in {}.", FormID, baseEsp);
-        return 0;
-    }
-    const auto quest = RE::TESForm::LookupByID<RE::TESQuest>(target->formID);
-
-    // Get the current stage of the quest
-    auto currentStage = quest->GetCurrentStageID();
-    return currentStage;
-}
-
 RE::TESForm* GetForm(std::string FormID, std::string baseEsp = "Skyrim.esm") {
 	// Get the TESDataHandler instance
 	auto dataHandler = RE::TESDataHandler::GetSingleton();
@@ -122,30 +107,6 @@ std::string GetPlayerName() {
     return "";
 }
 
-namespace PopupQueue {
-    typedef struct {
-        std::string name;
-        std::string description;
-    } ShowEntryPayload;
-}
-
-float GetGlobalVariableValue(RE::FormID formid) {
-    auto dataHandler = RE::TESDataHandler::GetSingleton();
-    if (!dataHandler) {
-        logger::warn("TESDataHandler not found.");
-        return 0.0f;
-    }
-
-    for (auto& global : dataHandler->GetFormArray<RE::TESGlobal>()) {
-        if (global->GetFormID() == formid) {
-            return global->value;
-        }
-    }
-
-    logger::warn("Global variable with formid %s not found.", formid);
-    return 0.0f;
-}
-
 bool isHex(const std::string& str) {
     // Check if the string is empty
     if (str.empty()) {
@@ -169,20 +130,4 @@ std::string StripExtension(const std::string& filename) {
         return filename.substr(0, pos);
     }
     return filename; // Return the original string if no dot is found
-}
-
-std::string utf16to8(const std::string path) {
-    std::ifstream fin(path, std::ios::binary);
-    fin.seekg(0, std::ios::end);
-    size_t size = (size_t) fin.tellg();
-
-    //skip BOM
-    fin.seekg(2, std::ios::beg);
-    size -= 2;
-
-    std::u16string u16((size / 2) + 1, '\0');
-    fin.read((char*) &u16[0], size);
-
-    std::string utf8 = std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}.to_bytes(u16);
-    return utf8;
 }

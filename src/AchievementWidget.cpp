@@ -53,25 +53,6 @@ namespace Scaleform {
         }
     }
 
-    void AchievementWidget::SetPosition() {
-        auto ui = RE::UI::GetSingleton();
-        if (!ui || !ui->IsMenuOpen(AchievementWidget::MENU_NAME)) {
-            logger::debug("Bestiary Widget not open, couldn't set position");
-            return;
-        }
-        RE::GFxValue widget;
-        std::array<RE::GFxValue, 1> posArgs;
-        std::array<RE::GFxValue, 1> scaleArgs;
-        //posArgs[0] = widgetX;
-        //posArgs[1] = widgetY;
-        //scaleArgs[0] = widgetScale;
-        ui->GetMenu(AchievementWidget::MENU_NAME)->uiMovie->GetVariable(&widget, "_root.BestiaryWidget_mc");
-        widget.Invoke("setYPosition", nullptr, posArgs.data(), posArgs.size());
-        widget.Invoke("setScale", nullptr, scaleArgs.data(), scaleArgs.size());
-
-        //logger::info("Set widget position to X {} and Y {}, scale to {}", widgetX, widgetY, widgetScale);
-    }
-
     void AchievementWidget::Accept(RE::FxDelegateHandler::CallbackProcessor* a_cbReg) {
         a_cbReg->Process("PlaySound", PlaySound);
     }

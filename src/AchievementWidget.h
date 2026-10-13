@@ -22,7 +22,6 @@ namespace Scaleform {
         static void Hide();
         static void DisplayEntry(std::string, std::string, std::string);
         static void HideEntry();
-        static void SetPosition();
 
         static constexpr std::string_view Name();
 

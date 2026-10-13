@@ -32,9 +32,7 @@ public:
 	AchievementGroup(std::string name, std::string plugin, std::string iconPath);
     void ForceUnlock(std::string achievementName);
 	void SetShowInMenu(bool showInMenu_p) { this->showInMenu = showInMenu_p; }
-	void ToGFxValue(RE::GFxValue* gfxValue);
     void SetId(std::string id) { groupid = id; }
-	json ToJson();
     std::string ToString();
 };
 
@@ -51,7 +49,6 @@ public:
 	std::string lastUsedPlayerName = "";
 	const std::string& GetCache();
 
-	json ToJson();
     std::string ToString();
 	void UpdateCache();
 	void AddEventSink(std::function<void(AchievementUnlockedEvent*)> callback);

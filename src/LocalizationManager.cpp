@@ -35,7 +35,7 @@ void LocalizationManager::LoadLocalizations() {
             std::string groupName = filename.substr(0, filename.find_last_of('_'));
 
             // TODO Maybe read only my locale
-            localizations[std::tuple<std::string, std::string>(groupName, locale)] = LocalizationManager::ReadLocalizationFile(LOCALIZATION_PATH + filename, false);
+            localizations[std::tuple<std::string, std::string>(groupName, locale)] = LocalizationManager::ReadLocalizationFile(LOCALIZATION_PATH + filename);
         }
 	}
 
@@ -46,38 +46,13 @@ void LocalizationManager::LoadLocalizations() {
             std::string groupName = filename.substr(0, filename.find_last_of('_'));
 
             // TODO Maybe read only my locale
-            localizations[std::tuple<std::string, std::string>(groupName, locale)] = LocalizationManager::ReadLocalizationFile(LOCALIZATION_PATH_2 + filename, false);
+            localizations[std::tuple<std::string, std::string>(groupName, locale)] = LocalizationManager::ReadLocalizationFile(LOCALIZATION_PATH_2 + filename);
         }
     }
 
-    /*std::string lang = RE::GetINISetting("sLanguage:General")->GetString();
-    std::transform(lang.begin(), lang.end(), lang.begin(), [](unsigned char c) { return std::tolower(c); });
-
-    std::map<std::string, std::string> tempMap;
-    bool found = false;
-
-    if (std::filesystem::exists("Data/interface/translations/AchievementInjector_" + lang + ".txt")) {
-        tempMap = LocalizationManager::ReadLocalizationFile(std::filesystem::current_path().string() +
-                                                            "\\Data\\interface\\translations\\AchievementInjector_" + lang + ".txt", true);
-        if (tempMap.find("$ACH_HIDDEN") != tempMap.end()) {
-            found = true;
-            this->Ach_Hidden = tempMap["$ACH_HIDDEN"];
-        }
-    }
-    
-    if (!found && std::filesystem::exists("Data/interface/translations/AchievementInjector_english.txt")) {
-        tempMap = LocalizationManager::ReadLocalizationFile(
-            std::filesystem::current_path().string()  + "\\Data\\interface\\translations\\AchievementInjector_english.txt", true);
-        if (tempMap.find("$ACH_HIDDEN") != tempMap.end()) {
-            found = true;
-            this->Ach_Hidden = tempMap["$ACH_HIDDEN"];
-        }
-    }
-    
-    if (!found) this->Ach_Hidden = "Hidden Description";*/
 }
 
-std::map<std::string, std::string> LocalizationManager::ReadLocalizationFile(const std::string& filename, bool utf16) {
+std::map<std::string, std::string> LocalizationManager::ReadLocalizationFile(const std::string& filename) {
     std::map<std::string, std::string> keyValueMap;
     std::stringstream buffer;
     std::ifstream file(filename);
@@ -89,12 +64,8 @@ std::map<std::string, std::string> LocalizationManager::ReadLocalizationFile(con
         return keyValueMap;
     }
 
-    if (utf16) {
-        fileString = utf16to8(filename);
-    } else {
-        buffer << file.rdbuf();
-        fileString = ToUtf8(buffer.str());
-    }
+    buffer << file.rdbuf();
+    fileString = ToUtf8(buffer.str());
 
     std::istringstream iss(fileString);
 

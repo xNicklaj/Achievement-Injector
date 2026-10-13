@@ -27,8 +27,6 @@ public:
     std::vector<int> GetConditionsState(void);
     void ForceUnlock();
     void Localize();
-    void ToGFxValue(RE::GFxValue* gfxValue);
-    json ToJson();
     std::string ToString();
 
     eventpp::EventDispatcher<std::string, void()> eventHandler;
@@ -48,7 +46,6 @@ public:
     std::vector<bool> conditionMet;
 private:
     ConditionsJoinType joinType;
-    std::vector<std::string> rewardCommandList;
 };
 
 #endif
