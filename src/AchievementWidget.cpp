@@ -21,7 +21,8 @@ namespace Scaleform {
             });
 
         inputContext = Context::kNone;
-        depthPriority = 0;
+        // Above HUD Menu (2), which hosts the SkyUI widgets
+        depthPriority = 3;
         menuFlags.set(RE::UI_MENU_FLAGS::kAllowSaving, RE::UI_MENU_FLAGS::kCustomRendering,
             RE::UI_MENU_FLAGS::kAssignCursorToRenderer);
     }
@@ -83,15 +84,17 @@ namespace Scaleform {
     }
 
     void AchievementWidget::DisplayEntry(std::string name, std::string description, std::string sound = "") {
+        static int failures = 0;  // consecutive attempts that found no widget
         auto ui = RE::UI::GetSingleton();
         RE::GFxValue widget;
         auto menu = ui->GetMenu(AchievementWidget::MENU_NAME); 
-        if (menu == nullptr || (menu != nullptr && !menu->uiMovie->GetVisible())) {
+        if (menu == nullptr || (menu != nullptr && (!menu->uiMovie || !menu->uiMovie->GetVisible()))) {
             AchievementWidget::Show();
             menu = ui->GetMenu(AchievementWidget::MENU_NAME);
         }
         // Maybe at some point understand why this is null with racemenu and skyrim unbound reborn
-        if (menu != nullptr && ui->GetMenu(AchievementWidget::MENU_NAME)->uiMovie->GetVariable(&widget, "_root.AchievementWidget_mc")) {
+        if (menu != nullptr && menu->uiMovie && menu->uiMovie->GetVariable(&widget, "_root.AchievementWidget_mc")) {
+            failures = 0;
             std::array<RE::GFxValue, 1> nameArgs;
             std::array<RE::GFxValue, 1> descriptionArgs;
             std::array<RE::GFxValue, 3> showArgs;
@@ -123,18 +126,30 @@ namespace Scaleform {
             }
             std::jthread t(HideEntry);
             t.detach();
+        } else {
+            // Widget not up yet (Show is async): queue it again instead of dropping the popup.
+            // Capped at about a minute so a missing SWF does not retry for the whole session.
+            if (++failures <= 15)
+                DisplayEntryWithWait(std::make_tuple(name, description, sound));
+            else
+                logger::error("Achievement widget unavailable, dropping popup for {}.", name);
         }
     }
 
     void AchievementWidget::HideEntry() {
         std::this_thread::sleep_for(std::chrono::seconds(3));
-        auto ui = RE::UI::GetSingleton();
-        RE::GFxValue widget;
-        if (ui->GetMenu(AchievementWidget::MENU_NAME)->uiMovie->GetVariable(&widget, "_root.AchievementWidget_mc")) {
-            std::array<RE::GFxValue, 2> hideArgs;
-            hideArgs[0] = false;
-            hideArgs[1] = false;
-            widget.Invoke("ShowNotification", nullptr, hideArgs.data(), hideArgs.size());
-        }
+        // Scaleform may only be touched from the UI thread
+        SKSE::GetTaskInterface()->AddUITask([]() {
+            auto ui = RE::UI::GetSingleton();
+            if (!ui) return;
+            RE::GFxValue widget;
+            auto menu = ui->GetMenu(AchievementWidget::MENU_NAME);
+            if (menu != nullptr && menu->uiMovie && menu->uiMovie->GetVariable(&widget, "_root.AchievementWidget_mc")) {
+                std::array<RE::GFxValue, 2> hideArgs;
+                hideArgs[0] = false;
+                hideArgs[1] = false;
+                widget.Invoke("ShowNotification", nullptr, hideArgs.data(), hideArgs.size());
+            }
+        });
     }
 }

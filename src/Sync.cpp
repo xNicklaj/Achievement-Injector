@@ -6,7 +6,7 @@
 
 
 std::queue<std::tuple<std::string, std::string, std::string>> entryQueue;
-bool isDisplayingEntry = false;
+std::atomic<bool> isDisplayingEntry = false;
 std::mutex entryMutex;
 
 void ProcessQueue() {
@@ -14,7 +14,7 @@ void ProcessQueue() {
         std::unique_lock<std::mutex> lock(entryMutex);
         auto ui = RE::UI::GetSingleton();
 
-        if (!entryQueue.empty() && !isDisplayingEntry && !ui->GameIsPaused()) {
+        if (ui && !entryQueue.empty() && !isDisplayingEntry && !ui->GameIsPaused()) {
             std::tuple<std::string, std::string, std::string> args = entryQueue.front();
             entryQueue.pop();
 
@@ -22,7 +22,10 @@ void ProcessQueue() {
 
             isDisplayingEntry = true;
 
-            Scaleform::AchievementWidget::DisplayEntry(std::get<0>(args), std::get<1>(args), std::get<2>(args));
+            // Scaleform may only be touched from the UI thread
+            SKSE::GetTaskInterface()->AddUITask([args]() {
+                Scaleform::AchievementWidget::DisplayEntry(std::get<0>(args), std::get<1>(args), std::get<2>(args));
+            });
 
             std::this_thread::sleep_for(std::chrono::seconds(4));
 

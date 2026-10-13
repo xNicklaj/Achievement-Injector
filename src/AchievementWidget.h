@@ -28,6 +28,9 @@ namespace Scaleform {
 
         virtual void Accept(RE::FxDelegateHandler::CallbackProcessor* a_cbReg) override;
 
+        // Always open and above other menus: the default handler swallows Scaleform input meant for them
+        RE::UI_MESSAGE_RESULTS ProcessMessage(RE::UIMessage&) override { return RE::UI_MESSAGE_RESULTS::kPassOn; }
+
         static RE::stl::owner<RE::IMenu*> Creator() { return new AchievementWidget(); }
 
     private:

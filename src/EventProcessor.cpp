@@ -45,6 +45,13 @@ RE::BSEventNotifyControl EventProcessor::ProcessEvent(const RE::MenuOpenCloseEve
         Scaleform::AchievementWidget::Show();
     }
 
+    // The popup must sit above the HUD (depth 2) but below the tween menu (depth 0), which depth alone
+    // cannot express: hide it while the tween menu is up
+    if (event->menuName == RE::TweenMenu::MENU_NAME) {
+        auto menu = RE::UI::GetSingleton()->GetMenu(Scaleform::AchievementWidget::MENU_NAME);
+        if (menu && menu->uiMovie) menu->uiMovie->SetVisible(!event->opening);
+    }
+
     if (!event->opening && event->menuName == "RaceSex Menu") {
         logger::debug("RaceMenu closed. Player's name is: {}", RE::PlayerCharacter::GetSingleton()->GetName());
         Settings::GetSingleton()->bIsNewGame = false;
