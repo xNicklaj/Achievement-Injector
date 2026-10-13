@@ -39,27 +39,6 @@ uint16_t CheckQuestStage(std::string FormID, std::string baseEsp) {
     return currentStage;
 }
 
-template <typename T>
-T GetFormOfType(std::string FormID, std::string baseEsp = "Skyrim.esm") {
-    // Get the TESDataHandler instance
-    auto dataHandler = RE::TESDataHandler::GetSingleton();
-    if (!dataHandler) {
-        logger::error("Failed to get TESDataHandler instance.");
-        return nullptr;
-    }
-
-    RE::FormID actualFormID;
-    std::istringstream converter(FormID);
-    converter >> std::hex >> actualFormID;
-    const auto form = RE::TESDataHandler::GetSingleton()->LookupForm<T>(actualFormID, baseEsp);
-    if (!form) {
-        //logger::error("Failed to find form with Form ID {} and IntFormID {} in plugin {}", FormID, actualFormID, baseEsp);
-        return nullptr;
-    }
-
-    return form;
-}
-
 RE::TESForm* GetForm(std::string FormID, std::string baseEsp = "Skyrim.esm") {
 	// Get the TESDataHandler instance
 	auto dataHandler = RE::TESDataHandler::GetSingleton();

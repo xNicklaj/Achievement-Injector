@@ -4,7 +4,7 @@ extern void RegisterPostLoadFunction(Condition* condition);
 
 SpellLearnedCondition::SpellLearnedCondition() : Condition(ConditionType::SpellLearned) {}
 void SpellLearnedCondition::OnDataLoaded(void) {
-    this->cachedSpell = static_cast<RE::SpellItem*>(GetForm(this->FormID, this->plugin));
+    this->cachedSpell = GetFormOfType<RE::SpellItem>(this->FormID, this->plugin);
     CheckCondition();
 }
 void SpellLearnedCondition::EnableListener(void)

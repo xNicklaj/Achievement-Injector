@@ -9,7 +9,7 @@ void QuestObjectiveDoneCondition::SetConditionParameters(std::string formID_a, i
 }
 void QuestObjectiveDoneCondition::OnDataLoaded(void) {
     // Check that quest hasn't been completed already
-    this->quest = static_cast<RE::TESQuest*>(GetForm(this->formID, this->plugin));
+    this->quest = GetFormOfType<RE::TESQuest>(this->formID, this->plugin);
     CheckCondition();
 }
 void QuestObjectiveDoneCondition::EnableListener(void)

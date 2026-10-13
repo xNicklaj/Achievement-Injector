@@ -7,7 +7,7 @@ PlayerCrimeCondition::PlayerCrimeCondition() : Condition(ConditionType::NotSet) 
 void PlayerCrimeCondition::OnDataLoaded(void) {
 	this->cachedFactions.clear();
 	for (const auto& id : this->factionIDs) {
-		auto faction = static_cast<RE::TESFaction*>(GetForm(id, this->plugin));
+		auto faction = GetFormOfType<RE::TESFaction>(id, this->plugin);
 		if(faction) this->cachedFactions.push_back(faction);
 	}
 	CheckCondition();

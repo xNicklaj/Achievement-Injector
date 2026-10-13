@@ -14,7 +14,7 @@ void HasPerksCondition::EnableListener(void) {
 void HasPerksCondition::OnDataLoaded(void) {
 	this->perks.clear();
 	for (const auto& formIDStr : this->formIDs) {
-		auto perk = static_cast<RE::BGSPerk*>(GetForm(formIDStr, this->plugin));
+		auto perk = GetFormOfType<RE::BGSPerk>(formIDStr, this->plugin);
 		if (perk) {
 			this->perks.push_back(perk);
 		} else {
@@ -29,7 +29,7 @@ bool HasPerksCondition::CheckCondition() {
 	
 	if (this->perks.empty()) {
 		for (const auto& formIDStr : this->formIDs) {
-			auto perk = static_cast<RE::BGSPerk*>(GetForm(formIDStr, this->plugin));
+			auto perk = GetFormOfType<RE::BGSPerk>(formIDStr, this->plugin);
 			if (perk) {
 				this->perks.push_back(perk);
 			}

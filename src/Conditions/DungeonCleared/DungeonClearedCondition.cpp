@@ -6,7 +6,7 @@ extern void RegisterPostLoadFunction(Condition* condition);
 
 DungeonClearedCondition::DungeonClearedCondition() : Condition(ConditionType::LocationCleared) {}
 void DungeonClearedCondition::OnDataLoaded(void) {
-    this->cachedLoc = static_cast<RE::BGSLocation*>(GetForm(this->formid, this->plugin));
+    this->cachedLoc = GetFormOfType<RE::BGSLocation>(this->formid, this->plugin);
     CheckCondition();
 }
 void DungeonClearedCondition::EnableListener() {

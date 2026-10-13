@@ -11,7 +11,7 @@ void HasPerkCondition::EnableListener(void) {
 }
 
 void HasPerkCondition::OnDataLoaded(void) {
-	this->perk = static_cast<RE::BGSPerk*>(GetForm(this->formIDStr, this->plugin));
+	this->perk = GetFormOfType<RE::BGSPerk>(this->formIDStr, this->plugin);
 	if (!this->perk) {
 		logger::error("Failed to find perk {}", this->formIDStr);
 	}
@@ -22,7 +22,7 @@ bool HasPerkCondition::CheckCondition() {
 	if (this->isMet) return false;
 	
 	if (!this->perk) {
-		this->perk = static_cast<RE::BGSPerk*>(GetForm(this->formIDStr, this->plugin));
+		this->perk = GetFormOfType<RE::BGSPerk>(this->formIDStr, this->plugin);
 	}
 	
 	if (!this->perk) return false;

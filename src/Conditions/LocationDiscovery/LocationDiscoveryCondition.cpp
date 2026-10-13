@@ -61,7 +61,7 @@ RE::TESObjectREFR* FindMapMarkerByData(RE::MapMarkerData* a_data) {
 LocationDiscoveryCondition::LocationDiscoveryCondition() : Condition(ConditionType::LocationDiscovery) {}
 void LocationDiscoveryCondition::OnDataLoaded(void) {
     try {
-        if (this->formID != "") this->cachedRef = static_cast<RE::TESObjectREFR*>(GetForm(this->formID, this->plugin));
+        if (this->formID != "") this->cachedRef = GetFormOfType<RE::TESObjectREFR>(this->formID, this->plugin);
         if (CheckKnownLocation(this->locationName, this->formID, this->plugin)) {
             logger::info("Player met condition found {} in {}.", this->formID != "" ? this->formID : this->locationName, this->worldspaceID);
             this->UnlockNotify();

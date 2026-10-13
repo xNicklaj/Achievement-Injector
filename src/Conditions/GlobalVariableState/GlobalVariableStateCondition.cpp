@@ -5,7 +5,7 @@ extern void RegisterPostLoadFunction(Condition* condition);
 
 GlobalVariableStateCondition::GlobalVariableStateCondition(void) : Condition(ConditionType::GlobalVariableState) {};
 void GlobalVariableStateCondition::OnDataLoaded(void) {
-	this->cachedGlobal = static_cast<RE::TESGlobal*>(GetForm(this->formID, this->plugin));
+	this->cachedGlobal = GetFormOfType<RE::TESGlobal>(this->formID, this->plugin);
 	CheckCondition();
 };
 void GlobalVariableStateCondition::EnableListener(void) {

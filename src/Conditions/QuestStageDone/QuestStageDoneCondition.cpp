@@ -9,7 +9,7 @@ void QuestStageDoneCondition::SetConditionParameters(std::string formID_a, std::
     this->stage = stage_a;
 }
 void QuestStageDoneCondition::OnDataLoaded(void) {
-    this->cachedQuest = static_cast<RE::TESQuest*>(GetForm(this->formID, this->plugin));
+    this->cachedQuest = GetFormOfType<RE::TESQuest>(this->formID, this->plugin);
     CheckCondition();
 }
 void QuestStageDoneCondition::EnableListener(void)

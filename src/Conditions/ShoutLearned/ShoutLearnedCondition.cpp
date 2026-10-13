@@ -4,7 +4,7 @@ extern void RegisterPostLoadFunction(Condition* condition);
 
 ShoutLearnedCondition::ShoutLearnedCondition() : Condition(ConditionType::SpellLearned) {}
 void ShoutLearnedCondition::OnDataLoaded(void) {
-	this->cachedShout = static_cast<RE::TESShout*>(GetForm(this->FormID, this->plugin));
+	this->cachedShout = GetFormOfType<RE::TESShout>(this->FormID, this->plugin);
     CheckCondition();
 }
 void ShoutLearnedCondition::EnableListener(void)

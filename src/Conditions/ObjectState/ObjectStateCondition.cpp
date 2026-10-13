@@ -17,7 +17,7 @@ void ObjectStateCondition::SetConditionParameters(std::string formID_a, bool sta
 bool ObjectStateCondition::CheckCondition() {
     if (this->isMet)
         return true;
-    RE::TESObjectREFR* target = static_cast<RE::TESObjectREFR*>(GetForm(this->formID, this->plugin));
+    RE::TESObjectREFR* target = GetFormOfType<RE::TESObjectREFR>(this->formID, this->plugin);
     if (!target)
         return false;
     logger::debug("Object {} is {}.", this->formID, !target->IsDisabled() ? "ENABLED" : "DISABLED");

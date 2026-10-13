@@ -16,9 +16,21 @@ uint16_t CheckQuestStage(std::string FormID, std::string baseEsp);
 RE::ActorValue StringToActorValue(std::string value);
 std::string FormIDToString(RE::FormID formID);
 void ReadJson(const std::string& filePath, json* jsonData);
-template <typename T>
-RE::TESForm* GetFormOfType(std::string FormID, std::string baseEsp);
 RE::TESForm* GetForm(std::string FormID, std::string baseEsp);
+// GetForm for callers that need a specific record type: a form ID that resolves to another
+// type is logged and treated as not found, instead of being cast blindly
+template <class T>
+T* GetFormOfType(const std::string& FormID, const std::string& baseEsp) {
+    RE::TESForm* form = GetForm(FormID, baseEsp);
+    if (!form) return nullptr;
+    T* typed;
+    if constexpr (std::is_same_v<T, RE::TESObjectREFR>) typed = form->AsReference();  // As<> rejects actor references
+    else typed = form->As<T>();
+    if (!typed)
+        logger::error("Form {} in {} is a {} record, expected {}.", FormID, baseEsp,
+                      RE::FormTypeToString(form->GetFormType()), RE::FormTypeToString(T::FORMTYPE));
+    return typed;
+}
 bool BindPapyrusFunctions(RE::BSScript::IVirtualMachine* vm);
 float GetGlobalVariableValue(RE::FormID formid);
 std::string GetPlayerName();

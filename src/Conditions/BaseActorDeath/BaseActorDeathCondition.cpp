@@ -6,7 +6,7 @@ extern void RegisterPostLoadFunction(Condition* condition);
 
 BaseActorDeathCondition::BaseActorDeathCondition() : Condition(ConditionType::BaseActorDeath){};
 void BaseActorDeathCondition::OnDataLoaded(void) {
-	if (this->isFormID) this->cachedNPC = static_cast<RE::TESNPC*>(GetForm(this->identifier, this->plugin));
+	if (this->isFormID) this->cachedNPC = GetFormOfType<RE::TESNPC>(this->identifier, this->plugin);
 }
 void BaseActorDeathCondition::EnableListener(void) {
 	RegisterPostLoadFunction(this);
