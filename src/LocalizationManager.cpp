@@ -15,6 +15,8 @@ static std::string ToUtf8(const std::string& s) {
 
 LocalizationManager::LocalizationManager() {
     this->currentLocale = std::string(RE::GetINISetting("sLanguage:General")->GetString()).substr(0,2);
+    // Localization files are named <Group>_EN.txt, while the ini may say English or ENGLISH
+    std::transform(this->currentLocale.begin(), this->currentLocale.end(), this->currentLocale.begin(), [](unsigned char c) { return static_cast<char>(std::toupper(c)); });
     logger::info("Game settings is {}.", this->currentLocale);
     this->LoadLocalizations();
 }
