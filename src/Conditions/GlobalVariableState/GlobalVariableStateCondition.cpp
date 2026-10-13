@@ -19,7 +19,7 @@ void GlobalVariableStateCondition::SetConditionParameters(std::string formID_a, 
 bool GlobalVariableStateCondition::CheckCondition() {
 	if(this->isMet) return true;
 	if (!this->cachedGlobal) return false;
-	float globValue = GetGlobalVariableValue(this->cachedGlobal->formID);
+	float globValue = this->cachedGlobal->value;
 	if(globValue >= this->value) {
 		this->UnlockNotify();
 		RE::PlayerCharacter::GetSingleton()->AsPositionPlayerEventSource()->RemoveEventSink(this);

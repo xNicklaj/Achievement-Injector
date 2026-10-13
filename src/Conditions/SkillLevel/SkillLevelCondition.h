@@ -11,6 +11,7 @@ public:
 
 	std::string skill;
 	int level = 0;
+	RE::ActorValue cachedSkill = RE::ActorValue::kNone;
 
 private:
 	RE::BSEventNotifyControl ProcessEvent(const RE::SkillIncrease::Event* a_event, RE::BSTEventSource<RE::SkillIncrease::Event>*) override;

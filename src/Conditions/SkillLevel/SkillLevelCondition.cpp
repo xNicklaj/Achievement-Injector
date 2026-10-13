@@ -14,13 +14,14 @@ void PlayerSkillLevelCondition::EnableListener(void)
 void PlayerSkillLevelCondition::SetConditionParameters(std::string skill_a, int level_a) {
     this->level = level_a;
     this->skill = skill_a;
+    this->cachedSkill = StringToActorValue(skill_a);
 }
 RE::BSEventNotifyControl PlayerSkillLevelCondition::ProcessEvent(const RE::SkillIncrease::Event* a_event, RE::BSTEventSource<RE::SkillIncrease::Event>*) {
-    if (StringToActorValue(this->skill) == a_event->actorValue) this->CheckCondition();
+    if (this->cachedSkill == a_event->actorValue) this->CheckCondition();
     return RE::BSEventNotifyControl::kContinue;
 }
 bool PlayerSkillLevelCondition::CheckCondition() {
-    RE::ActorValue skill_l = StringToActorValue(this->skill);
+    RE::ActorValue skill_l = this->cachedSkill;
     float skillLevel = RE::PlayerCharacter::GetSingleton()->AsActorValueOwner()->GetActorValue(skill_l);
     if (!this->isMet && skillLevel >= this->level) {
         logger::info("Skill {} met condition level {}", this->skill, skillLevel);
