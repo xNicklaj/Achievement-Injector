@@ -35,6 +35,9 @@ private:
 	const std::string& path = "DATA/SKSE/Plugins/AchievementInjector/UnlockedAchievements_{}.json";
 	json jsonData;
 	json jsonData_GLOBAL;
+	// File each json above was read from: it is only re-read when the path changes (character switch)
+	std::string loadedPath;
+	std::string loadedPath_GLOBAL;
 };
 
 #endif

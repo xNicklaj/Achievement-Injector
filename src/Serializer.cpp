@@ -153,10 +153,13 @@ struct SerializedAchievement Serializer::DeserializeAchievementData(std::string 
 
 	try {
         std::string filename = GetFilename(false);
-        if (!std::filesystem::exists(filename)) {
-            return SerializedAchievement("NULL", false, -1);
+        if (filename != loadedPath) {
+            if (!std::filesystem::exists(filename)) {
+                return SerializedAchievement("NULL", false, -1);
+            }
+            LoadJson(filename, jsonData);
+            loadedPath = filename;
         }
-		LoadJson(filename, jsonData);
 	}
 	catch (const fs::filesystem_error& e) {
 		logger::error("Filesystem error: {}", e.what());
@@ -176,7 +179,11 @@ struct SerializedAchievement Serializer::DeserializeAchievementData(std::string 
 
 struct SerializedAchievement Serializer::DeserializeAchievementData_GLOBAL(std::string name) {
 	try {
-		LoadJson(GetFilename(true), jsonData_GLOBAL);
+		std::string filename = GetFilename(true);
+		if (filename != loadedPath_GLOBAL) {
+			LoadJson(filename, jsonData_GLOBAL);
+			loadedPath_GLOBAL = filename;
+		}
 	}
 	catch (const fs::filesystem_error& e) {
 		logger::error("Filesystem error: {}", e.what());
