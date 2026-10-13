@@ -35,6 +35,25 @@ static void LoadJson(const std::string& path, json& out) {
 	WriteJson(path, out);
 }
 
+// Entries come from a file users edit and older versions wrote: a missing or mistyped field must not throw
+static bool IsEntry(const json& entry, const std::string& name) {
+	return entry.is_object() && entry.value("AchievementName", json()) == name;
+}
+
+static bool IsUnlocked(const json& entry) {
+	return entry.is_object() && entry.value("Unlocked", json()) == true;
+}
+
+static bool ReadEntry(const json& entry, const std::string& name, SerializedAchievement& out) {
+	if (!IsEntry(entry, name)) return false;
+	const json date = entry.value("UnlockDatetime", json());
+	const json state = entry.value("ConditionsState", json());
+	out = { name, IsUnlocked(entry), date.is_number_integer() ? date.get<int64_t>() : -1, {} };
+	// A bad value keeps its slot as 0: conditions are matched by position
+	if (state.is_array()) for (const json& value : state) out.conditionsState.push_back(value.is_number_integer() ? value.get<int>() : 0);
+	return true;
+}
+
 Serializer::Serializer() {
 
 }
@@ -62,6 +81,8 @@ std::string Serializer::GetFilename(bool useGlobal) const {
 		std::string playerName = RE::PlayerCharacter::GetSingleton()->GetName();
 		std::transform(playerName.begin(), playerName.end(), playerName.begin(), [](unsigned char c) { return std::toupper(c); });
 		playerName.erase(std::remove(playerName.begin(), playerName.end(), ' '), playerName.end());
+		// Characters Windows refuses in a file name would leave this character without a save file
+		for (char& c : playerName) if (static_cast<unsigned char>(c) < 32 || std::string_view("<>:\"/\\|?*").find(c) != std::string_view::npos) c = '_';
 
 		fileName = fmt::format(FILENAME, playerName);
 	}
@@ -80,7 +101,9 @@ void Serializer::SerializeAchievementData(Achievement* achievement) {
 	auto achievementData = jsonData["AchievementData"].get<std::vector<json>>();
 	bool remove = false;
     for (const auto& entry : achievementData) {
-        if (entry["AchievementName"] == achievement->achievementName) {
+        if (IsEntry(entry, achievement->achievementName)) {
+			// Keep the first unlock date: other conditions of an OR achievement still ask for saves after it unlocked
+			if (IsUnlocked(entry)) return;
 			remove = true;
             break;
         }
@@ -89,7 +112,7 @@ void Serializer::SerializeAchievementData(Achievement* achievement) {
 		achievementData.erase(
 			std::remove_if(achievementData.begin(), achievementData.end(),
 				[&achievement](const json& entry) {
-					return entry["AchievementName"] == achievement->achievementName;
+					return IsEntry(entry, achievement->achievementName);
 				}),
 			achievementData.end()
 		);
@@ -113,8 +136,8 @@ void Serializer::SerializeAchievementData_GLOBAL(Achievement* achievement) {
 	auto achievementData = jsonData_GLOBAL["AchievementData"].get<std::vector<json>>();
 	bool remove = false;
 	for (const auto& entry : achievementData) {
-		if (entry["AchievementName"] == achievement->achievementName) {
-			if (entry["Unlocked"]) return;
+		if (IsEntry(entry, achievement->achievementName)) {
+			if (IsUnlocked(entry)) return;
 			remove = true;
 			break;
 		}
@@ -123,7 +146,7 @@ void Serializer::SerializeAchievementData_GLOBAL(Achievement* achievement) {
 		achievementData.erase(
 			std::remove_if(achievementData.begin(), achievementData.end(),
 				[&achievement](const json& entry) {
-					return entry["AchievementName"] == achievement->achievementName;
+					return IsEntry(entry, achievement->achievementName);
 				}),
 			achievementData.end()
 		);
@@ -164,15 +187,9 @@ struct SerializedAchievement Serializer::DeserializeAchievementData(std::string 
 	catch (const fs::filesystem_error& e) {
 		logger::error("Filesystem error: {}", e.what());
 	}
-	for (json& achievement : jsonData["AchievementData"]) {
-		if (achievement["AchievementName"] == name) {
-			return SerializedAchievement({
-				achievement["AchievementName"],
-				achievement["Unlocked"],
-				achievement["UnlockDatetime"],
-				achievement["ConditionsState"]
-			});
-		}
+	for (const json& entry : jsonData["AchievementData"]) {
+		SerializedAchievement found;
+		if (ReadEntry(entry, name, found)) return found;
 	}
 	return SerializedAchievement("NULL", false, -1);
 }
@@ -188,15 +205,9 @@ struct SerializedAchievement Serializer::DeserializeAchievementData_GLOBAL(std::
 	catch (const fs::filesystem_error& e) {
 		logger::error("Filesystem error: {}", e.what());
 	}
-	for (json& achievement : jsonData_GLOBAL["AchievementData"]) {
-		if (achievement["AchievementName"] == name) {
-			return SerializedAchievement({
-				achievement["AchievementName"],
-				achievement["Unlocked"],
-				achievement["UnlockDatetime"],
-				achievement["ConditionsState"]
-				});
-		}
+	for (const json& entry : jsonData_GLOBAL["AchievementData"]) {
+		SerializedAchievement found;
+		if (ReadEntry(entry, name, found)) return found;
 	}
 
 	return SerializedAchievement("NULL", false, -1);
