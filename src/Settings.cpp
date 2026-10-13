@@ -67,7 +67,6 @@ void Settings::LoadMCMSettings() const
 			AchievementManager::GetSingleton()->UpdateCache();
 		}
 		Settings::GetSingleton()->AssignValue<bool>(&ini, &(Settings::GetSingleton()->bUsePopup), "Main", "bUsePopup");
-		Settings::GetSingleton()->AssignValue<bool>(&ini, &(Settings::GetSingleton()->bDelayNewGameAlert), "Main", "bDelayNewGameAlert");
 		Settings::GetSingleton()->AssignValue<bool>(&ini, &(Settings::GetSingleton()->bShowHidden), "Main", "bShowHidden");
         Settings::GetSingleton()->AssignValue<int>(&ini, &(Settings::GetSingleton()->iWidgetYOffset), "Main", "iWidgetYOffset");
         Settings::GetSingleton()->AssignValue<float>(&ini, &(Settings::GetSingleton()->fWidgetScale), "Main", "fWidgetScale");
@@ -100,9 +99,4 @@ void Settings::LoadMCMSettings() const
 		
 	};
 	SerializeINI(defaultMCMPath, userMCMPath, load_mcm);
-}
-
-void Settings::SerializeMCM(std::function<void(CSimpleIniA&)> a_func)
-{
-	SerializeINI(defaultMCMPath, a_func);
 }

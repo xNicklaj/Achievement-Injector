@@ -55,7 +55,6 @@ void InitializePostLoad() {
 
     Scaleform::AchievementWidget::Show();
     AchievementManager::GetSingleton()->UpdateCache();
-    Settings::GetSingleton()->bInitialized = true;
 }
 
 void ReadAchievementDirectory(std::vector<AchievementFile>* achievementFiles, std::string directoryPath) {
@@ -149,7 +148,6 @@ void MessageHandler(SKSE::MessagingInterface::Message* a_msg) {
                 logger::debug("Achievement group {} has {} achievements", achievementGroup.name, achievementGroup.achievements.size());
             }
             EventProcessor::GetSingleton()->Register();
-            //EventProcessor::GetSingleton()->EvaluateRequiredCellChanges();
             Scaleform::AchievementWidget::Register();
             Scaleform::AchievementMenuInjector::Register();
             Scaleform::AchievementMenu::Register();
