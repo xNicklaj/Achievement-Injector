@@ -33,8 +33,12 @@ namespace Scaleform {
         bool isSkyrimSoulsLoaded = GetModuleHandleA("SkyrimSoulsRE.dll") != NULL;
         if (isSkyrimSoulsLoaded) {
             // Skyrim Souls COMPAT
+            // Souls only blocks player/camera input (e.g. wheel zoom) for menus carrying its own kUnpaused flag.
+            // shortcut: bit value copied from SkyrimSoulsRE's MenuFlagEx, re-check if Souls changes it.
+            constexpr auto kSoulsUnpaused = static_cast<RE::UI_MENU_FLAGS>(1 << 28);
             menuFlags.set(RE::UI_MENU_FLAGS::kDisablePauseMenu, RE::UI_MENU_FLAGS::kModal,
-                          RE::UI_MENU_FLAGS::kUsesMenuContext, RE::UI_MENU_FLAGS::kTopmostRenderedMenu);
+                          RE::UI_MENU_FLAGS::kUsesMenuContext, RE::UI_MENU_FLAGS::kTopmostRenderedMenu,
+                          kSoulsUnpaused);
         } else {
             menuFlags.set(RE::UI_MENU_FLAGS::kPausesGame, RE::UI_MENU_FLAGS::kDisablePauseMenu, RE::UI_MENU_FLAGS::kModal,
                           RE::UI_MENU_FLAGS::kUsesMenuContext, RE::UI_MENU_FLAGS::kTopmostRenderedMenu,
