@@ -20,6 +20,11 @@ namespace SaveStore {
 
 	json Empty();
 
+	// Paths are UTF-8.
+
+	// True when the file exists. A file an older version named in the system code page is renamed to the UTF-8 name first.
+	bool Exists(const std::string& path);
+
 	// False when the file could not be written
 	bool Write(const std::string& path, const json& data);
 

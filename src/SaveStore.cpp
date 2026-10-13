@@ -19,21 +19,40 @@ namespace SaveStore {
 		return data.is_object() && data.contains("AchievementData") && data["AchievementData"].is_array();
 	}
 
+	// Paths hold the character name as the game gives it, in UTF-8. A narrow string handed to std::filesystem is read
+	// as the system code page and throws on bytes that are not valid in it (CTD with Chinese names).
+	// An empty path is returned when nothing converts: opening it fails and the caller reports the write.
+	static fs::path ToPath(const std::string& path) {
+		try { return fs::path(std::u8string(path.begin(), path.end())); } catch (const std::exception&) {}
+		try { return fs::path(path); } catch (const std::exception&) {}
+		return {};
+	}
+
 	json Empty() {
 		return { {"SchemaVersion", 1}, {"AchievementData", json::array()} };
+	}
+
+	bool Exists(const std::string& path) {
+		const fs::path file = ToPath(path);
+		std::error_code ec;
+		if (fs::exists(file, ec)) return true;
+		// Up to 1.1.1 the name was read as the system code page: adopt that file so non-ASCII names keep their progress
+		try { fs::rename(fs::path(path), file, ec); } catch (const std::exception&) { return false; }
+		return fs::exists(file, ec);
 	}
 
 	// Write to a temp file then rename, so a crash mid-write can't leave a truncated save
 	bool Write(const std::string& path, const json& data) {
 		const std::string text = data.dump(4, ' ', false, json::error_handler_t::replace);
-		std::ofstream out(path + ".tmp");
+		const fs::path file = ToPath(path), temp = ToPath(path + ".tmp");
+		std::ofstream out(temp);
 		out << text;
 		out.close();
 		std::error_code ec;
-		if (out) fs::rename(path + ".tmp", path, ec);
+		if (out) fs::rename(temp, file, ec);
 		if (out && !ec) return true;
 		// Rename can be refused (locked target, virtual file systems): write in place rather than lose the save
-		std::ofstream direct(path);
+		std::ofstream direct(file);
 		direct << text;
 		direct.close();
 		return static_cast<bool>(direct);
@@ -41,12 +60,13 @@ namespace SaveStore {
 
 	// An unreadable file must not throw into the game: keep it as .bak and start empty
 	bool Load(const std::string& path, json& data) {
-		std::ifstream in(path);
+		Exists(path);
+		std::ifstream in(ToPath(path));
 		data = json::parse(in, nullptr, false);
 		in.close();
 		if (HasEntries(data)) return true;
 		std::error_code ec;
-		fs::copy_file(path, path + ".bak", fs::copy_options::overwrite_existing, ec);
+		fs::copy_file(ToPath(path), ToPath(path + ".bak"), fs::copy_options::overwrite_existing, ec);
 		data = Empty();
 		Write(path, data);
 		return false;

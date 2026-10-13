@@ -67,7 +67,7 @@ void Serializer::CreateFileIfNotExists() {
 	// The two files are independent: one existing must not skip creating the other
 	for (Store* store : { &character, &global }) {
 		const std::string path = GetFilename(store->global);
-		if (fs::exists(path, ec)) continue;
+		if (SaveStore::Exists(path)) continue;
 		store->data = SaveStore::Empty();
 		store->loadedPath = path;
 		Save(*store);

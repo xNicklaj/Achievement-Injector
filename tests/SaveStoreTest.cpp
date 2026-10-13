@@ -90,6 +90,16 @@ int main() {
 	CHECK(!SaveStore::Load(path, recovered));
 	CHECK(recovered == SaveStore::Empty());
 
+	// A UTF-8 name that is not valid in the system code page neither throws nor loses the file
+	const std::u8string dirUtf8 = dir.u8string();
+	const std::string chinese = std::string(dirUtf8.begin(), dirUtf8.end()) + "/UnlockedAchievements_\xE9\xBE\x99\xE8\xA3\x94.json";
+	CHECK(!SaveStore::Exists(chinese));
+	CHECK(SaveStore::Write(chinese, data));
+	CHECK(SaveStore::Exists(chinese));
+	CHECK(fs::exists(dir / L"UnlockedAchievements_\x9F99\x88D4.json"));
+	CHECK(SaveStore::Load(chinese, reloaded));
+	CHECK(reloaded == data);
+
 	fs::remove_all(dir);
 	std::cout << (failures == 0 ? "SaveStoreTest passed" : "SaveStoreTest FAILED") << std::endl;
 	return failures == 0 ? 0 : 1;
