@@ -22,7 +22,7 @@ void QuestObjectiveDoneCondition::EnableListener(void)
     RE::PlayerCharacter::GetSingleton()->AsPositionPlayerEventSource()->AddEventSink<RE::PositionPlayerEvent>(this);
 }
 RE::BSEventNotifyControl QuestObjectiveDoneCondition::ProcessEvent(const RE::TESQuestStageEvent* event, RE::BSTEventSource<RE::TESQuestStageEvent>*) {
-    if (!this->isMet && !this->quest && event->formID == this->quest->formID) {
+    if (!this->isMet && this->quest && event->formID == this->quest->formID) {
         CheckCondition();
     }
 
@@ -35,6 +35,7 @@ RE::BSEventNotifyControl QuestObjectiveDoneCondition::ProcessEvent(const RE::Pos
 bool QuestObjectiveDoneCondition::CheckCondition() {
     bool found = false;
     if (this->isMet) return true;
+    if (!quest) return false;
     for (auto& objective_l : quest->objectives) {
 		if (objective_l->index != this->objective) continue;
         found = true;

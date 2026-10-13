@@ -30,7 +30,7 @@ bool BaseActorDeathCondition::CheckCondition() {
 };
 RE::BSEventNotifyControl BaseActorDeathCondition::ProcessEvent(const RE::TESDeathEvent* a_event, RE::BSTEventSource<RE::TESDeathEvent>*) {
 	bool isTarget = false;
-	if (!a_event->actorDying->IsDead()) return RE::BSEventNotifyControl::kContinue;
+	if (!a_event || !a_event->actorDying || !a_event->actorDying->IsDead()) return RE::BSEventNotifyControl::kContinue;
 	if (!this->isFormID && !this->isEditorID && a_event->dead) {
         logger::debug("Actor {} is dead. Reference found using name {}", a_event->actorDying->GetName(), this->identifier);
 		if (a_event->actorDying->GetName() == this->identifier) {

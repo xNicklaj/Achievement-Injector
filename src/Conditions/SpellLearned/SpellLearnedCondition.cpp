@@ -27,6 +27,7 @@ RE::BSEventNotifyControl SpellLearnedCondition::ProcessEvent(const RE::SpellsLea
 bool SpellLearnedCondition::CheckCondition() {
     bool found = false;
     RE::SpellItem* target = this->cachedSpell;
+    if (!target) return false;
     RE::TESNPC* player = RE::PlayerCharacter::GetSingleton()->GetActorBase();
     
     if (target && RE::PlayerCharacter::GetSingleton()->HasSpell(target))
