@@ -2,7 +2,7 @@
 
 extern void RegisterPostLoadFunction(Condition* condition);
 
-DragonSoulAbsorbedCondition::DragonSoulAbsorbedCondition() : Condition(ConditionType::DragonSoulAbsorbed) {}
+DragonSoulAbsorbedCondition::DragonSoulAbsorbedCondition() : Condition() {}
 void DragonSoulAbsorbedCondition::OnDataLoaded(void) {
     CheckCondition();
 }

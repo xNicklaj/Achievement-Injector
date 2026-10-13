@@ -2,7 +2,7 @@
 
 extern void RegisterPostLoadFunction(Condition* condition);
 
-PlayerSkillLevelCondition::PlayerSkillLevelCondition() : Condition(ConditionType::PlayerLevel) {}
+PlayerSkillLevelCondition::PlayerSkillLevelCondition() : Condition() {}
 void PlayerSkillLevelCondition::OnDataLoaded(void) {
     CheckCondition();
 }

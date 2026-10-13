@@ -3,7 +3,7 @@
 extern void RegisterPostLoadFunction(Condition* condition);
 extern RE::BSTArray<RE::ObjectRefHandle>* GetPlayerMapMarkers();
 
-WorldspaceDiscoveryCondition::WorldspaceDiscoveryCondition() : Condition(ConditionType::NotSet) {}
+WorldspaceDiscoveryCondition::WorldspaceDiscoveryCondition() : Condition() {}
 
 void WorldspaceDiscoveryCondition::OnDataLoaded(void) {
 	CheckCondition();

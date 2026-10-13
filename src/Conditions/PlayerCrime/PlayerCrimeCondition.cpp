@@ -2,7 +2,7 @@
 
 extern void RegisterPostLoadFunction(Condition* condition);
 
-PlayerCrimeCondition::PlayerCrimeCondition() : Condition(ConditionType::NotSet) {}
+PlayerCrimeCondition::PlayerCrimeCondition() : Condition() {}
 
 void PlayerCrimeCondition::OnDataLoaded(void) {
 	this->cachedFactions.clear();

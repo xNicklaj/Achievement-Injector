@@ -54,7 +54,7 @@ RE::TESObjectREFR* FindMapMarkerByData(RE::MapMarkerData* a_data) {
 }
 // --- Exergist Code ---
 
-LocationDiscoveryCondition::LocationDiscoveryCondition() : Condition(ConditionType::LocationDiscovery) {}
+LocationDiscoveryCondition::LocationDiscoveryCondition() : Condition() {}
 void LocationDiscoveryCondition::OnDataLoaded(void) {
     try {
         auto* sink = KeyedSink<RE::LocationDiscovery::Event>::GetSingleton();

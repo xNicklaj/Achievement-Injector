@@ -2,7 +2,7 @@
 
 extern void RegisterPostLoadFunction(Condition* condition);
 
-ItemInInventoryCondition::ItemInInventoryCondition() : Condition(ConditionType::ItemInInventory) {}
+ItemInInventoryCondition::ItemInInventoryCondition() : Condition() {}
 void ItemInInventoryCondition::OnDataLoaded(void) {
 	this->cachedForm = GetForm(this->formid, this->plugin);
     if (this->cachedForm) KeyedSink<RE::TESContainerChangedEvent>::GetSingleton()->Subscribe(this->cachedForm->formID, this);

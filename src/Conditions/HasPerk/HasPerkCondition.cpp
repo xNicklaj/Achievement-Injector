@@ -2,7 +2,7 @@
 
 extern void RegisterPostLoadFunction(Condition* condition);
 
-HasPerkCondition::HasPerkCondition(void) : Condition(ConditionType::HasPerk) {}
+HasPerkCondition::HasPerkCondition(void) : Condition() {}
 
 void HasPerkCondition::SetConditionParameters(std::string formID) {
 	this->formIDStr = formID;

@@ -3,7 +3,7 @@
 
 extern void RegisterPostLoadFunction(Condition* condition);
 
-QueryStatValueCondition::QueryStatValueCondition(void) : Condition(ConditionType::QueryStatValue) {};
+QueryStatValueCondition::QueryStatValueCondition(void) : Condition() {};
 void QueryStatValueCondition::OnDataLoaded(void) {
 	KeyedSink<RE::TESTrackedStatsEvent>::GetSingleton()->Subscribe(StatKey(this->stat), this);
 	CheckCondition();

@@ -2,7 +2,7 @@
 
 extern void RegisterPostLoadFunction(Condition* condition);
 
-ItemCraftedCondition::ItemCraftedCondition() : Condition(ConditionType::ItemCrafted) {}
+ItemCraftedCondition::ItemCraftedCondition() : Condition() {}
 void ItemCraftedCondition::OnDataLoaded(void) {
     this->cachedForm = GetForm(this->itemID, this->plugin);
 }

@@ -4,7 +4,7 @@
 
 extern void RegisterPostLoadFunction(Condition* condition);
 
-BaseActorDeathCondition::BaseActorDeathCondition() : Condition(ConditionType::BaseActorDeath){};
+BaseActorDeathCondition::BaseActorDeathCondition() : Condition(){};
 void BaseActorDeathCondition::OnDataLoaded(void) {
 	// Names and editor IDs are not keys: those conditions see every death
 	if (this->isEditorID || !this->isFormID) {

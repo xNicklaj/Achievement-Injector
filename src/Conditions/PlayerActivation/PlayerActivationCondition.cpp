@@ -2,7 +2,7 @@
 
 extern void RegisterPostLoadFunction(Condition* condition);
 
-PlayerActivationCondition::PlayerActivationCondition() : Condition(PlayerActivation) {}
+PlayerActivationCondition::PlayerActivationCondition() : Condition() {}
 void PlayerActivationCondition::OnDataLoaded(void) {
 	this->cachedFormID = GetFormID(this->formid, this->plugin);
 	if (this->cachedFormID) KeyedSink<RE::TESActivateEvent>::GetSingleton()->Subscribe(this->cachedFormID, this);

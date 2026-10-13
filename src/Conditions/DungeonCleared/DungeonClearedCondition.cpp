@@ -4,7 +4,7 @@ extern void RegisterPostLoadFunction(Condition* condition);
 
 extern void RegisterPostLoadFunction(Condition* condition);
 
-DungeonClearedCondition::DungeonClearedCondition() : Condition(ConditionType::LocationCleared) {}
+DungeonClearedCondition::DungeonClearedCondition() : Condition() {}
 void DungeonClearedCondition::OnDataLoaded(void) {
     this->cachedLoc = GetFormOfType<RE::BGSLocation>(this->formid, this->plugin);
     if (this->cachedLoc) KeyedSink<RE::TESTrackedStatsEvent>::GetSingleton()->Subscribe(StatKey("Dungeons Cleared"), this);

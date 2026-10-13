@@ -2,7 +2,7 @@
 
 extern void RegisterPostLoadFunction(Condition* condition);
 
-ShoutLearnedCondition::ShoutLearnedCondition() : Condition(ConditionType::SpellLearned) {}
+ShoutLearnedCondition::ShoutLearnedCondition() : Condition() {}
 void ShoutLearnedCondition::OnDataLoaded(void) {
 	this->cachedShout = GetFormOfType<RE::TESShout>(this->FormID, this->plugin);
     if (this->cachedShout) KeyedSink<RE::TESTrackedStatsEvent>::GetSingleton()->Subscribe(StatKey("Words Of Power Learned"), this);

@@ -3,7 +3,7 @@
 
 extern void RegisterPostLoadFunction(Condition* condition);
 
-BookReadCondition::BookReadCondition() : Condition(ConditionType::BookRead) {}
+BookReadCondition::BookReadCondition() : Condition() {}
 
 void BookReadCondition::OnDataLoaded(void) {
     if (isHex(this->identifier)) this->cachedBook = GetForm(this->identifier, this->plugin);

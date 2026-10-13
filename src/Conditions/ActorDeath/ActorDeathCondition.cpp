@@ -3,7 +3,7 @@
 
 extern void RegisterPostLoadFunction(Condition* condition);
 
-ActorDeathCondition::ActorDeathCondition() : Condition(ConditionType::ActorDeath){};
+ActorDeathCondition::ActorDeathCondition() : Condition(){};
 void ActorDeathCondition::OnDataLoaded(void) {
 	// TODO check if actor is already dead
 	this->cachedFormID = GetFormID(this->formID, this->plugin);

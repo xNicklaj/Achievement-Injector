@@ -2,7 +2,7 @@
 
 extern void RegisterPostLoadFunction(Condition* condition);
 
-ObjectStateCondition::ObjectStateCondition(void) : Condition(ConditionType::ObjectState){};
+ObjectStateCondition::ObjectStateCondition(void) : Condition(){};
 void ObjectStateCondition::OnDataLoaded(void) {
     this->CheckCondition();
 };

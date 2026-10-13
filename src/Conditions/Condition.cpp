@@ -2,12 +2,7 @@
 
 
 
-Condition::Condition(ConditionType type, json jsonData) : Runnable(jsonData.value("onUnlock", json::array())) {
-    this->type = type;
-}
-Condition::Condition(ConditionType type) : Runnable(json::array()) {
-    this->type = type;
-}
+Condition::Condition() : Runnable(json::array()) {}
 void Condition::SetPlugin(std::string plugin_a) {
     this->plugin = plugin_a;
 }
@@ -45,31 +40,3 @@ void Condition::UnlockNotify() {
     this->eventManager->dispatch("ConditionMet");
     this->RunAll();
 }
-
-// QuestStageDoneCondition - V
-
-
-// PlayerLevelCondition - V
-
-
-// PlayerSkillLevelCondition - V
-
-
-// ItemInInventoryCondition - V
-
-
-// LocationDiscoveryCondition
-
-
-
-// DragonSoulAbsorbedCondition - V
-
-// PlayerActivationCondition - Kind of V
-
-
-
-
-
-
-
-

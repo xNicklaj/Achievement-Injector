@@ -2,7 +2,7 @@
 
 extern void RegisterPostLoadFunction(Condition* condition);
 
-QuestObjectiveDoneCondition::QuestObjectiveDoneCondition() : Condition(ConditionType::QuestStageDone) {}
+QuestObjectiveDoneCondition::QuestObjectiveDoneCondition() : Condition() {}
 void QuestObjectiveDoneCondition::SetConditionParameters(std::string formID_a, int objective_a) {
     this->formID = formID_a;
     this->objective = objective_a;

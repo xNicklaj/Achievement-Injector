@@ -18,38 +18,9 @@
 
 using json = nlohmann::json;
 
-enum ConditionType {
-	AchievementUnlocked, // Done
-	QuestStageDone, // Done
-	QuestObjectiveDone, // Done
-	PlayerLevel, // Done
-	SkillLevel, // Done
-	DungeonCleared, 
-	ItemCrafted, // Done
-	ItemInInventory, // Done
-	LocationDiscovery, // Done
-	LocationCleared, // Done
-	PlayerActivation, // Done
-	DragonSoulAbsorbed, // Done
-	FirstEnterCell, // Done
-	BookRead, // Done
-	ShoutLearned, 
-	GlobalVariableState, // Done
-	QueryStatValue, // Done
-	ActorDeath, // Done
-	BaseActorDeath, // Done
-	SpellLearned, // Done
-	PapyrusBinding,
-	ObjectState,
-	HasPerk,
-	HasPerks,
-	NotSet // Done
-};
-
 class Condition : public Runnable {
 public:
-	Condition(ConditionType type);
-	Condition(ConditionType type, json jsonData);
+	Condition();
 
 	virtual void EnableListener(void);
 	virtual void OnDataLoaded(void);
@@ -71,7 +42,6 @@ public:
 	void SetPlugin(std::string plugin);
 	void UnlockNotify();
 	
-	ConditionType type;
 	bool isMet = false;
 	std::string plugin = "Skyrim.esm";
 protected:

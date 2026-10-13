@@ -2,7 +2,7 @@
 
 extern void RegisterPostLoadFunction(Condition* condition);
 
-PlayerFirstEnterCellCondition::PlayerFirstEnterCellCondition() : Condition(ConditionType::FirstEnterCell) {}
+PlayerFirstEnterCellCondition::PlayerFirstEnterCellCondition() : Condition() {}
 void PlayerFirstEnterCellCondition::SetConditionParameters(std::string cellID_a) {
     this->cellID = cellID_a;
 }
