@@ -46,3 +46,12 @@ target("AchievementInjector")
     
     -- PCH
     set_pcxxheader("src/PCH.h")
+
+-- Self-check for the progress file logic, built without the game: xmake build SaveStoreTest && xmake run SaveStoreTest
+target("SaveStoreTest")
+    set_kind("binary")
+    set_default(false)
+    add_packages("nlohmann_json")
+    add_includedirs("src")
+    add_files("src/SaveStore.cpp", "tests/SaveStoreTest.cpp")
+    add_tests("default")

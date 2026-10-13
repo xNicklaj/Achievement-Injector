@@ -377,22 +377,12 @@ json Achievement::ToJson() {
         SKSE::Translation::Translate("$ACH_HIDDEN", desc);
     }
 
-    if (Settings::GetSingleton()->GetGlobal()) {
-        SerializedAchievement sa = Serializer::GetSingleton()->DeserializeAchievementData_GLOBAL(this->achievementName);
-        data["AchievementName"] = this->achievementName;
-        data["Description"] = desc;
-        data["UnlockDatetime"] = sa.unlockDatetime;
-        data["Unlocked"] = this->unlocked;
-        data["Icon"] = this->iconPath;
-    }
-    else {
-        SerializedAchievement sa = Serializer::GetSingleton()->DeserializeAchievementData(this->achievementName);
-        data["AchievementName"] = this->achievementName;
-        data["Description"] = desc;
-        data["UnlockDatetime"] = sa.unlockDatetime;
-        data["Unlocked"] = sa.unlocked;
-        data["Icon"] = this->iconPath;
-    }
+    SerializedAchievement sa = Serializer::GetSingleton()->DeserializeAchievementData(this->achievementName);
+    data["AchievementName"] = this->achievementName;
+    data["Description"] = desc;
+    data["UnlockDatetime"] = sa.unlockDatetime;
+    data["Unlocked"] = Settings::GetSingleton()->GetGlobal() ? this->unlocked : sa.unlocked;
+    data["Icon"] = this->iconPath;
     return data;
 }
 
@@ -408,17 +398,9 @@ std::string Achievement::ToString() {
 
     // TODO convert \n to something else
 
-    if (Settings::GetSingleton()->GetGlobal()) {
-        SerializedAchievement sa = Serializer::GetSingleton()->DeserializeAchievementData_GLOBAL(this->achievementName);
-        output =
-            this->groupName + "||" + this->achievementName + "||" + replaceAll(desc, "\n", " ") + "||" +
-            std::to_string(sa.unlocked ? sa.unlockDatetime : -1) + "||" +
-            this->iconPath;
-    } else {
-        SerializedAchievement sa = Serializer::GetSingleton()->DeserializeAchievementData(this->achievementName);
-        output =
-            this->groupName + "||" + this->achievementName + "||" + replaceAll(desc, "\n", " ") + "||" +
-            std::to_string(sa.unlocked ? sa.unlockDatetime : -1) + "||" + this->iconPath;
-    }
+    SerializedAchievement sa = Serializer::GetSingleton()->DeserializeAchievementData(this->achievementName);
+    output =
+        this->groupName + "||" + this->achievementName + "||" + replaceAll(desc, "\n", " ") + "||" +
+        std::to_string(sa.unlocked ? sa.unlockDatetime : -1) + "||" + this->iconPath;
     return output;
 }
