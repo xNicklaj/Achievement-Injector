@@ -30,3 +30,59 @@ While not a requirement, I still recommend Achievements Mods Enabler if you want
 
 ## FURTHER INFORMATIONS
 If you require further informations about this mod, please visit the nexus page at [https://www.nexusmods.com/skyrimspecialedition/mods/126220](https://www.nexusmods.com/skyrimspecialedition/mods/126220?tab=description).
+
+# DEVELOPMENT
+
+## CREATING ACHIEVEMENTS
+If you want to add achievements for your own mod you don't need to write a single line of C++: all you have to do is drop a json file in `Data/SKSE/Plugins/AchievementsData/` (the old `Data/AchievementsData/` folder still works too). The name of the file is the id of your group, and if you want a custom icon for it you can add a dds with the same name in the `Icons` folder, otherwise the default one will be used.
+
+```json
+{
+    "groupName": "My Mod",
+    "plugin": "MyMod.esp",
+    "achievements": [
+        {
+            "achievementName": "$NAME_Hero",
+            "description": "$DESC_Hero",
+            "icon": "ACH_Hero.dds",
+            "joinType": "AND",
+            "conditions": [
+                { "type": "QuestStageDone", "formID": "00352A", "stage": 200 },
+                { "type": "PlayerLevel", "level": 20 }
+            ],
+            "onUnlock": [
+                { "type": "command", "command": "player.additem f 100" }
+            ]
+        }
+    ]
+}
+```
+
+Names and descriptions can either be written directly in the json or, if they start with `$`, they will be looked up in `Localizations/<FileName>_<LANG>.txt`, which is a simple tab separated file with the key on the left and the text on the right. The formIDs are hex strings relative to the plugin you set for the group, so you don't have to worry about load order.
+
+By default an achievement unlocks as soon as one of its conditions is met; if you want all of them to be required set `joinType` to `AND`. You can also hide an achievement from the menu with `showInMenu`, hide its description until it's unlocked with `hideDescription`, disable its popup with `showPopup`, give it its own sound with `notificationSound` and run console commands or papyrus functions when it unlocks with `onUnlock`. Papyrus functions called this way must be `Global`.
+
+The conditions currently available are AchievementUnlocked, ActorDeath, BaseActorDeath, BookRead, DragonSoulAbsorbed, FirstEnterCell, GlobalVariableState, HasPerk, HasPerks, ItemCrafted, ItemInInventory, LocationCleared, LocationDiscovery, ObjectState, PapyrusBinding, PlayerActivation, PlayerCrime, PlayerLevel, QueryStatValue, QuestObjectiveDone, QuestStageDone, ShoutLearned, SkillLevel, SpellLearned and WorldspaceDiscovery. I haven't documented the fields of each one here, so the best reference is the json files of the vanilla achievements that ship with the mod, which you can find in `Skyrim/Data/SKSE/Plugins/AchievementsData/`.
+
+## PAPYRUS AND CONSOLE
+In case none of the conditions do what you need, you can unlock an achievement directly from your own scripts:
+
+```papyrus
+Scriptname AchievementInjectorScripts Hidden
+
+Int[] Function GetVersion() Global Native
+Function UnlockAchievement(String name, String group) Global Native
+```
+
+If you have Custom Console installed, the same function is available in the console as `ai uach -n <achievementName> -g <group>`, which is quite handy for testing.
+
+## BUILDING
+The plugin is built with [xmake](https://xmake.io) and needs a C++23 compiler (MSVC) and the CommonLibSSE-NG submodule, so remember to clone the repository with its submodules or xmake will complain that it can't find it.
+
+```
+git submodule update --init --recursive
+xmake f -m release
+xmake
+```
+
+The source of the plugin is in `src`, with one folder for each condition in `src/Conditions`. `Skyrim/Data` mirrors the Data folder of the game and is what ends up in the release, while `flash` contains the sources of the menu and of the popup widget, which have to be compiled by hand.
