@@ -91,7 +91,6 @@ namespace Scaleform {
         }
         if (ui->GetMenu(AchievementMenu::MENU_NAME)->uiMovie->GetVariable(&widget, "_root.MenuFader_mc.Menu_mc")) {
             std::array<RE::GFxValue, 1> args;
-            json test = AchievementManager::GetSingleton()->ToJson();
             args[0] = data;
             widget.Invoke("setData", nullptr, args.data(), args.size());
             args[0] = 1;
