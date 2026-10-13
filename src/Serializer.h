@@ -29,7 +29,12 @@ public:
 	struct SerializedAchievement DeserializeAchievementData(std::string name);
 	struct SerializedAchievement DeserializeAchievementData_GLOBAL(std::string name);
 	void CreateFileIfNotExists();
+	// While deferred, Save only marks the file as pending; turning it off writes each pending file once
+	void DeferSaves(bool defer);
 private:
+	bool deferSaves = false;
+	bool savePending = false;
+	bool savePending_GLOBAL = false;
 	std::string GetFilename() const;
 	std::string GetFilename(bool) const;
 	const std::string& path = "DATA/SKSE/Plugins/AchievementInjector/UnlockedAchievements_{}.json";

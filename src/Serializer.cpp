@@ -202,7 +202,16 @@ struct SerializedAchievement Serializer::DeserializeAchievementData_GLOBAL(std::
 	return SerializedAchievement("NULL", false, -1);
 }
 
+void Serializer::DeferSaves(bool defer) {
+	deferSaves = defer;
+	if (defer) return;
+	if (savePending) Save();
+	if (savePending_GLOBAL) Save_GLOBAL();
+	savePending = savePending_GLOBAL = false;
+}
+
 void Serializer::Save() {
+	if (deferSaves) { savePending = true; return; }
 	std::string filename = this->GetFilename(false);
 	try {
 		WriteJson(filename, jsonData);
@@ -212,6 +221,7 @@ void Serializer::Save() {
 	}
 }
 void Serializer::Save_GLOBAL() {
+	if (deferSaves) { savePending_GLOBAL = true; return; }
 	std::string filename = this->GetFilename(true);
 	try {
 		WriteJson(filename, jsonData_GLOBAL);

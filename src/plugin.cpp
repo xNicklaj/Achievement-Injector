@@ -46,9 +46,12 @@ void InitializePostLoad() {
         }
 
         logger::info("Data loaded. Executing {} functions.", postLoadConditionRegistry.size());
+        // An existing save can meet many conditions at once: write the progress files once, not per condition
+        Serializer::GetSingleton()->DeferSaves(true);
         for (auto& condition: postLoadConditionRegistry) {
             condition->OnDataLoaded();
         }
+        Serializer::GetSingleton()->DeferSaves(false);
     }
 
     Scaleform::AchievementWidget::Show();
