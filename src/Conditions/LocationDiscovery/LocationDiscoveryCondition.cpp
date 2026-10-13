@@ -6,27 +6,23 @@ extern void RegisterPostLoadFunction(Condition* condition);
 // Retrieve all map markers in the game
 RE::BSTArray<RE::ObjectRefHandle>* GetPlayerMapMarkers() {
     RE::PlayerCharacter* player = RE::PlayerCharacter::GetSingleton();
-    std::uint32_t offset = 0;
-    if (REL::Module::IsAE() && REL::Module::get().version().patch() >= 629)
-        offset = 0x500;
-    else if (REL::Module::IsSE() || (REL::Module::IsAE() && REL::Module::get().version().patch() < 629))
-        offset = 0x4F8;
-    else
-        offset = 0xAE8;
-    return reinterpret_cast<RE::BSTArray<RE::ObjectRefHandle>*>((uintptr_t) player + offset);
+    // CommonLib tracks the per-runtime layout (it shifted again in 1.7.99); a hardcoded offset crashed there
+    if (REL::Module::IsVR()) return &player->GetVRPlayerRuntimeData()->currentMapMarkers;
+    return &player->GetPlayerRuntimeData().currentMapMarkers;
 }
 
 // Check if targetLocation or formID is known (map marker visible and enabled)
 bool CheckKnownLocation(std::string targetLocation, std::string targetFormID, std::string plugin) {
     auto* playerMapMarkers = GetPlayerMapMarkers();
+    // Resolved once, not per marker
+    RE::TESObjectREFR* targetRefr = targetFormID != "" ? GetFormOfType<RE::TESObjectREFR>(targetFormID, plugin) : nullptr;
     for (auto playerMapMarker : *playerMapMarkers) {
         const auto refr = playerMapMarker.get().get();
-        if (refr->IsDisabled() == false) { // Check if map marker is NOT disabled
+        if (refr && refr->IsDisabled() == false) { // Check if map marker is NOT disabled
             const auto marker = refr ? refr->extraList.GetByType<RE::ExtraMapMarker>() : nullptr;
             if (marker && marker->mapData) {
                 if (marker->mapData->flags.any(RE::MapMarkerData::Flag::kCanTravelTo) == true) { // Check if map marker is visible
                     if (targetFormID != "") {
-                        RE::TESObjectREFR* targetRefr = static_cast<RE::TESObjectREFR*>(GetForm(targetFormID, plugin));
                         if (targetRefr && targetRefr->formID == refr->formID) {
                             return true;
                         }
