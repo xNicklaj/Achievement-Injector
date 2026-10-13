@@ -16,6 +16,7 @@ public:
 private:
     std::string achievementName = "";
     std::string groupName = "";
+    bool registered = false;
 };
 
 class AchievementUnlockedConditionFactory : public ConditionFactory {

@@ -41,7 +41,6 @@ public:
     std::string icon;
 
     bool unlocked;
-    bool hooked = false;
     bool showPopup = true;
     bool hidden = false;
     bool showInMenu = true;

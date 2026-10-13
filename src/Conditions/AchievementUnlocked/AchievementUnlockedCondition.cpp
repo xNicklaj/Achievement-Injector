@@ -10,6 +10,9 @@ void AchievementUnlockedCondition::OnDataLoaded(void) {
 };
 void AchievementUnlockedCondition::EnableListener(void) {
 	RegisterPostLoadFunction(this);
+	// eventpp would append a second listener when this runs again on a character switch
+	if (this->registered) return;
+	this->registered = true;
 	AchievementManager::GetSingleton()->AddEventSink([this](AchievementUnlockedEvent* a_event) {
 			this->ProcessEvent(a_event);
 	});

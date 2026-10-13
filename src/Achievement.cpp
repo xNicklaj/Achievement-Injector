@@ -234,7 +234,7 @@ Achievement::Achievement(json& jsonData, std::string plugin, std::string groupNa
             a_condition->push_back(condition.value("onUnlock", json::array()));
             conditions.push_back(a_condition);
         };
-        conditionMet.push_back(false);
+        if (a_condition) conditionMet.push_back(false);
     }
     try {
         for (auto& func : jsonData["onUnlock"]) {
@@ -258,33 +258,38 @@ void Achievement::ForceUnlock() {
 void Achievement::EnableListener(void) {
     if(conditions.size() == 0) {
 		logger::warn("Achievement {} has no conditions.", this->achievementName);
-		return;
 	}
-	// Enable listener for this achievement
+    // Runs again on a character switch: drop the previous character's in-memory progress
     this->unlocked = false;
+    conditionMet.assign(conditionMet.size(), false);
+    for (Condition* condition : conditions) {
+        condition->Deserialize(0);
+        condition->isMet = false;
+    }
     SerializedAchievement sa = Serializer::GetSingleton()->DeserializeAchievementData(this->achievementName);
     if (sa.unlocked) {
         this->unlocked = true;
         logger::info("Achievement {} has already been unlocked.", this->achievementName);
+        // Sinks hooked for a previous character may still be registered; mark them spent
+        for (Condition* condition : conditions) condition->isMet = true;
         return;
     }
 
-    if (hooked) return;
-    int i = 0;
-    for (Condition* condition : conditions) {
+    for (size_t i = 0; i < conditions.size(); i++) {
+        Condition* condition = conditions[i];
         if (!CheckIfModIsLoaded(condition->plugin)) {
             logger::warn("Plugin {} not loaded. Skipping condition.", condition->plugin);
             continue;
         }
-        if (sa.conditionsState.size() > 0 && (this->conditionMet[i] = condition->Deserialize(sa.conditionsState[i]))) {
+        if (i < sa.conditionsState.size() && condition->Deserialize(sa.conditionsState[i])) {
+            // Already fulfilled: nothing to listen for, but the other conditions still need hooking
             condition->isMet = true;
-            // Conditions is already fulfilled
-            return;
+            this->conditionMet[i] = true;
+            continue;
         };
         condition->SetEventManager(&eventHandler);
 		condition->EnableListener();
 	}
-    this->hooked = true;
 }
 
 void Achievement::OnSerializationRequested() {
@@ -325,7 +330,8 @@ void Achievement::OnConditionMet(void) {
         break;
     }
 
-    if (allConditionsMet) {
+    // Zero conditions: only ForceUnlock dispatches here
+    if (allConditionsMet || conditions.empty()) {
         unlocked = true;
         logger::info("Achievement {} unlocked", achievementName);
         AchievementUnlockedEvent e;

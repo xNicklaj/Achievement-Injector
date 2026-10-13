@@ -39,6 +39,8 @@ bool Condition::Deserialize(int value) {
 }
 
 void Condition::UnlockNotify() {
+    // Fire once: a sink that outlives its purpose must not re-run onUnlock or re-save
+    if (this->isMet) return;
     this->isMet = true;
     this->eventManager->dispatch("ConditionMet");
     this->RunAll();
