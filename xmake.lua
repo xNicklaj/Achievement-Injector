@@ -4,7 +4,7 @@ add_rules("mode.debug", "mode.release")
 includes("lib/commonlibsse-ng")
 
 set_project("AchievementInjector")
-set_version("0.0.1")
+set_version("1.1.2")
 set_license("MIT")
 set_languages("c++23")
 add_defines("SPDLOG_COMPILED_LIB")

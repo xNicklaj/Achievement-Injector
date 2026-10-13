@@ -19,12 +19,9 @@ namespace NativePapyrus {
 	}
 
 	std::vector<int> GetVersion(STATIC_ARGS) {
-        std::vector<int> response = std::vector<int>();
-        response.push_back(1);
-        response.push_back(1);
-        response.push_back(2);
-
-        return response;
+        // The version is set once, in xmake.lua
+        const auto version = SKSE::PluginDeclaration::GetSingleton()->GetVersion();
+        return { static_cast<int>(version.major()), static_cast<int>(version.minor()), static_cast<int>(version.patch()) };
     }
 
 	void OnConfigClose(RE::TESQuest*)
