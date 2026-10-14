@@ -7,8 +7,9 @@ namespace fs = std::filesystem;
 
 namespace SaveStore {
 	// Entries come from a file users edit and older versions wrote: a missing or mistyped field must not throw
-	static bool IsEntry(const json& entry, const std::string& name) {
-		return entry.is_object() && entry.value("AchievementName", json()) == name;
+	// A null group matches the entries older versions wrote without one
+	static bool IsEntry(const json& entry, const json& group, const std::string& name) {
+		return entry.is_object() && entry.value("AchievementName", json()) == name && entry.value("Group", json()) == group;
 	}
 
 	static bool IsUnlocked(const json& entry) {
@@ -17,6 +18,11 @@ namespace SaveStore {
 
 	static bool HasEntries(const json& data) {
 		return data.is_object() && data.contains("AchievementData") && data["AchievementData"].is_array();
+	}
+
+	static const json* FindEntry(const json& data, const json& group, const std::string& name) {
+		if (HasEntries(data)) for (const json& entry : data["AchievementData"]) if (IsEntry(entry, group, name)) return &entry;
+		return nullptr;
 	}
 
 	// Paths hold the character name as the game gives it, in UTF-8. A narrow string handed to std::filesystem is read
@@ -72,27 +78,25 @@ namespace SaveStore {
 		return false;
 	}
 
-	SerializedAchievement Find(const json& data, const std::string& name) {
-		if (HasEntries(data)) {
-			for (const json& entry : data["AchievementData"]) {
-				if (!IsEntry(entry, name)) continue;
-				const json date = entry.value("UnlockDatetime", json());
-				const json state = entry.value("ConditionsState", json());
-				SerializedAchievement found{ name, IsUnlocked(entry), date.is_number_integer() ? date.get<int64_t>() : -1, {} };
-				// A bad value keeps its slot as 0: conditions are matched by position
-				if (state.is_array()) for (const json& value : state) found.conditionsState.push_back(value.is_number_integer() ? value.get<int>() : 0);
-				return found;
-			}
-		}
-		return { "NULL", false, -1, {} };
+	SerializedAchievement Find(const json& data, const std::string& group, const std::string& name) {
+		const json* entry = FindEntry(data, group, name);
+		if (!entry) entry = FindEntry(data, json(), name);
+		if (!entry) return { "NULL", false, -1, {} };
+		const json date = entry->value("UnlockDatetime", json());
+		const json state = entry->value("ConditionsState", json());
+		SerializedAchievement found{ name, IsUnlocked(*entry), date.is_number_integer() ? date.get<int64_t>() : -1, {} };
+		// A bad value keeps its slot as 0: conditions are matched by position
+		if (state.is_array()) for (const json& value : state) found.conditionsState.push_back(value.is_number_integer() ? value.get<int>() : 0);
+		return found;
 	}
 
-	bool Put(json& data, const std::string& name, bool unlocked, int64_t unlockDatetime, const std::vector<int>& conditionsState) {
+	bool Put(json& data, const std::string& group, const std::string& name, bool unlocked, int64_t unlockDatetime, const std::vector<int>& conditionsState) {
 		if (!HasEntries(data)) data = Empty();
+		if (Find(data, group, name).unlocked) return false;
 		auto& entries = data["AchievementData"].get_ref<json::array_t&>();
-		for (const json& entry : entries) if (IsEntry(entry, name) && IsUnlocked(entry)) return false;
-		std::erase_if(entries, [&name](const json& entry) { return IsEntry(entry, name); });
+		std::erase_if(entries, [&](const json& entry) { return IsEntry(entry, group, name); });
 		entries.push_back({
+			{"Group", group},
 			{"AchievementName", name},
 			{"Unlocked", unlocked},
 			{"UnlockDatetime", unlockDatetime},

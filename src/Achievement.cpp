@@ -243,7 +243,7 @@ void Achievement::EnableListener(void) {
         condition->Deserialize(0);
         condition->isMet = false;
     }
-    SerializedAchievement sa = Serializer::GetSingleton()->DeserializeAchievementData(this->achievementName);
+    SerializedAchievement sa = Serializer::GetSingleton()->DeserializeAchievementData(this->groupName, this->achievementName);
     if (sa.unlocked) {
         this->unlocked = true;
         logger::info("Achievement {} has already been unlocked.", this->achievementName);
@@ -352,7 +352,7 @@ std::string Achievement::ToString() {
 
     // TODO convert \n to something else
 
-    SerializedAchievement sa = Serializer::GetSingleton()->DeserializeAchievementData(this->achievementName);
+    SerializedAchievement sa = Serializer::GetSingleton()->DeserializeAchievementData(this->groupName, this->achievementName);
     output =
         this->groupName + "||" + this->achievementName + "||" + replaceAll(desc, "\n", " ") + "||" +
         std::to_string(sa.unlocked ? sa.unlockDatetime : -1) + "||" + this->iconPath;

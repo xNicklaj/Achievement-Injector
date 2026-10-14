@@ -36,7 +36,7 @@ void Serializer::Write(Store& store, Achievement* achievement) {
 	Load(store);
 	const int64_t now_ms = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 	// Put refuses an entry that is already unlocked: other conditions of an OR achievement still ask for saves after it unlocked
-	if (SaveStore::Put(store.data, achievement->achievementName, achievement->unlocked, achievement->unlocked ? now_ms : -1, achievement->GetConditionsState()))
+	if (SaveStore::Put(store.data, achievement->groupName, achievement->achievementName, achievement->unlocked, achievement->unlocked ? now_ms : -1, achievement->GetConditionsState()))
 		Save(store);
 }
 
@@ -45,10 +45,10 @@ void Serializer::SerializeAchievementData(Achievement* achievement) {
 	if (!Settings::GetSingleton()->GetGlobal()) Write(character, achievement);
 }
 
-struct SerializedAchievement Serializer::DeserializeAchievementData(std::string name) {
+struct SerializedAchievement Serializer::DeserializeAchievementData(const std::string& group, const std::string& name) {
 	Store& store = Settings::GetSingleton()->GetGlobal() ? global : character;
 	Load(store);
-	return SaveStore::Find(store.data, name);
+	return SaveStore::Find(store.data, group, name);
 }
 
 void Serializer::DeferSaves(bool defer) {

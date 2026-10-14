@@ -31,10 +31,11 @@ namespace SaveStore {
 	// False when the file was missing or unreadable: it is kept as .bak, data starts empty and is written back
 	bool Load(const std::string& path, json& data);
 
-	// The entry stored for name, or {"NULL", false, -1} when there is none
-	SerializedAchievement Find(const json& data, const std::string& name);
+	// The entry stored for name in group, or {"NULL", false, -1} when there is none.
+	// Up to 1.3.0 entries had no group: one of those is used when group has no entry of its own.
+	SerializedAchievement Find(const json& data, const std::string& group, const std::string& name);
 
-	// Stores the entry for name, replacing the previous one.
+	// Stores the entry for name in group, replacing the previous one. Entries without a group are kept for the other groups.
 	// False, changing nothing, when name is already stored as unlocked: the first unlock date is kept.
-	bool Put(json& data, const std::string& name, bool unlocked, int64_t unlockDatetime, const std::vector<int>& conditionsState);
+	bool Put(json& data, const std::string& group, const std::string& name, bool unlocked, int64_t unlockDatetime, const std::vector<int>& conditionsState);
 }

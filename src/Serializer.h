@@ -16,7 +16,7 @@ public:
 	// Always writes the shared file, and the character's file too unless bGlobal is set
 	void SerializeAchievementData(Achievement* achievement);
 	// Reads from the file the current mode uses: the shared one with bGlobal, the character's otherwise
-	struct SerializedAchievement DeserializeAchievementData(std::string name);
+	struct SerializedAchievement DeserializeAchievementData(const std::string& group, const std::string& name);
 	void CreateFileIfNotExists();
 	// While deferred, saving only marks the file as pending; turning it off writes each pending file once
 	void DeferSaves(bool defer);

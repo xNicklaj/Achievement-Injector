@@ -22,7 +22,7 @@ void AchievementUnlockedCondition::SetConditionParameters(std::string achievemen
 	this->groupName = groupName_a;
 };
 bool AchievementUnlockedCondition::CheckCondition() {
-	SerializedAchievement sa = Serializer::GetSingleton()->DeserializeAchievementData(this->achievementName);
+	SerializedAchievement sa = Serializer::GetSingleton()->DeserializeAchievementData(this->groupName, this->achievementName);
 	if (sa.unlocked) {
 		logger::info("Player met condition unlocked {}", this->achievementName);
 		this->UnlockNotify();
