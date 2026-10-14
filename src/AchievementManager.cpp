@@ -27,7 +27,8 @@ std::string AchievementGroup::ToString() {
 
 void AchievementGroup::ForceUnlock(std::string achievementName) {
     for (const auto& achievement: this->achievements) {
-        if (achievement->achievementName == achievementName) {
+        // Papyrus strings are case-insensitively interned, so the caller's casing may not survive
+        if (_stricmp(achievement->achievementName.c_str(), achievementName.c_str()) == 0) {
             achievement->ForceUnlock();
             return;
         }
@@ -78,7 +79,7 @@ void AchievementManager::ForceUnlock(std::string achievementName, std::string gr
     }
     logger::debug("Forcing unlock of achievement {} in group {}.", achievementName, group_a);
     for (auto& group: this->achievementGroups) {
-        if (group.groupid == group_a) {
+        if (_stricmp(group.groupid.c_str(), group_a.c_str()) == 0) {
             group.ForceUnlock(achievementName);
             return;
         }
