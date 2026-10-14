@@ -1,6 +1,6 @@
 #include "../Condition.h"
 
-class SpellLearnedCondition : public Condition, public RE::BSTEventSink<RE::SpellsLearned::Event>
+class SpellLearnedCondition : public Condition, public RE::BSTEventSink<RE::SpellsLearned::Event>, public RE::BSTEventSink<RE::PositionPlayerEvent>
 {
 public:
 	SpellLearnedCondition();
@@ -13,4 +13,5 @@ public:
 	RE::SpellItem* cachedSpell = nullptr;
 private:
 	RE::BSEventNotifyControl ProcessEvent(const RE::SpellsLearned::Event* a_event, RE::BSTEventSource<RE::SpellsLearned::Event>*) override;
+	RE::BSEventNotifyControl ProcessEvent(const RE::PositionPlayerEvent* a_event, RE::BSTEventSource<RE::PositionPlayerEvent>*) override;
 };
