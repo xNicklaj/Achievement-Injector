@@ -14,14 +14,27 @@ void SpellCastCondition::EnableListener(void) {
 void SpellCastCondition::SetConditionParameters(std::string formid_a) {
 	this->formid = formid_a;
 };
+void SpellCastCondition::SetConditionParameters(std::string formid_a, int quantity_a) {
+	this->formid = formid_a;
+	this->quantity = quantity_a;
+};
+int SpellCastCondition::Serialize() {
+	return currQuantity;
+}
+bool SpellCastCondition::Deserialize(int value) {
+	this->currQuantity = value;
+	return this->currQuantity >= this->quantity;
+}
 bool SpellCastCondition::CheckCondition() {
 	return false;
 };
 RE::BSEventNotifyControl SpellCastCondition::ProcessEvent(const RE::TESSpellCastEvent* a_event, RE::BSTEventSource<RE::TESSpellCastEvent>*) {
 	if (a_event && this->cachedFormID && a_event->object && a_event->object->IsPlayerRef() && a_event->spell == this->cachedFormID) {
-		logger::info("Player met condition spell cast {}", this->formid);
-		this->UnlockNotify();
-		KeyedSink<RE::TESSpellCastEvent>::GetSingleton()->Unsubscribe(this);
+		if (++this->currQuantity >= this->quantity) {
+			logger::info("Player met condition spell cast {}", this->formid);
+			this->UnlockNotify();
+			KeyedSink<RE::TESSpellCastEvent>::GetSingleton()->Unsubscribe(this);
+		} else this->eventManager->dispatch("SerializationRequested");
 	}
 	return RE::BSEventNotifyControl::kContinue;
 };

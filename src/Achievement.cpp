@@ -117,11 +117,11 @@ Achievement::Achievement(json& jsonData, std::string plugin, std::string groupNa
             }
             else if (type == "SpellCast") {
                 a_condition = new SpellCastCondition();
-                a_condition->SetConditionParameters(condition["formID"].get<std::string>());
+                a_condition->SetConditionParameters(condition["formID"].get<std::string>(), condition.value("quantity", 1));
             }
             else if (type == "MagicEffectApplied") {
                 a_condition = new MagicEffectAppliedCondition();
-                a_condition->SetConditionParameters(condition["formID"].get<std::string>());
+                a_condition->SetConditionParameters(condition["formID"].get<std::string>(), condition.value("quantity", 1));
             }
             else if (type == "FirstEnterCell") {
                 a_condition = new PlayerFirstEnterCellCondition();
