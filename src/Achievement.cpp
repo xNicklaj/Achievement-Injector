@@ -28,6 +28,7 @@
 #include "Conditions/HasPerk/HasPerkCondition.h"
 #include "Conditions/HasPerks/HasPerksCondition.h"
 #include "Conditions/QueryStatValue/QueryStatValueCondition.h"
+#include "Conditions/PapyrusVariable/PapyrusVariableCondition.h"
 #include "Conditions/ActorDeath/ActorDeathCondition.h"
 #include "Conditions/GlobalVariableState/GlobalVariableStateCondition.h"
 #include "Conditions/BaseActorDeath/BaseActorDeathCondition.h"
@@ -148,6 +149,12 @@ Achievement::Achievement(json& jsonData, std::string plugin, std::string groupNa
             else if (type == "QueryStatValue") {
                 a_condition = new QueryStatValueCondition();
                 a_condition->SetConditionParameters(condition["stat"].get<std::string>(), condition["value"].get<float>());
+            }
+            else if (type == "PapyrusVariable") {
+                auto pv = new PapyrusVariableCondition();
+                a_condition = pv;
+                pv->SetParameters(condition["formID"].get<std::string>(), condition["script"].get<std::string>(),
+                                  condition["variable"].get<std::string>(), condition["value"].get<int>());
             }
             else if (type == "BaseActorDeath") {
                 a_condition = new BaseActorDeathCondition();

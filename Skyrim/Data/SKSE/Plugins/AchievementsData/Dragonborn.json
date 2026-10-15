@@ -207,7 +207,15 @@
             "achievementName": "$NAME_Dragonrider",
             "description": "$DESC_Dragonrider",
             "icon": "ACH_Dragonrider.dds",
-            "conditions": []
+            "conditions": [
+                {
+                    "type": "PapyrusVariable",
+                    "formID": "0179E2",
+                    "script": "DLC2TameDragonScript",
+                    "variable": "iDragonsRiddenCount",
+                    "value": 5
+                }
+            ]
         },
         {
             "achievementName": "$NAME_Raven Rock Owner",
