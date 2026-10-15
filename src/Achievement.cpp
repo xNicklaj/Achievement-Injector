@@ -21,6 +21,8 @@
 #include "Conditions/SkillLevel/SkillLevelCondition.h"
 #include "Conditions/SpellCast/SpellCastCondition.h"
 #include "Conditions/MagicEffectApplied/MagicEffectAppliedCondition.h"
+#include "Conditions/FactionRank/FactionRankCondition.h"
+#include "Conditions/ItemEquipped/ItemEquippedCondition.h"
 #include "Conditions/QuestStageDone/QuestStageDoneCondition.h"
 #include "Conditions/PlayerFirstEnterCell/PlayerFirstEnterCellCondition.h"
 #include "Conditions/ItemCrafted/ItemCraftedCondition.h"
@@ -122,6 +124,14 @@ Achievement::Achievement(json& jsonData, std::string plugin, std::string groupNa
             else if (type == "MagicEffectApplied") {
                 a_condition = new MagicEffectAppliedCondition();
                 a_condition->SetConditionParameters(condition["formID"].get<std::string>(), condition.value("quantity", 1));
+            }
+            else if (type == "FactionRank") {
+                a_condition = new FactionRankCondition();
+                a_condition->SetConditionParameters(condition["formID"].get<std::string>(), condition.value("rank", 0));
+            }
+            else if (type == "ItemEquipped") {
+                a_condition = new ItemEquippedCondition();
+                a_condition->SetConditionParameters(condition["formID"].get<std::string>());
             }
             else if (type == "FirstEnterCell") {
                 a_condition = new PlayerFirstEnterCellCondition();

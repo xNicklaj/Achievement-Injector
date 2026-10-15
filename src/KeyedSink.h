@@ -52,6 +52,12 @@ struct KeyedEvent<RE::TESMagicEffectApplyEvent> {
 };
 
 template <>
+struct KeyedEvent<RE::TESEquipEvent> {
+    static RE::BSTEventSource<RE::TESEquipEvent>* Source() { return RE::ScriptEventSourceHolder::GetSingleton()->GetEventSource<RE::TESEquipEvent>(); }
+    static std::array<std::uint64_t, 1> Keys(const RE::TESEquipEvent& e) { return {e.baseObject}; }
+};
+
+template <>
 struct KeyedEvent<RE::TESActivateEvent> {
     static RE::BSTEventSource<RE::TESActivateEvent>* Source() { return RE::ScriptEventSourceHolder::GetSingleton()->GetEventSource<RE::TESActivateEvent>(); }
     static std::array<std::uint64_t, 1> Keys(const RE::TESActivateEvent& e) { return {e.objectActivated ? e.objectActivated->GetFormID() : 0}; }
@@ -164,6 +170,7 @@ inline void ClearKeyedSinks() {
     KeyedSink<RE::TESTrackedStatsEvent>::GetSingleton()->Clear();
     KeyedSink<RE::TESContainerChangedEvent>::GetSingleton()->Clear();
     KeyedSink<RE::TESActivateEvent>::GetSingleton()->Clear();
+    KeyedSink<RE::TESEquipEvent>::GetSingleton()->Clear();
     KeyedSink<RE::TESSpellCastEvent>::GetSingleton()->Clear();
     KeyedSink<RE::TESMagicEffectApplyEvent>::GetSingleton()->Clear();
     KeyedSink<RE::TESDeathEvent>::GetSingleton()->Clear();
