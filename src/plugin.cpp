@@ -134,6 +134,11 @@ void MessageHandler(SKSE::MessagingInterface::Message* a_msg) {
                 AchievementGroup ag(achievementFile.groupName, achievementFile.plugin, achievementFile.iconPath);
                 ag.SetShowInMenu(achievementFile.showInMenu);
                 ag.SetId(StripExtension(achievementFile.path));
+                // Localized after construction: the constructor derives the sort priority from the raw name
+                if (ag.name.starts_with("$")) {
+                    auto* lm = LocalizationManager::GetSingleton();
+                    ag.name = lm->GetLocalizedText(ag.groupid, lm->CurrentLocale(), ag.name);
+                }
                 for (json achievement: achievementFile.FileData) {
                     try {
                         ag.achievements.push_back(new Achievement(achievement, ag.plugin, StripExtension(achievementFile.path)));
