@@ -1,0 +1,177 @@
+{
+    "groupName": "Test",
+    "plugin": "Skyrim.esm",
+    "achievements": [
+        {
+            "achievementName": "Test QuestStageDone",
+            "description": "MQ102 (Before the Storm) stage >= 10. Console: setstage MQ102 10",
+            "conditions": [ { "type": "QuestStageDone", "formID": "04E50D", "stage": 10 } ]
+        },
+        {
+            "achievementName": "Test QuestObjectiveDone",
+            "description": "MQ102 objective 10 displayed. Console: setobjectivedisplayed MQ102 10 1",
+            "conditions": [ { "type": "QuestObjectiveDone", "formID": "04E50D", "objective": 10 } ]
+        },
+        {
+            "achievementName": "Test PlayerLevel",
+            "description": "Reach level 2. Console: player.advlevel",
+            "conditions": [ { "type": "PlayerLevel", "level": 2 } ]
+        },
+        {
+            "achievementName": "Test SkillLevel",
+            "description": "One-Handed 25. Console: player.advskill onehanded 2000",
+            "conditions": [ { "type": "SkillLevel", "skill": "onehanded", "level": 25 } ]
+        },
+        {
+            "achievementName": "Test ItemInInventory",
+            "description": "Hold 100 gold. Console: player.additem f 100",
+            "conditions": [ { "type": "ItemInInventory", "formID": "00000F", "quantity": 100 } ]
+        },
+        {
+            "achievementName": "Test LocationDiscovery Name",
+            "description": "Discover Riverwood (by location name, Tamriel)",
+            "conditions": [ { "type": "LocationDiscovery", "locationID": "Riverwood", "worldspaceID": "Tamriel" } ]
+        },
+        {
+            "achievementName": "Test LocationDiscovery FormID",
+            "description": "Discover Embershard Mine (map marker ref 0B6CDF). Console: player.moveto b6cdf",
+            "conditions": [ { "type": "LocationDiscovery", "formID": "0B6CDF", "worldspaceID": "Tamriel" } ]
+        },
+        {
+            "achievementName": "Test WorldspaceDiscovery",
+            "description": "Discover 3 map markers in Tamriel",
+            "conditions": [ { "type": "WorldspaceDiscovery", "worldspaceID": "Tamriel", "requiredCount": 3 } ]
+        },
+        {
+            "achievementName": "Test QueryStatValue",
+            "description": "Locations Discovered stat >= 3",
+            "conditions": [ { "type": "QueryStatValue", "stat": "Locations Discovered", "value": 3 } ]
+        },
+        {
+            "achievementName": "Test DragonSoulAbsorbed",
+            "description": "Absorb 1 dragon soul. Console: player.placeatme 1ca05 (Mirmulnir), kill it",
+            "conditions": [ { "type": "DragonSoulAbsorbed", "quantity": 1 } ]
+        },
+        {
+            "achievementName": "Test PlayerActivation",
+            "description": "Activate the Warrior Stone (ref 0E7BDD). Console: player.moveto e7bdd",
+            "conditions": [ { "type": "PlayerActivation", "formID": "0E7BDD" } ]
+        },
+        {
+            "achievementName": "Test FirstEnterCell",
+            "description": "Enter the Sleeping Giant Inn. Console: coc RiverwoodSleepingGiantInn",
+            "conditions": [ { "type": "FirstEnterCell", "cellID": "0133C6" } ]
+        },
+        {
+            "achievementName": "Test ItemCrafted",
+            "description": "Forge an Iron Dagger. Console: player.additem 5ace4 1, player.additem 800e4 1",
+            "conditions": [ { "type": "ItemCrafted", "formID": "01397E" } ]
+        },
+        {
+            "achievementName": "Test BookRead",
+            "description": "Read The Lusty Argonian Maid v1. Console: player.additem 1acef 1",
+            "conditions": [ { "type": "BookRead", "formID": "01ACEF" } ]
+        },
+        {
+            "achievementName": "Test ActorDeath",
+            "description": "Faendal (ref 01348C) dies. Console: prid 1348c, kill",
+            "conditions": [ { "type": "ActorDeath", "formID": "01348C" } ]
+        },
+        {
+            "achievementName": "Test BaseActorDeath FormID",
+            "description": "Kill 2 wolves (EncWolf 023ABE). Console: player.placeatme 23abe 2",
+            "conditions": [ { "type": "BaseActorDeath", "formID": "023ABE", "quantity": 2 } ]
+        },
+        {
+            "achievementName": "Test BaseActorDeath Name",
+            "description": "Kill 1 actor named Wolf. Console: player.placeatme 23abe",
+            "conditions": [ { "type": "BaseActorDeath", "name": "Wolf", "quantity": 1 } ]
+        },
+        {
+            "achievementName": "Test GlobalVariableState",
+            "description": "TimeScale >= 30. Console: set timescale to 30, then coc anywhere (checked on player move)",
+            "conditions": [ { "type": "GlobalVariableState", "formID": "00003A", "value": 30.0 } ]
+        },
+        {
+            "achievementName": "Test SpellLearned",
+            "description": "Learn Sparks. Console: player.addspell 2dd2a",
+            "conditions": [ { "type": "SpellLearned", "formID": "02DD2A" } ]
+        },
+        {
+            "achievementName": "Test LocationCleared",
+            "description": "Clear Bleak Falls Barrow (location 018EE9)",
+            "conditions": [ { "type": "LocationCleared", "formID": "018EE9" } ]
+        },
+        {
+            "achievementName": "Test ShoutLearned",
+            "description": "Unrelenting Force, 1 word. Console: player.addshout 13e07, player.teachword 13e22",
+            "conditions": [ { "type": "ShoutLearned", "formID": "013E07", "words": 1 } ]
+        },
+        {
+            "achievementName": "Test AchievementUnlocked",
+            "description": "Unlocks after Test PlayerLevel",
+            "conditions": [ { "type": "AchievementUnlocked", "achievement": "Test PlayerLevel" } ]
+        },
+        {
+            "achievementName": "Test ObjectState",
+            "description": "Lydia (ref 0A2C94) disabled. Console: prid a2c94, disable",
+            "conditions": [ { "type": "ObjectState", "formID": "0A2C94", "enabled": false } ]
+        },
+        {
+            "achievementName": "Test PapyrusBinding",
+            "description": "Console: ai uach -n \"Test PapyrusBinding\" -g \"Test\"",
+            "conditions": [ { "type": "PapyrusBinding" } ]
+        },
+        {
+            "achievementName": "Test PlayerCrime",
+            "description": "Bounty >= 40 in Whiterun Hold (CrimeFactionWhiterun 0267EA)",
+            "conditions": [ { "type": "PlayerCrime", "factions": [ "0267EA" ], "threshold": 40 } ]
+        },
+        {
+            "achievementName": "Test HasPerk",
+            "description": "Have Armsman rank 1. Console: player.addperk babe4",
+            "conditions": [ { "type": "HasPerk", "formID": "0BABE4" } ]
+        },
+        {
+            "achievementName": "Test HasPerks",
+            "description": "Have Armsman ranks 1 and 2. Console: player.addperk babe4, player.addperk 79343",
+            "conditions": [ { "type": "HasPerks", "perks": [ "0BABE4", "079343" ], "threshold": 2 } ]
+        },
+        {
+            "achievementName": "Test SpellCast",
+            "description": "Cast Flames. Console: player.addspell 12fcd, equip it, then cast",
+            "conditions": [ { "type": "SpellCast", "formID": "012FCD" } ]
+        },
+        {
+            "achievementName": "Test MagicEffectApplied",
+            "description": "Apply RestoreHealthConcSelf (01CEA4) to yourself. Console: player.addspell 12fcc (Healing), then cast",
+            "conditions": [ { "type": "MagicEffectApplied", "formID": "01CEA4" } ]
+        },
+        {
+            "achievementName": "Test SpellCast Quantity",
+            "description": "Cast Flames 3 times. Console: player.addspell 12fcd, equip it, then cast 3 times (save/reload between casts to test persistence)",
+            "conditions": [ { "type": "SpellCast", "formID": "012FCD", "quantity": 3 } ]
+        },
+        {
+            "achievementName": "Test FactionRank",
+            "description": "Join Companions (rank 0, 048362 - verify in CK). Console: player.addfac 48362 0",
+            "conditions": [ { "type": "FactionRank", "formID": "048362" } ]
+        },
+        {
+            "achievementName": "Test ItemEquipped",
+            "description": "Equip Iron Dagger (01397E). Console: player.additem 1397e 1, then equip it",
+            "conditions": [ { "type": "ItemEquipped", "formID": "01397E" } ]
+        },
+        {
+            "achievementName": "Test ItemEquipped Set",
+            "description": "Equip a full Iron set (armor, helmet, gauntlets, boots). Console: player.additem 12e49 1, 12e4d 1, 12e46 1, 12e4b 1",
+            "joinType": "AND",
+            "conditions": [
+                { "type": "ItemEquipped", "formID": "012E49" },
+                { "type": "ItemEquipped", "formID": "012E4D" },
+                { "type": "ItemEquipped", "formID": "012E46" },
+                { "type": "ItemEquipped", "formID": "012E4B" }
+            ]
+        }
+    ]
+}
