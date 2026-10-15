@@ -66,7 +66,11 @@
             "achievementName": "$NAME_Auriel's Bow",
             "description": "$DESC_Auriel's Bow",
             "icon": "ACH_AurielsBow.dds",
-            "conditions": []
+            "conditions": [
+                { "type": "MagicEffectApplied", "formID": "018C5A" },
+                { "type": "MagicEffectApplied", "formID": "00C60E" },
+                { "type": "MagicEffectApplied", "formID": "00CE10" }
+            ]
         },
         {
             "achievementName": "$NAME_Werewolf Mastered",

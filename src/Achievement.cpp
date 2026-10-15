@@ -19,6 +19,8 @@
 #include "Conditions/PlayerActivation/PlayerActivationCondition.h"
 #include "Conditions/PlayerLevel/PlayerLevelCondition.h"
 #include "Conditions/SkillLevel/SkillLevelCondition.h"
+#include "Conditions/SpellCast/SpellCastCondition.h"
+#include "Conditions/MagicEffectApplied/MagicEffectAppliedCondition.h"
 #include "Conditions/QuestStageDone/QuestStageDoneCondition.h"
 #include "Conditions/PlayerFirstEnterCell/PlayerFirstEnterCellCondition.h"
 #include "Conditions/ItemCrafted/ItemCraftedCondition.h"
@@ -110,6 +112,14 @@ Achievement::Achievement(json& jsonData, std::string plugin, std::string groupNa
             }
             else if (type == "PlayerActivation") {
                 a_condition = new PlayerActivationCondition();
+                a_condition->SetConditionParameters(condition["formID"].get<std::string>());
+            }
+            else if (type == "SpellCast") {
+                a_condition = new SpellCastCondition();
+                a_condition->SetConditionParameters(condition["formID"].get<std::string>());
+            }
+            else if (type == "MagicEffectApplied") {
+                a_condition = new MagicEffectAppliedCondition();
                 a_condition->SetConditionParameters(condition["formID"].get<std::string>());
             }
             else if (type == "FirstEnterCell") {
