@@ -33,6 +33,7 @@
 #include "Conditions/PapyrusVariable/PapyrusVariableCondition.h"
 #include "Conditions/ActorDeath/ActorDeathCondition.h"
 #include "Conditions/GlobalVariableState/GlobalVariableStateCondition.h"
+#include "Conditions/CustomSkillLevel/CustomSkillLevelCondition.h"
 #include "Conditions/BaseActorDeath/BaseActorDeathCondition.h"
 #include "Conditions/SpellLearned/SpellLearnedCondition.h"
 #include "Conditions/ShoutLearned/ShoutLearnedCondition.h"
@@ -155,6 +156,10 @@ Achievement::Achievement(json& jsonData, std::string plugin, std::string groupNa
             else if (type == "GlobalVariableState") {
                 a_condition = new GlobalVariableStateCondition();
                 a_condition->SetConditionParameters(condition["formID"].get<std::string>(), condition["value"].get<float>());
+            }
+            else if (type == "CustomSkillLevel") {
+                a_condition = new CustomSkillLevelCondition();
+                a_condition->SetConditionParameters(condition["skill"].get<std::string>(), condition["level"].get<float>());
             }
             else if (type == "QueryStatValue") {
                 a_condition = new QueryStatValueCondition();

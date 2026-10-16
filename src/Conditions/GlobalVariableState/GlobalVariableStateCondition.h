@@ -12,9 +12,10 @@ public:
     bool CheckCondition();
 
 	RE::TESGlobal* cachedGlobal = nullptr;
-private:
+protected:
     std::string formID = "";
     float value = -1;
+private:
     RE::BSEventNotifyControl ProcessEvent(const RE::PositionPlayerEvent* a_event, RE::BSTEventSource<RE::PositionPlayerEvent>*) override;
 };
 

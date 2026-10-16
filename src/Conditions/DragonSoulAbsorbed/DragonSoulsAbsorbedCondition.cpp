@@ -15,6 +15,10 @@ void DragonSoulAbsorbedCondition::SetConditionParameters(int quantity_a) {
 }
 bool DragonSoulAbsorbedCondition::CheckCondition() {
     RE::TESGlobal* absorbed = RE::TESDataHandler::GetSingleton()->LookupForm<RE::TESGlobal>(0x1C0F2, "Skyrim.esm");
+    if (!absorbed) {
+        logger::warn("Dragon souls global not found.");
+        return false;
+    }
     float totalAbsorbed = absorbed->value;
     if (totalAbsorbed >= quantity) {
         logger::info("Player met condition absorbed souls {}", this->quantity);

@@ -1,0 +1,26 @@
+{
+    "groupName": "Test CSF",
+    "plugin": "ConstellationsNewSkills.esp",
+    "achievements": [
+        {
+            "achievementName": "Test CustomSkillLevel",
+            "description": "Athletics level 5. Console: csf incpcs Athletics (repeat 5 times)",
+            "conditions": [ { "type": "CustomSkillLevel", "skill": "Athletics", "level": 5 } ]
+        },
+        {
+            "achievementName": "Test CustomSkillLevel 25",
+            "description": "Athletics level 25. Console: csf incpcs Athletics (repeat 25 times)",
+            "conditions": [ { "type": "CustomSkillLevel", "skill": "Athletics", "level": 25 } ]
+        },
+        {
+            "achievementName": "Test CustomSkillLevel 30",
+            "description": "Athletics level 30. Console: csf incpcs Athletics (repeat 30 times)",
+            "conditions": [ { "type": "CustomSkillLevel", "skill": "Athletics", "level": 30 } ]
+        },
+        {
+            "achievementName": "Test CSF HasPerk",
+            "description": "Athletics perk Mastery. Take it in the Athletics perk menu, or console: player.addperk <load order>000175",
+            "conditions": [ { "type": "HasPerk", "formID": "000175" } ]
+        }
+    ]
+}
