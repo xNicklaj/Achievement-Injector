@@ -16,6 +16,7 @@ using namespace SKSE::stl;
 #include "settings.h"
 #include "LocalizationManager.h"
 #include "AchievementMenu.h"
+#include "Conditions/CustomSkillLevel/CustomSkillLevelCondition.h"
 
 using json = nlohmann::json;
 using namespace SKSE;
@@ -193,6 +194,7 @@ SKSEPluginLoad(const LoadInterface* skse) {
 
     const auto messaging = SKSE::GetMessagingInterface();
     messaging->RegisterListener("SKSE", MessageHandler);
+    messaging->RegisterListener("CustomSkills", OnCustomSkillsMessage);
 
     SKSE::GetPapyrusInterface()->Register(NativePapyrus::Register);
     std::thread(ProcessQueue).detach();
