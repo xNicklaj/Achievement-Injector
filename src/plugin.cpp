@@ -153,7 +153,10 @@ void MessageHandler(SKSE::MessagingInterface::Message* a_msg) {
             logger::info("Loaded {} achievement groups:", AchievementManager::GetSingleton()->achievementGroups.size());
             for (auto& achievementGroup: AchievementManager::GetSingleton()->achievementGroups) {
                 const bool pluginLoaded = RE::TESDataHandler::GetSingleton()->LookupModByName(achievementGroup.plugin) != nullptr;
-                logger::info("  {} ({}.json): plugin {} [{}], {} achievements", achievementGroup.name, achievementGroup.groupid,
+                std::string name = achievementGroup.name;
+                // Keeps the key if the lookup fails
+                if (name.starts_with("$")) SKSE::Translation::Translate(achievementGroup.name, name);
+                logger::info("  {} ({}.json): plugin {} [{}], {} achievements", name, achievementGroup.groupid,
                              achievementGroup.plugin, pluginLoaded ? "loaded" : "NOT loaded", achievementGroup.achievements.size());
             }
             EventProcessor::GetSingleton()->Register();
