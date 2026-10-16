@@ -144,8 +144,11 @@ void MessageHandler(SKSE::MessagingInterface::Message* a_msg) {
                 AchievementManager::GetSingleton()->achievementGroups.push_back(ag);
             }
 
+            logger::info("Loaded {} achievement groups:", AchievementManager::GetSingleton()->achievementGroups.size());
             for (auto& achievementGroup: AchievementManager::GetSingleton()->achievementGroups) {
-                logger::debug("Achievement group {} has {} achievements", achievementGroup.name, achievementGroup.achievements.size());
+                const bool pluginLoaded = RE::TESDataHandler::GetSingleton()->LookupModByName(achievementGroup.plugin) != nullptr;
+                logger::info("  {} ({}.json): plugin {} [{}], {} achievements", achievementGroup.name, achievementGroup.groupid,
+                             achievementGroup.plugin, pluginLoaded ? "loaded" : "NOT loaded", achievementGroup.achievements.size());
             }
             EventProcessor::GetSingleton()->Register();
             Scaleform::AchievementWidget::Register();
