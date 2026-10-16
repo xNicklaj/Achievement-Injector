@@ -17,56 +17,63 @@ inline std::uint64_t StatKey(std::string_view stat) {
     return hash;
 }
 
+// Null before the game has created its event holder
+template <class E>
+RE::BSTEventSource<E>* HolderSource() {
+    auto* holder = RE::ScriptEventSourceHolder::GetSingleton();
+    return holder ? holder->GetEventSource<E>() : nullptr;
+}
+
 // Source(): where the game sends E. Keys(e): every key e is delivered under.
 template <class E>
 struct KeyedEvent;
 
 template <>
 struct KeyedEvent<RE::TESQuestStageEvent> {
-    static RE::BSTEventSource<RE::TESQuestStageEvent>* Source() { return RE::ScriptEventSourceHolder::GetSingleton()->GetEventSource<RE::TESQuestStageEvent>(); }
+    static RE::BSTEventSource<RE::TESQuestStageEvent>* Source() { return HolderSource<RE::TESQuestStageEvent>(); }
     static std::array<std::uint64_t, 1> Keys(const RE::TESQuestStageEvent& e) { return {e.formID}; }
 };
 
 template <>
 struct KeyedEvent<RE::TESTrackedStatsEvent> {
-    static RE::BSTEventSource<RE::TESTrackedStatsEvent>* Source() { return RE::ScriptEventSourceHolder::GetSingleton()->GetEventSource<RE::TESTrackedStatsEvent>(); }
+    static RE::BSTEventSource<RE::TESTrackedStatsEvent>* Source() { return HolderSource<RE::TESTrackedStatsEvent>(); }
     static std::array<std::uint64_t, 1> Keys(const RE::TESTrackedStatsEvent& e) { return {StatKey(e.stat.c_str() ? e.stat.c_str() : "")}; }
 };
 
 template <>
 struct KeyedEvent<RE::TESContainerChangedEvent> {
-    static RE::BSTEventSource<RE::TESContainerChangedEvent>* Source() { return RE::ScriptEventSourceHolder::GetSingleton()->GetEventSource<RE::TESContainerChangedEvent>(); }
+    static RE::BSTEventSource<RE::TESContainerChangedEvent>* Source() { return HolderSource<RE::TESContainerChangedEvent>(); }
     static std::array<std::uint64_t, 1> Keys(const RE::TESContainerChangedEvent& e) { return {e.baseObj}; }
 };
 
 template <>
 struct KeyedEvent<RE::TESSpellCastEvent> {
-    static RE::BSTEventSource<RE::TESSpellCastEvent>* Source() { return RE::ScriptEventSourceHolder::GetSingleton()->GetEventSource<RE::TESSpellCastEvent>(); }
+    static RE::BSTEventSource<RE::TESSpellCastEvent>* Source() { return HolderSource<RE::TESSpellCastEvent>(); }
     static std::array<std::uint64_t, 1> Keys(const RE::TESSpellCastEvent& e) { return {e.spell}; }
 };
 
 template <>
 struct KeyedEvent<RE::TESMagicEffectApplyEvent> {
-    static RE::BSTEventSource<RE::TESMagicEffectApplyEvent>* Source() { return RE::ScriptEventSourceHolder::GetSingleton()->GetEventSource<RE::TESMagicEffectApplyEvent>(); }
+    static RE::BSTEventSource<RE::TESMagicEffectApplyEvent>* Source() { return HolderSource<RE::TESMagicEffectApplyEvent>(); }
     static std::array<std::uint64_t, 1> Keys(const RE::TESMagicEffectApplyEvent& e) { return {e.magicEffect}; }
 };
 
 template <>
 struct KeyedEvent<RE::TESEquipEvent> {
-    static RE::BSTEventSource<RE::TESEquipEvent>* Source() { return RE::ScriptEventSourceHolder::GetSingleton()->GetEventSource<RE::TESEquipEvent>(); }
+    static RE::BSTEventSource<RE::TESEquipEvent>* Source() { return HolderSource<RE::TESEquipEvent>(); }
     static std::array<std::uint64_t, 1> Keys(const RE::TESEquipEvent& e) { return {e.baseObject}; }
 };
 
 template <>
 struct KeyedEvent<RE::TESActivateEvent> {
-    static RE::BSTEventSource<RE::TESActivateEvent>* Source() { return RE::ScriptEventSourceHolder::GetSingleton()->GetEventSource<RE::TESActivateEvent>(); }
+    static RE::BSTEventSource<RE::TESActivateEvent>* Source() { return HolderSource<RE::TESActivateEvent>(); }
     static std::array<std::uint64_t, 1> Keys(const RE::TESActivateEvent& e) { return {e.objectActivated ? e.objectActivated->GetFormID() : 0}; }
 };
 
 // Delivered under the dying reference, its base actor and, for leveled spawns, the record it was templated from
 template <>
 struct KeyedEvent<RE::TESDeathEvent> {
-    static RE::BSTEventSource<RE::TESDeathEvent>* Source() { return RE::ScriptEventSourceHolder::GetSingleton()->GetEventSource<RE::TESDeathEvent>(); }
+    static RE::BSTEventSource<RE::TESDeathEvent>* Source() { return HolderSource<RE::TESDeathEvent>(); }
     static std::array<std::uint64_t, 3> Keys(const RE::TESDeathEvent& e) {
         if (!e.actorDying) return {0, 0, 0};
         const auto* base = e.actorDying->GetBaseObject();
@@ -77,7 +84,7 @@ struct KeyedEvent<RE::TESDeathEvent> {
 
 template <>
 struct KeyedEvent<RE::BGSActorCellEvent> {
-    static RE::BSTEventSource<RE::BGSActorCellEvent>* Source() { return RE::PlayerCharacter::GetSingleton()->AsBGSActorCellEventSource(); }
+    static RE::BSTEventSource<RE::BGSActorCellEvent>* Source() { auto* player = RE::PlayerCharacter::GetSingleton(); return player ? player->AsBGSActorCellEventSource() : nullptr; }
     static std::array<std::uint64_t, 1> Keys(const RE::BGSActorCellEvent& e) { return {e.cellID}; }
 };
 
@@ -153,8 +160,13 @@ private:
         if (std::find(sinks.begin(), sinks.end(), sink) == sinks.end()) sinks.push_back(sink);
         // Hooked on first use: the player's event sources do not exist yet when the plugin loads
         if (!hooked) {
+            auto* source = KeyedEvent<E>::Source();
+            if (!source) {
+                logger::warn("Event source not available yet; will retry on the next subscription.");
+                return;
+            }
+            source->AddEventSink(this);
             hooked = true;
-            KeyedEvent<E>::Source()->AddEventSink(this);
         }
     }
 
