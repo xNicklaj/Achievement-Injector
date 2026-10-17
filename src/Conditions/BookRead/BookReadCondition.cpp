@@ -22,7 +22,8 @@ void BookReadCondition::Localize(std::string path) {
 }
 bool BookReadCondition::CheckCondition() { return false; }
 RE::BSEventNotifyControl BookReadCondition::ProcessEvent(const RE::BooksRead::Event* a_event, RE::BSTEventSource<RE::BooksRead::Event>*) {
-	std::string targetName = a_event->book->GetFullName();
+	if (!a_event || !IsValidEventPtr(a_event->book, "BooksRead book")) return RE::BSEventNotifyControl::kContinue;
+	std::string targetName =a_event->book->GetFullName();
     bool IsHex = isHex(identifier);
 	if ((IsHex && this->cachedBook && this->cachedBook->formID == a_event->book->formID) || (!IsHex && targetName == this->identifier))
 	{

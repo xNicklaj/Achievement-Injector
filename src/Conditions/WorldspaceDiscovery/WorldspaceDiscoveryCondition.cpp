@@ -52,6 +52,7 @@ bool WorldspaceDiscoveryCondition::CheckCondition() {
 }
 
 RE::BSEventNotifyControl WorldspaceDiscoveryCondition::ProcessEvent(const RE::LocationDiscovery::Event* a_event, RE::BSTEventSource<RE::LocationDiscovery::Event>*) {
+	if (!a_event || !IsValidEventPtr(a_event->worldspaceID, "LocationDiscovery worldspaceID")) return RE::BSEventNotifyControl::kContinue;
 	if (a_event->worldspaceID == this->worldspaceID) {
 		CheckCondition();
 	}

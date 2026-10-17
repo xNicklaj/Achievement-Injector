@@ -14,6 +14,13 @@ std::string replaceAll(std::string, const std::string&, const std::string&);
 std::string NumToString(long);
 RE::ActorValue StringToActorValue(std::string value);
 std::string FormIDToString(RE::FormID formID);
+// Event payloads from CommonLib are not always laid out as declared (SpellsLearned arrived as a small integer, 0x46).
+// Anything below the first 64K page can't be a real object, so log it and let the caller skip the event.
+inline bool IsValidEventPtr(const void* ptr, const char* what) {
+    if (reinterpret_cast<std::uintptr_t>(ptr) >= 0x10000) return true;
+    logger::error("Invalid {} pointer {} in event payload, ignoring event.", what, ptr);
+    return false;
+}
 void ReadJson(const std::string& filePath, json* jsonData);
 RE::TESForm* GetForm(std::string FormID, std::string baseEsp);
 // GetForm for callers that need a specific record type: a form ID that resolves to another

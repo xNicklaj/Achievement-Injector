@@ -97,6 +97,8 @@ bool LocationDiscoveryCondition::CheckCondition(std::string locationName_l, std:
     return false;
 }
 RE::BSEventNotifyControl LocationDiscoveryCondition::ProcessEvent(const RE::LocationDiscovery::Event* a_event, RE::BSTEventSource<RE::LocationDiscovery::Event>*) {
+    if (!a_event || !IsValidEventPtr(a_event->mapMarkerData, "LocationDiscovery mapMarkerData") || !IsValidEventPtr(a_event->worldspaceID, "LocationDiscovery worldspaceID"))
+        return RE::BSEventNotifyControl::kContinue;
     if (this->formID != "") {
         RE::TESObjectREFR* refr = FindMapMarkerByData(a_event->mapMarkerData);
         if (refr) {

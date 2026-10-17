@@ -18,11 +18,10 @@ void SpellLearnedCondition::SetConditionParameters(std::string formID) {
     this->FormID = formID;
 }
 RE::BSEventNotifyControl SpellLearnedCondition::ProcessEvent(const RE::SpellsLearned::Event* a_event, RE::BSTEventSource<RE::SpellsLearned::Event>*) {
-    if(!a_event || !a_event->spell) return RE::BSEventNotifyControl::kContinue;
-    if (this->cachedSpell && a_event->spell->GetFormID() == this->cachedSpell->formID) {
-        CheckCondition();
-    }
-    
+    // The event payload is not a valid SpellItem* in practice (crashes with a garbage pointer), so never read through it: ask the player instead.
+    // The check is only here to leave a trace in the log.
+    IsValidEventPtr(a_event ? a_event->spell : nullptr, "SpellsLearned spell");
+    if (!this->isMet) CheckCondition();
     return RE::BSEventNotifyControl::kContinue;
 }
 RE::BSEventNotifyControl SpellLearnedCondition::ProcessEvent(const RE::PositionPlayerEvent*, RE::BSTEventSource<RE::PositionPlayerEvent>*) {
