@@ -13,14 +13,28 @@ void ItemCraftedCondition::EnableListener() {
 void ItemCraftedCondition::SetConditionParameters(std::string itemID__a) {
 	this->itemID = itemID__a;
 }
+void ItemCraftedCondition::SetConditionParameters(std::string itemID_a, int quantity_a) {
+	this->itemID = itemID_a;
+	this->quantity = quantity_a;
+}
+int ItemCraftedCondition::Serialize() {
+	return currQuantity;
+}
+bool ItemCraftedCondition::Deserialize(int value) {
+	this->currQuantity = value;
+	return this->currQuantity >= this->quantity;
+}
 bool ItemCraftedCondition::CheckCondition(RE::FormID itemID_a) {
 	auto* target = this->cachedForm;
 	if(target == NULL) return false;
 	if (itemID_a == target->formID) {
-		logger::info("Player met condition crafted {}.", this->itemID);
-		this->UnlockNotify();
-		RE::ItemCrafted::GetEventSource()->RemoveEventSink(this);
-		return true;
+		if (++this->currQuantity >= this->quantity) {
+			logger::info("Player met condition crafted {}.", this->itemID);
+			this->UnlockNotify();
+			RE::ItemCrafted::GetEventSource()->RemoveEventSink(this);
+			return true;
+		}
+		this->eventManager->dispatch("SerializationRequested");
 	}
 	return false;
 }

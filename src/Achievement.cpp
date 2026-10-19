@@ -116,7 +116,7 @@ Achievement::Achievement(json& jsonData, std::string plugin, std::string groupNa
             }
             else if (type == "PlayerActivation") {
                 a_condition = new PlayerActivationCondition();
-                a_condition->SetConditionParameters(condition["formID"].get<std::string>());
+                a_condition->SetConditionParameters(condition["formID"].get<std::string>(), condition.value("quantity", 1));
             }
             else if (type == "SpellCast") {
                 a_condition = new SpellCastCondition();
@@ -140,7 +140,7 @@ Achievement::Achievement(json& jsonData, std::string plugin, std::string groupNa
             }
             else if (type == "ItemCrafted") {
                 a_condition = new ItemCraftedCondition();
-                a_condition->SetConditionParameters(condition["formID"].get<std::string>());
+                a_condition->SetConditionParameters(condition["formID"].get<std::string>(), condition.value("quantity", 1));
             }
             else if (type == "BookRead") {
                 a_condition = new BookReadCondition();

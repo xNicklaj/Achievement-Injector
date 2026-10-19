@@ -13,14 +13,27 @@ void PlayerActivationCondition::EnableListener(void) {
 void PlayerActivationCondition::SetConditionParameters(std::string formid_a) {
 	this->formid = formid_a;
 };
+void PlayerActivationCondition::SetConditionParameters(std::string formid_a, int quantity_a) {
+	this->formid = formid_a;
+	this->quantity = quantity_a;
+};
+int PlayerActivationCondition::Serialize() {
+	return currQuantity;
+}
+bool PlayerActivationCondition::Deserialize(int value) {
+	this->currQuantity = value;
+	return this->currQuantity >= this->quantity;
+}
 bool PlayerActivationCondition::CheckCondition() {
 	return false;
 };
 RE::BSEventNotifyControl PlayerActivationCondition::ProcessEvent(const RE::TESActivateEvent* a_event, RE::BSTEventSource<RE::TESActivateEvent>*) {
 	if (this->cachedFormID && a_event->actionRef && a_event->actionRef->IsPlayerRef() && a_event->objectActivated && a_event->objectActivated->GetFormID() == this->cachedFormID) {
-		logger::info("Player met condition activation {}", this->formid);
-		this->UnlockNotify();
-		KeyedSink<RE::TESActivateEvent>::GetSingleton()->Unsubscribe(this);
+		if (++this->currQuantity >= this->quantity) {
+			logger::info("Player met condition activation {}", this->formid);
+			this->UnlockNotify();
+			KeyedSink<RE::TESActivateEvent>::GetSingleton()->Unsubscribe(this);
+		} else this->eventManager->dispatch("SerializationRequested");
 	}
 	return RE::BSEventNotifyControl::kContinue;
 };
