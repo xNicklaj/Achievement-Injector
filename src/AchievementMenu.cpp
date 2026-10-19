@@ -25,7 +25,12 @@ namespace Scaleform {
 
         auto& view = this->uiMovie;
         //view->SetMouseCursorCount(0);
-        Internal::Interface::FunctionManager::AttachSKSEFunctions(view);
+        // LoadMovieEx leaves the view null when the SWF can't be loaded (missing/misplaced Interface files)
+        if (view) {
+            Internal::Interface::FunctionManager::AttachSKSEFunctions(view);
+        } else {
+            logger::error("Failed to load menu movie {}; is the mod installed correctly (Data/Interface)?", MENU_PATH);
+        }
         
         //RE::UIBlurManager::GetSingleton()->blurCount = 0;
 
