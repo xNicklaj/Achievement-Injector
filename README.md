@@ -1,5 +1,5 @@
-﻿
 # Achievement Injector
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/xNicklaj/Achievement-Injector)
 
 This skyrim mod allows modders to create custom in-game achievements that can be unlocked by the player. Releases and more informations about the mod can be found on nexusmods.
 If you're developing your addon for this mod and you need help, feel free to join the discord in the nexusmods page.
