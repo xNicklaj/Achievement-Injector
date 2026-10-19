@@ -13,10 +13,14 @@ static std::string ToUtf8(const std::string& s) {
     return out;
 }
 
+// Locales are compared uppercase: the ini may say English or ENGLISH, and a BSA lowercases file names (hotm_en.txt)
+static std::string ToUpper(std::string s) {
+    std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c) { return static_cast<char>(std::toupper(c)); });
+    return s;
+}
+
 LocalizationManager::LocalizationManager() {
-    this->currentLocale = std::string(RE::GetINISetting("sLanguage:General")->GetString()).substr(0,2);
-    // Localization files are named <Group>_EN.txt, while the ini may say English or ENGLISH
-    std::transform(this->currentLocale.begin(), this->currentLocale.end(), this->currentLocale.begin(), [](unsigned char c) { return static_cast<char>(std::toupper(c)); });
+    this->currentLocale = ToUpper(std::string(RE::GetINISetting("sLanguage:General")->GetString()).substr(0,2));
     logger::info("Game settings is {}.", this->currentLocale);
     this->LoadLocalizations();
 }
@@ -31,7 +35,7 @@ void LocalizationManager::LoadLocalizations() {
         for (const auto& entry : std::filesystem::directory_iterator(LOCALIZATION_PATH)) {
 
             std::string filename = entry.path().filename().string();
-            std::string locale = StripExtension(filename.substr(filename.find_last_of('_') + 1));
+            std::string locale = ToUpper(StripExtension(filename.substr(filename.find_last_of('_') + 1)));
             std::string groupName = filename.substr(0, filename.find_last_of('_'));
 
             // TODO Maybe read only my locale
@@ -42,7 +46,7 @@ void LocalizationManager::LoadLocalizations() {
     if (std::filesystem::exists(LOCALIZATION_PATH_2)) {
         for (const auto& entry : std::filesystem::directory_iterator(LOCALIZATION_PATH_2)) {
             std::string filename = entry.path().filename().string();
-            std::string locale = StripExtension(filename.substr(filename.find_last_of('_') + 1));
+            std::string locale = ToUpper(StripExtension(filename.substr(filename.find_last_of('_') + 1)));
             std::string groupName = filename.substr(0, filename.find_last_of('_'));
 
             // TODO Maybe read only my locale
