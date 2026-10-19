@@ -23,7 +23,8 @@ namespace Scaleform {
         inputContext = Context::kNone;
         // Above HUD Menu (2), which hosts the SkyUI widgets
         depthPriority = 3;
-        menuFlags.set(RE::UI_MENU_FLAGS::kAllowSaving, RE::UI_MENU_FLAGS::kCustomRendering,
+        // kAlwaysOpen keeps QuickLoot IE from treating the widget as a blocking menu
+        menuFlags.set(RE::UI_MENU_FLAGS::kAlwaysOpen, RE::UI_MENU_FLAGS::kAllowSaving, RE::UI_MENU_FLAGS::kCustomRendering,
             RE::UI_MENU_FLAGS::kAssignCursorToRenderer);
     }
 
