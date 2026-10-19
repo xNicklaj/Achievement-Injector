@@ -9,10 +9,12 @@ public:
     void OnDataLoaded() override;
     void EnableListener() override;
     void SetConditionParameters(std::string stat, float value) override;
+    void SetConditionParameters(std::string stat, std::string OP, float value) override;
     bool CheckCondition();
 
 private:
     std::string stat = "";
+    std::string OP = ">=";
     float value = -1;
 
     RE::BSEventNotifyControl ProcessEvent(const RE::TESTrackedStatsEvent* a_event, RE::BSTEventSource<RE::TESTrackedStatsEvent>* a_eventSource) override;

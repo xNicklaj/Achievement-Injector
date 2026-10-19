@@ -9,11 +9,13 @@ public:
     void OnDataLoaded() override;
     void EnableListener() override;
     void SetConditionParameters(std::string formID, float value) override;
+    void SetConditionParameters(std::string formID, std::string OP, float value) override;
     bool CheckCondition();
 
 	RE::TESGlobal* cachedGlobal = nullptr;
 protected:
     std::string formID = "";
+    std::string OP = ">=";
     float value = -1;
 private:
     RE::BSEventNotifyControl ProcessEvent(const RE::PositionPlayerEvent* a_event, RE::BSTEventSource<RE::PositionPlayerEvent>*) override;

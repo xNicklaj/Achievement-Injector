@@ -15,9 +15,15 @@ void QueryStatValueCondition::SetConditionParameters(std::string stat_a, float v
 	this->stat = stat_a;
 	this->value = value_a;
 };
+void QueryStatValueCondition::SetConditionParameters(std::string stat_a, std::string OP_a, float value_a) {
+	SetConditionParameters(stat_a, value_a);
+	this->OP = OP_a;
+	if (!IsValidOperation(OP_a))
+		logger::error("QueryStatValue: unknown operation \"{}\" for stat {}, this condition can never be met. Use >= or ==.", OP_a, stat_a);
+};
 bool QueryStatValueCondition::CheckCondition() {
 	int32_t globValue = RE::QueryStat(this->stat.c_str());
-	if (globValue >= this->value) {
+	if (CompareValues(this->OP, (float)globValue, this->value)) {
 		this->UnlockNotify();
 		return true;
 	}

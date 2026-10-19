@@ -31,6 +31,7 @@ public:
 	virtual void SetConditionParameters(std::string, std::string);
 	virtual void SetConditionParameters(std::string, std::string, std::string);
 	virtual void SetConditionParameters(std::string, float);
+	virtual void SetConditionParameters(std::string, std::string, float);
     virtual void SetConditionParameters(std::string, bool);
     virtual void SetConditionParameters(std::vector<std::string>, int);
 	virtual bool CheckCondition();
@@ -41,6 +42,9 @@ public:
 	void SetEventManager(eventpp::EventDispatcher<std::string, void()>* eventManager);
 	void SetPlugin(std::string plugin);
 	void UnlockNotify();
+	// Accepts ">="/"GT" or "=="/"EQ" (same as QuestStageDone); unknown operators never match.
+	static bool IsValidOperation(const std::string& op);
+	static bool CompareValues(const std::string& op, float actual, float expected);
 	
 	bool isMet = false;
 	std::string plugin = "Skyrim.esm";

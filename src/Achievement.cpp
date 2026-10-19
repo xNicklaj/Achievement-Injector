@@ -155,7 +155,7 @@ Achievement::Achievement(json& jsonData, std::string plugin, std::string groupNa
             }
             else if (type == "GlobalVariableState") {
                 a_condition = new GlobalVariableStateCondition();
-                a_condition->SetConditionParameters(condition["formID"].get<std::string>(), condition["value"].get<float>());
+                a_condition->SetConditionParameters(condition["formID"].get<std::string>(), condition.value("operation", ">="), condition["value"].get<float>());
             }
             else if (type == "CustomSkillLevel") {
                 a_condition = new CustomSkillLevelCondition();
@@ -163,7 +163,7 @@ Achievement::Achievement(json& jsonData, std::string plugin, std::string groupNa
             }
             else if (type == "QueryStatValue") {
                 a_condition = new QueryStatValueCondition();
-                a_condition->SetConditionParameters(condition["stat"].get<std::string>(), condition["value"].get<float>());
+                a_condition->SetConditionParameters(condition["stat"].get<std::string>(), condition.value("operation", ">="), condition["value"].get<float>());
             }
             else if (type == "PapyrusVariable") {
                 auto pv = new PapyrusVariableCondition();

@@ -16,11 +16,17 @@ void GlobalVariableStateCondition::SetConditionParameters(std::string formID_a, 
 	this->formID = formID_a;
 	this->value = value_a;
 };
+void GlobalVariableStateCondition::SetConditionParameters(std::string formID_a, std::string OP_a, float value_a) {
+	SetConditionParameters(formID_a, value_a);
+	this->OP = OP_a;
+	if (!IsValidOperation(OP_a))
+		logger::error("GlobalVariableState: unknown operation \"{}\" for global {}, this condition can never be met. Use >= or ==.", OP_a, formID_a);
+};
 bool GlobalVariableStateCondition::CheckCondition() {
 	if(this->isMet) return true;
 	if (!this->cachedGlobal) return false;
 	float globValue = this->cachedGlobal->value;
-	if(globValue >= this->value) {
+	if(CompareValues(this->OP, globValue, this->value)) {
 		this->UnlockNotify();
 		RE::PlayerCharacter::GetSingleton()->AsPositionPlayerEventSource()->RemoveEventSink(this);
 		return true;
