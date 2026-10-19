@@ -8,14 +8,24 @@ class AchievementsMenuInjector extends MovieClip {
     private var LoadGameIndex = 0;
     private var itemEmbedDone:Boolean = false;
 
+    function FindAchievementsIndex(entryList:Array) {
+        for ( var i = 0; i < entryList.length; i++ ) {
+            if ( entryList[ i ].isAchievements ) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     function onLoad() {
-        SystemPage = _parent._parent.QuestJournalFader.Menu_mc.SystemFader.Page_mc;
-        CategoryList = SystemPage.CategoryList_mc.List_mc;
+        this.SystemPage = this._parent._parent.QuestJournalFader.Menu_mc.SystemFader.Page_mc;
+        this.CategoryList = this.SystemPage.CategoryList_mc.List_mc;
         var _this = this;
-        CategoryList.__InvalidateData = CategoryList.InvalidateData;
-        CategoryList.InvalidateData = function() {
-            if ( _this.itemEmbedDone === false ) {
-                var entryList = _this.CategoryList.entryList;
+        _this.CategoryList.__InvalidateData = _this.CategoryList.InvalidateData;
+        _this.CategoryList.InvalidateData = function() {
+            // The game may rebuild entryList at any time, so insert whenever our entry is missing (not once)
+            var entryList = _this.CategoryList.entryList;
+            if ( _this.FindAchievementsIndex( entryList ) === -1 ) {
                 for ( var i = 0; i < entryList.length; i++ ) {
                     if ( entryList[ i ].text === '$LOAD' ) {
                         _this.LoadGameIndex = i + 1;
@@ -23,20 +33,27 @@ class AchievementsMenuInjector extends MovieClip {
                     }
                 }
                 _this.CategoryList.entryList = entryList.slice(0, _this.LoadGameIndex).concat( [ { text : '$ACH_MENULBL', isAchievements : true } ], entryList.slice( _this.LoadGameIndex ) );
-                _this.itemEmbedDone = true;
+                // Newer SystemPage dispatches on IDX_* positions it computed (by text) before our entry existed; recompute
+                if ( typeof _this.SystemPage.UpdateIndices === 'function' ) {
+                    _this.SystemPage.UpdateIndices();
+                }
             }
             _this.CategoryList.__InvalidateData();
         }
-        CategoryList.InvalidateData();
+        _this.CategoryList.InvalidateData();
 
-        SystemPage.__onCategoryButtonPress = SystemPage.onCategoryButtonPress;
-        SystemPage.onCategoryButtonPress = function(event:Object) {
+        _this.SystemPage.__onCategoryButtonPress = _this.SystemPage.onCategoryButtonPress;
+        _this.SystemPage.onCategoryButtonPress = function(event:Object) {
             _this.LogObject(event.entry);
             if ( event.entry.isAchievements ) {
                 skse.SendModEvent( 'AchievementsMenu_Open' );
             } else {
-                if ( event.index > _this.LoadGameIndex ) {
-                    event.index--;
+                // Older SystemPage dispatches on fixed vanilla positions, so hide our entry from the index
+                if ( typeof _this.SystemPage.UpdateIndices !== 'function' ) {
+                    var achIndex = _this.FindAchievementsIndex( _this.CategoryList.entryList );
+                    if ( achIndex !== -1 && event.index > achIndex ) {
+                        event.index--;
+                    }
                 }
 
                 _this.SystemPage.__onCategoryButtonPress(event);
