@@ -167,8 +167,8 @@ class AchievementMenu extends MovieClip {
 					if(groupId != newObject.groupId) continue;
 					if (newObject != undefined) {
 						var achievement:Object = {
-							Unlocked: parseInt(achievementLine[3]) > 0,
-							UnlockDatetime: parseInt(achievementLine[3]),
+							Unlocked: Number(achievementLine[3]) > 0,
+							UnlockDatetime: Number(achievementLine[3]),
 							Icon: achievementLine[4],
 							Description: achievementLine[2],
 							AchievementName: achievementLine[1]
