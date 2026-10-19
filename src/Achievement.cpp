@@ -239,7 +239,7 @@ Achievement::Achievement(json& jsonData, std::string plugin, std::string groupNa
                 a_condition->SetConditionParameters(perks, condition["threshold"].get<int>());
             }
             else {
-                logger::warn("Unknown condition type {} in {}.", type, this->achievementName);
+                logger::warn("[{}.json] Unknown condition type {} in {}.", this->groupName, type, this->achievementName);
             }
         } catch (std::exception& e) {
 			logger::error("Error in Achievement constructor: {}", e.what());
