@@ -17,10 +17,8 @@ void SpellLearnedCondition::EnableListener(void)
 void SpellLearnedCondition::SetConditionParameters(std::string formID) {
     this->FormID = formID;
 }
-RE::BSEventNotifyControl SpellLearnedCondition::ProcessEvent(const RE::SpellsLearned::Event* a_event, RE::BSTEventSource<RE::SpellsLearned::Event>*) {
-    // The event payload is not a valid SpellItem* in practice (crashes with a garbage pointer), so never read through it: ask the player instead.
-    // The check is only here to leave a trace in the log.
-    IsValidEventPtr(a_event ? a_event->spell : nullptr, "SpellsLearned spell");
+RE::BSEventNotifyControl SpellLearnedCondition::ProcessEvent(const RE::SpellsLearned::Event*, RE::BSTEventSource<RE::SpellsLearned::Event>*) {
+    // The event carries no spell (CommonLib removed the member), it is only a trigger: ask the player instead
     if (!this->isMet) CheckCondition();
     return RE::BSEventNotifyControl::kContinue;
 }
