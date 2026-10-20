@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { copySelection, paste } from "./clipboard";
-import { refuseReason, pinKind, type AppNode } from "./graph";
+import { refuseReason, pinKind, pluginOf, type AppNode } from "./graph";
 import { exportGroup, withoutEditor } from "./io/exportGroup";
 import { importGroup, mkEdge, type Json } from "./io/importGroup";
 import { parseLoc } from "./io/localization";
@@ -184,5 +184,25 @@ describe("Icon nodes on import", () => {
     useApp.getState().onNodesChange([{ type: "remove", id: icon.id }]);
     const icons = useApp.getState().nodes.filter((n) => n.data.kind === "CreateAchievement").map((n) => n.data.values.icon);
     expect(icons).toEqual(["Shared.dds", "Shared.dds", undefined, undefined]);
+  });
+});
+
+describe("Plugin Override node", () => {
+  const raw = group([{ ...A, pluginOverride: "B.esp", conditions: [{ type: "HasPerk", formID: "1" }, { type: "HasPerk", formID: "2", pluginOverride: "C.esp" }] }]);
+  it("imports as shared nodes, one per file, and writes the same JSON back", () => {
+    const snap = importGroup(raw);
+    expect(snap.nodes.filter((n) => n.data.kind === "PluginOverride").map((n) => n.data.values.plugin).sort()).toEqual(["B.esp", "C.esp"]);
+    expect(strip(exportGroup(snap).json)).toEqual(raw);
+    expect(exportGroup(snap).issues).toEqual([]);
+  });
+  it("is inherited achievement -> condition, and the condition's own override wins", () => {
+    const snap = importGroup(raw);
+    const [inherits, own] = snap.nodes.filter((n) => n.data.kind === "HasPerk");
+    const create = snap.nodes.find((n) => n.data.kind === "CreateAchievement")!;
+    expect(pluginOf(snap.nodes, snap.edges, create, "A.esp")).toBe("B.esp");
+    expect(pluginOf(snap.nodes, snap.edges, inherits, "A.esp")).toBe("B.esp");
+    expect(pluginOf(snap.nodes, snap.edges, own, "A.esp")).toBe("C.esp");
+    const plain = importGroup(group([{ ...A, conditions: [{ type: "HasPerk", formID: "1" }] }]));
+    expect(pluginOf(plain.nodes, plain.edges, plain.nodes.find((n) => n.data.kind === "HasPerk")!, "A.esp")).toBe("A.esp");
   });
 });

@@ -10,9 +10,9 @@ const nodes = [node("live", "Live"), node("neg", "Negate"), node("drag", "Dragon
 const link = (source: string, target: string, sourceHandle: string, targetHandle: string) => ({ source, target, sourceHandle, targetHandle });
 
 describe("registry", () => {
-  it("has every condition type plus nine non-condition nodes", () => {
+  it("has every condition type plus ten non-condition nodes", () => {
     expect(nodeDefs.filter((d) => d.category === "condition")).toHaveLength(31);
-    expect(nodeDefs).toHaveLength(40);
+    expect(nodeDefs).toHaveLength(41);
   });
   it("localizable fields come from the schema", () => {
     expect(registry.CreateAchievement.fields.filter((f) => f.widget === "localizedString").map((f) => f.name)).toEqual(["achievementName", "description"]);

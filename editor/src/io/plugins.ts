@@ -1,7 +1,8 @@
 import { create } from "zustand";
 import { registry } from "../registry";
 import type { FieldInfo } from "../schema";
-import type { AppNode } from "../graph";
+import { pluginOf, type AppNode } from "../graph";
+import type { Edge } from "@xyflow/react";
 import type { Issue } from "./exportGroup";
 
 /** A quest stage or objective: its number and, when the plugin is not localized, its log or display text. */
@@ -267,10 +268,10 @@ export function searchFor(plugins: Plugin[], kind: string, f: FieldInfo, values:
 }
 
 /** FormIDs that are not in their loaded plugin, or point at the wrong kind of record. Fields of plugins that are not loaded are not checked. */
-export function formIssues(nodes: AppNode[], groupPlugin: string | undefined, plugins: Plugin[]): Issue[] {
+export function formIssues(nodes: AppNode[], edges: Edge[], groupPlugin: string | undefined, plugins: Plugin[]): Issue[] {
   const issues: Issue[] = [];
   for (const n of nodes) {
-    const file = (typeof n.data.values.pluginOverride === "string" && n.data.values.pluginOverride) || groupPlugin;
+    const file = pluginOf(nodes, edges, n, groupPlugin);
     for (const f of registry[n.data.kind]?.fields ?? []) {
       if (f.widget !== "formId" && f.item !== "formId") continue;
       const v = n.data.values[f.name];
@@ -295,7 +296,7 @@ export function formIssues(nodes: AppNode[], groupPlugin: string | undefined, pl
     }
   }
   for (const n of nodes) {
-    const file = (typeof n.data.values.pluginOverride === "string" && n.data.values.pluginOverride) || groupPlugin;
+    const file = pluginOf(nodes, edges, n, groupPlugin);
     const form = typeof n.data.values.formID === "string" ? lookup(plugins, file, n.data.values.formID)?.record : undefined;
     for (const [field, steps] of Object.entries(STEPS[n.data.kind] ?? {})) {
       const v = n.data.values[field];

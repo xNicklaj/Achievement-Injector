@@ -1,6 +1,6 @@
 import { Handle, Position, useStore, type NodeProps } from "@xyflow/react";
 import { AlertTriangle, CircleAlert, CircleHelp } from "lucide-react";
-import { achievementNames, conditionsSummary, isInternalGroup, linkedText, type AppNode } from "../graph";
+import { achievementNames, conditionsSummary, isInternalGroup, linkedText, pluginOf, type AppNode } from "../graph";
 import { searchFor, usePlugins } from "../io/plugins";
 import { getText } from "../io/localization";
 import { linkKind, registry, UNKNOWN_CONDITION, wiredFields, type LinkKind } from "../registry";
@@ -16,7 +16,7 @@ import { FieldWidget, inputClass, pascal } from "./Widgets";
 
 const flowHandle = "!h-3.5 !w-3.5 !rounded-sm !border-0 !bg-[var(--pin-flow)]";
 /** Pin colours by link kind, as CSS variables. */
-const LINK_COLOR: Record<LinkKind, string> = { loc: "var(--pin-localized)", ach: "var(--pin-achievement)", icon: "var(--pin-icon)" };
+const LINK_COLOR: Record<LinkKind, string> = { loc: "var(--pin-localized)", ach: "var(--pin-achievement)", icon: "var(--pin-icon)", plugin: "var(--pin-plugin)" };
 
 /** What a linked field shows in place of its input: the achievement name or icon file its wire stands for. */
 function LinkedValue({ id, field, kind }: { id: string; field: string; kind: LinkKind }) {
@@ -144,9 +144,11 @@ export function GraphNode({ id, data, selected }: NodeProps<AppNode>) {
   const setValue = useApp((s) => s.setValue);
   // The Controls lock button turns all three off; the fields must stop taking input too.
   const locked = useStore((s) => !(s.nodesDraggable || s.nodesConnectable || s.elementsSelectable));
-  const groupPlugin = useApp((s) => s.group.plugin);
-  const override = data.values.pluginOverride;
-  const plugin = (typeof override === "string" && override) || groupPlugin;
+  // Own override (wired or typed), else the achievement's, else the group's.
+  const plugin = useApp((s) => {
+    const self = s.nodes.find((n) => n.id === id);
+    return self ? pluginOf(s.nodes, s.edges, self, s.group.plugin) : s.group.plugin;
+  });
   const plugins = usePlugins((s) => s.plugins);
   // Strings keep the selector stable, so the node only re-renders when its own summary changes.
   const summary = useApp((s) => {
@@ -227,6 +229,7 @@ export function GraphNode({ id, data, selected }: NodeProps<AppNode>) {
         {def.flowOut && <Handle type="source" id="flow-out" position={Position.Right} className={flowHandle} title={def.category === "condition" ? "On Unlock: commands and Papyrus calls to run when this condition is met" : undefined} />}
         {def.condOut && def.category !== "condition" && <Handle type="source" id="cond-out" position={Position.Right} style={dot("var(--pin-condition)")} />}
         {def.locOut && <Handle type="source" id="loc-out" position={Position.Right} style={dot("var(--pin-localized)")} />}
+        {def.pluginOut && <Handle type="source" id="plugin-out" position={Position.Right} style={dot("var(--pin-plugin)")} />}
         {def.iconOut && <Handle type="source" id="icon-out" position={Position.Right} style={dot("var(--pin-icon)")} />}
       </div>
       <div className="py-2" inert={locked}>

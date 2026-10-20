@@ -32,7 +32,7 @@ export function tidyPositions(nodes: AppNode[], edges: Edge[]): Map<string, Pos>
     let loc = bandY; // next free row in the left column
     const text = (n: AppNode) => {
       for (const e of edges) {
-        const src = e.target === n.id && (e.sourceHandle === "loc-out" || e.sourceHandle === "icon-out") ? byId.get(e.source) : undefined;
+        const src = e.target === n.id && (e.sourceHandle === "loc-out" || e.sourceHandle === "icon-out" || e.sourceHandle === "plugin-out") ? byId.get(e.source) : undefined;
         if (src && !placed.has(src.id)) (put(src, -COL, loc), (loc += height(src) + 20));
       }
     };

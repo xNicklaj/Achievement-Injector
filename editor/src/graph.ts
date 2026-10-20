@@ -7,7 +7,7 @@ import { isAction, isCondition, LINK_KINDS, missingRequired, registry, wiredFiel
 export type NodeData = { kind: string; values: Record<string, unknown>; extra?: Record<string, unknown> };
 export type AppNode = Node<NodeData, "ae">;
 
-// Handle ids: `flow-in|flow-out`, `cond-in|cond-out`, and for text, achievement and icon links `<kind>-out` and `<kind>:<field>`.
+// Handle ids: `flow-in|flow-out`, `cond-in|cond-out`, and for text, achievement, icon and plugin links `<kind>-out` and `<kind>:<field>`.
 export type PinKind = "flow" | "cond" | LinkKind;
 export const pinKind = (handle: string | null | undefined): PinKind | null =>
   handle?.startsWith("flow") ? "flow" : handle?.startsWith("cond") ? "cond" : LINK_KINDS.find((k) => handle?.startsWith(k)) ?? null;
@@ -101,15 +101,28 @@ export function ownerOf(nodes: AppNode[], edges: Edge[], condition: string): str
   return [...upstream(edges, add)].find((id) => nodes.find((n) => n.id === id)?.data.kind === "CreateAchievement");
 }
 
-/** What a link wire stands for: the text of a Localized Text key, an achievement name, or an icon file. Undefined when the source has none yet. */
+/** What a link wire stands for: the text of a Localized Text key, an achievement name, an icon file or a plugin. Undefined when the source has none yet. */
 export function linkedText(nodes: AppNode[], edges: Edge[], loc: Record<string, LocFile>, source: AppNode, kind: LinkKind): string | undefined {
   const translated = (key: unknown) => (typeof key === "string" && key ? fallbackText(loc, key) : undefined);
   const plain = (v: unknown) => (typeof v === "string" && v ? v : undefined);
   if (kind === "loc") return translated(source.data.values.key);
   if (kind === "icon") return plain(source.data.values.file);
+  if (kind === "plugin") return plain(source.data.values.plugin);
   // A localized achievement name counts as its fallback text: the DLL compares plain text.
   const wire = edges.find((e) => e.target === source.id && e.targetHandle === "loc:achievementName");
   return wire ? translated(nodes.find((n) => n.id === wire.source)?.data.values.key) : plain(source.data.values.achievementName);
+}
+
+/** The plugin a node resolves forms in: its own override, else its achievement's, else the group's. An override is a wired Plugin Override node or a typed value. */
+export function pluginOf(nodes: AppNode[], edges: Edge[], node: AppNode, groupPlugin: string | undefined): string | undefined {
+  const own = (n: AppNode | undefined) => {
+    if (!n) return undefined;
+    const wire = edges.find((e) => e.target === n.id && e.targetHandle === "plugin:pluginOverride");
+    const v = wire ? nodes.find((x) => x.id === wire.source)?.data.values.plugin : n.data.values.pluginOverride;
+    return typeof v === "string" && v ? v : undefined;
+  };
+  const owner = isCondition(node.data.kind) ? nodes.find((x) => x.id === ownerOf(nodes, edges, node.id)) : undefined;
+  return own(node) ?? own(owner) ?? groupPlugin;
 }
 
 /**

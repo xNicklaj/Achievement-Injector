@@ -33,6 +33,8 @@ export type NodeDef = {
   achOut: boolean;
   /** Output naming an icon file, for achievement `icon` fields. */
   iconOut: boolean;
+  /** Output naming a plugin file, for `pluginOverride` fields. */
+  pluginOut: boolean;
   /** At most one per flow chain. */
   unique: boolean;
   fields: FieldInfo[];
@@ -46,7 +48,7 @@ export type NodeDef = {
 
 const field = (f: Pick<FieldInfo, "name" | "widget"> & Partial<FieldInfo>): FieldInfo => ({ optional: false, ...f });
 
-const base = { description: undefined, keywords: [], flowIn: false, flowOut: false, condOut: false, condIn: false, locOut: false, achOut: false, iconOut: false, unique: false };
+const base = { description: undefined, keywords: [], flowIn: false, flowOut: false, condOut: false, condIn: false, locOut: false, achOut: false, iconOut: false, pluginOut: false, unique: false };
 
 // Fields come straight from the Zod schema so the widgets cannot drift from validation.
 const achievementFields = describeFields(
@@ -74,6 +76,7 @@ const flowNodes: NodeDef[] = [
   { ...base, kind: "RunCommand", description: "Runs a console command when this achievement or condition unlocks.", category: "flow", title: "Run Command", flowIn: true, flowOut: true, keywords: ["console", "onUnlock", "action"], fields: [field({ name: "command", widget: "string" })] },
   { ...base, kind: "CallPapyrus", description: "Calls a Global Papyrus function when this achievement or condition unlocks.", category: "flow", title: "Call Papyrus", flowIn: true, flowOut: true, keywords: ["script", "function", "onUnlock", "action"], fields: [field({ name: "script", widget: "string" }), field({ name: "function", widget: "string", description: "Must be a Global function" })] },
   { ...base, kind: "Icon", description: "An .dds image from Icons/<Group>/ to use as an achievement icon. Wire it into an achievement's Icon field.", category: "asset", title: "Icon", iconOut: true, keywords: ["image", "dds", "texture", "picture"], fields: [field({ name: "file", widget: "iconPath", description: "File name in Icons/<Group>/" })] },
+  { ...base, kind: "PluginOverride", description: "Sets the plugin that form IDs are looked up in. Wire it into an achievement, which passes it on to its conditions, or into a single condition, which then uses it instead.", category: "asset", title: "Plugin Override", pluginOut: true, keywords: ["plugin", "esp", "esm", "mod", "inherit"], fields: [field({ name: "plugin", widget: "plugin", description: "An .esp, .esm or .esl file name" })] },
   { ...base, kind: "LocalizedText", description: "A translation key written as $key. Wire it into any text field, and fill in each language on this node.", category: "localization", title: "Localized Text", locOut: true, keywords: ["translation", "key", "language"], fields: [field({ name: "key", widget: "string", description: "Written as $key" })] },
 ];
 
@@ -87,7 +90,7 @@ const conditionNodes: NodeDef[] = Object.values(conditionRegistry).map((c) => ({
   condOut: true,
   // A condition's `onUnlock` actions hang off its flow pin.
   flowOut: true,
-  fields: [...c.fields, field({ name: "pluginOverride", widget: "plugin", optional: true, description: "Defaults to the group's base plugin" })],
+  fields: [...c.fields, field({ name: "pluginOverride", widget: "plugin", optional: true, description: "Inherited from the achievement, then the group" })],
 }));
 
 /** A condition type this editor does not know: kept as it is (the real type is in `extra.type`) and flagged, so nothing is lost. */
@@ -104,14 +107,14 @@ export const isLocalizable = (f: FieldInfo) => f.widget === "localizedString";
 
 /**
  * Fields that can be fed by another node instead of typed: text by a Localized Text node (`loc`), an achievement name by a
- * Create Achievement node (`ach`), an icon file by an Icon node (`icon`). The wire runs from `<kind>-out` to `<kind>:<field>`.
+ * Create Achievement node (`ach`), an icon file by an Icon node (`icon`), a plugin by a Plugin Override node (`plugin`). The wire runs from `<kind>-out` to `<kind>:<field>`.
  */
-export type LinkKind = "loc" | "ach" | "icon";
-export const LINK_KINDS: readonly LinkKind[] = ["loc", "ach", "icon"];
-const LINK_WIDGET = { localizedString: "loc", achievementRef: "ach", iconPath: "icon" } as const;
-/** The link kind a field accepts, or null. An Icon node's own file is typed, never wired. */
-export const linkKind = (def: NodeDef, f: FieldInfo): LinkKind | null => (def.kind === "Icon" ? null : LINK_WIDGET[f.widget as keyof typeof LINK_WIDGET] ?? null);
-export const linkOut = (def: NodeDef): LinkKind | null => (def.locOut ? "loc" : def.achOut ? "ach" : def.iconOut ? "icon" : null);
+export type LinkKind = "loc" | "ach" | "icon" | "plugin";
+export const LINK_KINDS: readonly LinkKind[] = ["loc", "ach", "icon", "plugin"];
+const LINK_WIDGET = { localizedString: "loc", achievementRef: "ach", iconPath: "icon", plugin: "plugin" } as const;
+/** The link kind a field accepts, or null. An Icon or Plugin Override node's own value is typed, never wired. */
+export const linkKind = (def: NodeDef, f: FieldInfo): LinkKind | null => (def.kind === "Icon" || def.kind === "PluginOverride" ? null : LINK_WIDGET[f.widget as keyof typeof LINK_WIDGET] ?? null);
+export const linkOut = (def: NodeDef): LinkKind | null => (def.locOut ? "loc" : def.achOut ? "ach" : def.iconOut ? "icon" : def.pluginOut ? "plugin" : null);
 
 /** `wired`: fields fed by a LocalizedText node, which count as filled. */
 export const missingRequired = (def: NodeDef, values: Record<string, unknown>, wired: ReadonlySet<string> = new Set()) =>

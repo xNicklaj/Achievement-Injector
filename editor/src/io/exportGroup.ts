@@ -91,7 +91,7 @@ export function exportGroup(s: ExportState): { json: Json; issues: Issue[] } {
       add("warning", `AchievementUnlocked refers to "${v.achievement}", which is not an achievement in this group.`, n.id, { field: "achievement", detail: `achievement: no achievement named "${v.achievement}" in this group` });
   }
 
-  if (s.plugins?.length) issues.push(...formIssues(s.nodes, typeof s.group.plugin === "string" ? s.group.plugin : undefined, s.plugins));
+  if (s.plugins?.length) issues.push(...formIssues(s.nodes, s.edges, typeof s.group.plugin === "string" ? s.group.plugin : undefined, s.plugins));
 
   // An icon that is not in Icons/<group>/ is skipped by the DLL with a log warning. Only checkable when the folder can be listed.
   if (s.iconFiles && s.fileName) {
@@ -107,6 +107,11 @@ export function exportGroup(s: ExportState): { json: Json; issues: Issue[] } {
   for (const n of s.nodes.filter((x) => x.data.kind === "Icon")) {
     if (!n.data.values.file) add("warning", "An Icon node has no file.", n.id, { field: "file", detail: "file is required" });
     if (!s.edges.some((e) => e.source === n.id)) add("warning", "An Icon node is not used by any achievement.", n.id, { detail: "Not used by any achievement" });
+  }
+
+  for (const n of s.nodes.filter((x) => x.data.kind === "PluginOverride")) {
+    if (!n.data.values.plugin) add("warning", "A Plugin Override node has no plugin.", n.id, { field: "plugin", detail: "plugin is required" });
+    if (!s.edges.some((e) => e.source === n.id)) add("warning", "A Plugin Override node is not used by any achievement or condition.", n.id, { detail: "Not used by any achievement or condition" });
   }
 
   /** Field values of one node: wired fields take what their wire stands for (`$key`, achievement name, icon file), then its unknown keys. */
@@ -228,7 +233,7 @@ export function exportGroup(s: ExportState): { json: Json; issues: Issue[] } {
 
   // Anything not reached from an achievement would vanish on save: say so.
   for (const n of s.nodes) {
-    if (used.has(n.id) || n.data.kind === "LocalizedText" || n.data.kind === "Icon") continue;
+    if (used.has(n.id) || n.data.kind === "LocalizedText" || n.data.kind === "Icon" || n.data.kind === "PluginOverride") continue;
     const msg = `${registry[n.data.kind].title} is not connected to an achievement and will not be saved.`;
     add("warning", msg, n.id, { detail: "Not connected to an achievement: it will not be saved" });
   }
@@ -251,7 +256,10 @@ export function exportGroup(s: ExportState): { json: Json; issues: Issue[] } {
   const icons: Record<string, { x: number; y: number }> = {};
   for (const n of s.nodes) if (n.data.kind === "Icon" && typeof n.data.values.file === "string" && n.data.values.file) icons[n.data.values.file] = xy(n);
 
-  const json: Json = { ...s.group, ...s.groupExtra, achievements, _editor: { schemaVersion: SCHEMA_VERSION, modVersion, ...(keyNodes.length ? { keys } : {}), ...(Object.keys(icons).length ? { icons } : {}) } };
+  const plugins: Record<string, { x: number; y: number }> = {};
+  for (const n of s.nodes) if (n.data.kind === "PluginOverride" && typeof n.data.values.plugin === "string" && n.data.values.plugin) plugins[n.data.values.plugin] = xy(n);
+
+  const json: Json = { ...s.group, ...s.groupExtra, achievements, _editor: { schemaVersion: SCHEMA_VERSION, modVersion, ...(keyNodes.length ? { keys } : {}), ...(Object.keys(icons).length ? { icons } : {}), ...(Object.keys(plugins).length ? { plugins } : {}) } };
 
   const parsed = GroupSchema.safeParse(json);
   if (!parsed.success)

@@ -34,7 +34,7 @@ export const estimateHeight = (def: NodeDef, values: Json = {}) => {
   const rows = required === 0 || open ? def.fields.length + (required === 0 ? 0 : 1) : required + 1;
   // Plus the condition's On Unlock row, or an unknown condition's notice.
   const listRows = def.fields.reduce((n, f) => n + (f.widget === "list" && Array.isArray(values[f.name]) ? (values[f.name] as unknown[]).length : 0), 0);
-  return 48 + listRows * 36 + (def.condIn ? 32 : 0) + (def.category === "condition" ? 32 : 0) + (def.kind === UNKNOWN_CONDITION ? 32 : 0) + (def.kind === "Icon" ? 120 : 0) + rows * 36 + (def.kind === "LocalizedText" ? 36 : 0);
+  return 48 + listRows * 36 + (def.condIn ? 32 : 0) + (def.category === "condition" ? 32 : 0) + (def.kind === UNKNOWN_CONDITION ? 32 : 0) + (def.kind === "Icon" ? 120 : 0) + (def.kind === "PluginOverride" ? 36 : 0) + rows * 36 + (def.kind === "LocalizedText" ? 36 : 0);
 };
 
 /** `live`/`negate` on a type that supports them become Live / Negate nodes; on any other type they stay as plain keys. */
@@ -114,6 +114,24 @@ export function importGroup(raw: unknown): Snapshot {
     }
     delete node.data.values.icon;
     edges.push(mkEdge(icon.id, "icon-out", node.id, "icon:icon"));
+  };
+
+  // A `pluginOverride` file name becomes one Plugin Override node shared by every achievement and condition that names it.
+  const pluginNodes = new Map<string, AppNode>();
+  const pluginPos = isObj(editor.plugins) ? editor.plugins : {};
+  const linkPlugin = (node: AppNode) => {
+    const file = node.data.values.pluginOverride;
+    if (typeof file !== "string" || !file) return;
+    let p = pluginNodes.get(file);
+    if (!p) {
+      const at = pluginPos[file];
+      const pos = isObj(at) && num(at.x) && num(at.y) ? { x: at.x, y: at.y } : { x: -COL, y: locY };
+      locY += 120;
+      p = add("PluginOverride", { plugin: file }, {}, pos);
+      pluginNodes.set(file, p);
+    }
+    delete node.data.values.pluginOverride;
+    edges.push(mkEdge(p.id, "plugin-out", node.id, "plugin:pluginOverride"));
   };
 
   /** `$key` in a localizable field becomes one shared LocalizedText node wired to every use (HANDOVER 3.13). */
@@ -213,6 +231,7 @@ export function importGroup(raw: unknown): Snapshot {
       });
       edges.push(mkEdge(last.id, "cond-out", addNode!.id, "cond-in"));
       localize(cn);
+      linkPlugin(cn);
 
       // The condition's own `onUnlock` is a chain of action nodes hanging off its flow pin, placed past the achievement's chain.
       const list = (Array.isArray(c.onUnlock) ? c.onUnlock : []) as Json[];
@@ -228,6 +247,7 @@ export function importGroup(raw: unknown): Snapshot {
     });
     localize(create);
     linkIcon(create);
+    linkPlugin(create);
     bandY += bandH + 80;
   }
 
