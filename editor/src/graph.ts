@@ -1,4 +1,5 @@
 import type { Edge, Node } from "@xyflow/react";
+import { fallbackText, type LocFile } from "./io/localization";
 import { missingRequired, registry, wiredFields } from "./registry";
 
 /** `values`: fields the editor has a widget for (unset = absent). `extra`: unknown keys, kept so import/export is lossless. */
@@ -55,6 +56,43 @@ export function refuseReason(nodes: AppNode[], edges: Edge[], c: Link): string |
   if (kind === "cond" && used(c.sourceHandle, "source", c.source)) return "Condition already used";
   if (kind === "loc" && used(c.targetHandle, "target", c.target)) return "Field already localized";
   return null;
+}
+
+/**
+ * Names `AchievementUnlocked` can refer to in this group. A localized name counts as its fallback text, because the DLL
+ * compares the reference with the achievement's final (localized) name as plain text.
+ */
+export function achievementNames(nodes: AppNode[], edges: Edge[], loc: Record<string, LocFile>): string[] {
+  const names = new Set<string>();
+  for (const n of nodes) {
+    if (n.data.kind !== "CreateAchievement") continue;
+    const wire = edges.find((e) => e.target === n.id && e.targetHandle === "loc:achievementName");
+    const key = wire ? nodes.find((x) => x.id === wire.source)?.data.values.key : undefined;
+    const name = wire ? (typeof key === "string" ? fallbackText(loc, key) : undefined) : n.data.values.achievementName;
+    if (typeof name === "string" && name) names.add(name);
+  }
+  return [...names].sort((a, b) => a.localeCompare(b));
+}
+
+/** An `AchievementUnlocked` reference is inside this group when it names no group or this group's file name. */
+export const isInternalGroup = (group: unknown, groupFile: string | null | undefined) =>
+  group === undefined || group === "" || (typeof group === "string" && !!groupFile && group.toLowerCase() === groupFile.replace(/\.json$/i, "").toLowerCase());
+
+/**
+ * Fields fed by a LocalizedText wire that is going away keep the text as plain inline text, so removing the node
+ * (or only its wire) never silently empties a field. No translation anywhere means the field stays empty.
+ */
+export function restoreInline(nodes: AppNode[], gone: Edge[], loc: Record<string, LocFile>): AppNode[] {
+  const byId = new Map(nodes.map((n) => [n.id, n]));
+  const patches = new Map<string, Record<string, string>>();
+  for (const e of gone) {
+    if (e.sourceHandle !== "loc-out" || !e.targetHandle?.startsWith("loc:") || !byId.has(e.target)) continue;
+    const key = byId.get(e.source)?.data.values.key;
+    const text = typeof key === "string" && key ? fallbackText(loc, key) : undefined;
+    if (text !== undefined) patches.set(e.target, { ...patches.get(e.target), [e.targetHandle.slice(4)]: text });
+  }
+  if (!patches.size) return nodes;
+  return nodes.map((n) => (patches.has(n.id) ? { ...n, data: { ...n.data, values: { ...n.data.values, ...patches.get(n.id) } } } : n));
 }
 
 /** Human summary of an AddConditions node, derived from edges (HANDOVER 3.2), never stored. */

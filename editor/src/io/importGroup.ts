@@ -25,9 +25,13 @@ export const mkEdge = (source: string, sh: string, target: string, th: string): 
 const W = 288;
 const GAP = 110;
 const COL = W + GAP;
-const estimateHeight = (def: NodeDef) => {
-  const optional = def.fields.filter((f) => f.optional).length;
-  return 40 + (def.condIn ? 26 : 0) + def.fields.filter((f) => !f.optional).length * 26 + (optional ? 22 : 0);
+const estimateHeight = (def: NodeDef, values: Json = {}) => {
+  const required = def.fields.filter((f) => !f.optional).length;
+  // Mirrors GraphNode: with no required field every field shows. Otherwise optional ones fold into one summary row,
+  // unless one is already set, which opens them all.
+  const open = def.fields.some((f) => f.optional && values[f.name] !== undefined);
+  const rows = required === 0 || open ? def.fields.length + (required === 0 ? 0 : 1) : required + 1;
+  return 40 + (def.condIn ? 26 : 0) + rows * 26 + (def.kind === "LocalizedText" ? 26 : 0);
 };
 
 const FLOW_KIND = { command: "RunCommand", papyrus: "CallPapyrus" } as const;
@@ -129,8 +133,8 @@ export function importGroup(raw: unknown): Snapshot {
 
     // Positions: saved `_editor` when present, otherwise a row layout per achievement band.
     const saved = Array.isArray(ed.chain) && ed.chain.length === chainSpec.length && ed.chain.every((p) => isObj(p) && num(p.x) && num(p.y)) ? (ed.chain as { x: number; y: number }[]) : null;
-    const condHeights = conds.map((c) => estimateHeight(registry[c.type as string]) + 20);
-    const bandH = Math.max(estimateHeight(registry.CreateAchievement), condHeights.reduce((s, h) => s + h, 0));
+    const condHeights = conds.map((c) => estimateHeight(registry[c.type as string], c) + 20);
+    const bandH = Math.max(estimateHeight(registry.CreateAchievement, a), condHeights.reduce((s, h) => s + h, 0));
     const chainX = (i: number) => (hasConds ? COL * 2 : COL) + i * COL;
 
     const create = add("CreateAchievement", created.values, created.extra, hasPos ? { x: ed.x as number, y: ed.y as number } : { x: 0, y: bandY }, ed.id);

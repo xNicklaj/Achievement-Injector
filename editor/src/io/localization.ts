@@ -54,6 +54,15 @@ export function renameKey(f: LocFile, from: string, to: string): LocFile {
   return { ...f, lines: f.lines.map((l) => (l.key === from ? entry(to, l.value ?? "") : l)) };
 }
 
+/** What a field keeps when its LocalizedText node goes away: English if there is any, else the next language that has text (HANDOVER 3.13). */
+export function fallbackText(loc: Record<string, LocFile>, key: string): string | undefined {
+  for (const l of sortedLocales(loc)) {
+    const t = getText(loc[l], key);
+    if (t) return t;
+  }
+  return undefined;
+}
+
 export type LocRow = { key: string; used: boolean };
 
 /** Locales in display order: English (the fallback) first, then alphabetical. */

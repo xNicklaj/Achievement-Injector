@@ -1,11 +1,14 @@
 import { Background, BackgroundVariant, Controls, MiniMap, ReactFlow, SelectionMode, useReactFlow } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { useEffect, useMemo, useRef, type DragEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type DragEvent } from "react";
 import { pinKind, type AppNode } from "../graph";
-import { missingRequired, registry, wiredFields } from "../registry";
+import { registry } from "../registry";
 import { beginDrag, endDrag, useApp } from "../store";
+import { useValidation } from "../validation";
 import { createWheelClassifier, wheelPixels, zoomFactor } from "../wheel";
+import { spawnOptions, type SpawnFrom, type SpawnOption } from "../spawn";
 import { GraphNode } from "./GraphNode";
+import { SpawnMenu } from "./SpawnMenu";
 
 export const DRAG_MIME = "application/ae-node";
 const nodeTypes = { ae: GraphNode };
@@ -16,8 +19,10 @@ const MAX_ZOOM = 2;
 const EDGE_COLOR = { flow: "var(--pin-flow)", cond: "var(--pin-condition)", loc: "var(--pin-localized)" };
 
 export function Canvas() {
-  const { nodes, edges, onNodesChange, onEdgesChange, onConnect, isValid, addNode } = useApp();
-  const { screenToFlowPosition, getViewport, setViewport } = useReactFlow();
+  const { nodes, edges, onNodesChange, onEdgesChange, onConnect, isValid, addNode, addNodeConnected } = useApp();
+  const [menu, setMenu] = useState<{ x: number; y: number; from: SpawnFrom | null } | null>(null);
+  const closeMenu = useCallback(() => setMenu(null), []);
+  const { screenToFlowPosition, getViewport, setViewport, fitView } = useReactFlow();
   const box = useRef<HTMLDivElement>(null);
 
   // Mouse and touchpad share one canvas: a touchpad scroll pans, a mouse notch zooms at the cursor.
@@ -51,6 +56,16 @@ export function Canvas() {
     [edges],
   );
 
+  const options = useMemo(() => (menu ? spawnOptions(nodes, edges, menu.from) : []), [menu, nodes, edges]);
+  const pick = (o: SpawnOption) => {
+    if (!menu) return;
+    const at = screenToFlowPosition({ x: menu.x, y: menu.y });
+    // A node made from an input pin sits to the left of the cursor so its output meets the wire; otherwise its input does.
+    const left = menu.from?.handleType === "target";
+    addNodeConnected(o.def.kind, { x: at.x - (left ? 288 : 0), y: at.y - 14 }, menu.from && o.pin ? { from: menu.from, pin: o.pin } : undefined);
+    setMenu(null);
+  };
+
   const onDrop = (e: DragEvent) => {
     const kind = e.dataTransfer.getData(DRAG_MIME);
     if (!kind) return;
@@ -75,6 +90,22 @@ export function Canvas() {
         if (e.dataTransfer.types.includes(DRAG_MIME)) (e.preventDefault(), (e.dataTransfer.dropEffect = "copy"));
       }}
       onDrop={onDrop}
+      // Dropping a wire on empty canvas opens the node menu for what can take it; right-click opens every node (HANDOVER 3.5).
+      onConnectEnd={(event, state) => {
+        if (state.isValid || state.toNode || !state.fromNode || !state.fromHandle?.id) return;
+        const p = "changedTouches" in event ? event.changedTouches[0] : event;
+        setMenu({ x: p.clientX, y: p.clientY, from: { nodeId: state.fromNode.id, handleId: state.fromHandle.id, handleType: state.fromHandle.type } });
+      }}
+      onNodeDoubleClick={(e, node) => {
+        // Double-clicking a field selects text; only the node's frame and title focus it.
+        if (!(e.target as HTMLElement).closest("input, textarea, select, button")) void fitView({ nodes: [{ id: node.id }], duration: 300, maxZoom: 1.2, padding: 0.3 });
+      }}
+      onPaneContextMenu={(e) => {
+        e.preventDefault();
+        setMenu({ x: (e as unknown as MouseEvent).clientX, y: (e as unknown as MouseEvent).clientY, from: null });
+      }}
+      onPaneClick={closeMenu}
+      onMoveStart={closeMenu}
       deleteKeyCode={["Delete", "Backspace"]}
       fitView
       minZoom={MIN_ZOOM}
@@ -100,7 +131,8 @@ export function Canvas() {
         // Invalid nodes show red/amber on the minimap (HANDOVER 3.9).
         nodeColor={(n) => {
           const d = (n as AppNode).data;
-          return missingRequired(registry[d.kind], d.values, wiredFields(useApp.getState().edges, n.id)) ? "var(--status-warning)" : `var(--cat-${registry[d.kind].category})`;
+          const level = useValidation.getState().byNode[n.id]?.split("|")[0];
+          return level === "error" ? "var(--status-error)" : level === "warning" ? "var(--status-warning)" : `var(--cat-${registry[d.kind].category})`;
         }}
       />
       {nodes.length === 0 && (
@@ -109,6 +141,7 @@ export function Canvas() {
         </div>
       )}
     </ReactFlow>
+    {menu && <SpawnMenu x={menu.x} y={menu.y} options={options} onPick={pick} onClose={closeMenu} title={menu.from ? "Create a node that connects here" : "Add a node"} />}
     </div>
   );
 }

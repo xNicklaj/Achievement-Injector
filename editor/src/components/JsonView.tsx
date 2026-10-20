@@ -1,20 +1,10 @@
 import { Check, Copy } from "lucide-react";
 import { tokenizeJson, type JsonTokenKind } from "./jsonTokens";
-import { useEffect, useMemo, useState } from "react";
-import { exportGroup, withoutEditor, type ExportState, type Issue } from "../io/exportGroup";
+import { useMemo, useState } from "react";
+import { withoutEditor, type Issue } from "../io/exportGroup";
 import { useApp } from "../store";
+import { useValidation } from "../validation";
 import { Button } from "./Dialog";
-
-/** The group file as it would be saved, rebuilt as the document changes (debounced, so dragging stays smooth). */
-function useBuilt() {
-  const [built, setBuilt] = useState(() => exportGroup(useApp.getState() as ExportState));
-  useEffect(() => {
-    let t: ReturnType<typeof setTimeout>;
-    const off = useApp.subscribe(() => (clearTimeout(t), (t = setTimeout(() => setBuilt(exportGroup(useApp.getState() as ExportState)), 200))));
-    return () => (off(), clearTimeout(t));
-  }, []);
-  return built;
-}
 
 const COLOR: Record<JsonTokenKind, string | undefined> = {
   key: "var(--syn-key)",
@@ -29,7 +19,8 @@ const COLOR: Record<JsonTokenKind, string | undefined> = {
 const levelClass = (i: Issue) => (i.level === "error" ? "text-[var(--status-error)]" : "text-[var(--status-warning)]");
 
 export function JsonView() {
-  const { json, issues } = useBuilt();
+  const json = useValidation((s) => s.json);
+  const issues = useValidation((s) => s.issues);
   const fileName = useApp((s) => s.fileName);
   const [copied, setCopied] = useState(false);
 

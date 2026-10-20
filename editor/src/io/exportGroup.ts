@@ -1,13 +1,28 @@
 import type { Edge } from "@xyflow/react";
-import type { AppNode } from "../graph";
+import { achievementNames, isInternalGroup, type AppNode } from "../graph";
 import { isLocalizable, registry } from "../registry";
 import { GroupSchema, SCHEMA_VERSION } from "../schema";
 import type { GroupValues } from "../store";
 import type { Json } from "./importGroup";
 import { getText, type LocFile } from "./localization";
 
-export type Issue = { level: "error" | "warning"; message: string };
-export type ExportState = { nodes: AppNode[]; edges: Edge[]; group: GroupValues; groupExtra: Json; loc?: Record<string, LocFile> };
+/**
+ * A problem found while building the file. `nodeId` and `field` say where it shows on the canvas;
+ * `detail` is the short text for that node's tooltip (`message` is the full line for lists).
+ * A missing required value is only a warning ("incomplete"), like the unfinished-condition count; everything else wrong is an error.
+ */
+export type Issue = { level: "error" | "warning"; message: string; nodeId?: string; field?: string; detail?: string };
+export type ExportState = {
+  nodes: AppNode[];
+  edges: Edge[];
+  group: GroupValues;
+  groupExtra: Json;
+  loc?: Record<string, LocFile>;
+  fileName?: string | null;
+  /** File names found in `Icons/<group>/`; null when they cannot be listed, so nothing is checked. */
+  iconFiles?: string[] | null;
+  pendingIcons?: Record<string, unknown>;
+};
 
 /** The JSON without editor metadata, for reading. `_editor` is still written to the file. */
 export const withoutEditor = (v: unknown): unknown =>
@@ -16,6 +31,9 @@ export const withoutEditor = (v: unknown): unknown =>
 const round = (n: number) => Math.round(n);
 const xy = (n: AppNode) => ({ x: round(n.position.x), y: round(n.position.y) });
 
+/** Where each part of an exported achievement came from, so schema errors can be pinned on nodes. */
+type Refs = { create: string; add?: string; join?: string; conds: string[]; actions: string[] };
+
 /**
  * Graph -> JSON. Unset fields are omitted, unknown keys come back from `extra`, so a file imported and
  * exported untouched is identical apart from `_editor` (HANDOVER 3.3). Problems are returned, never thrown:
@@ -23,6 +41,8 @@ const xy = (n: AppNode) => ({ x: round(n.position.x), y: round(n.position.y) });
  */
 export function exportGroup(s: ExportState): { json: Json; issues: Issue[] } {
   const issues: Issue[] = [];
+  const add = (level: Issue["level"], message: string, nodeId?: string, extra: Pick<Issue, "field" | "detail"> = {}) =>
+    issues.push({ level, message, nodeId, ...extra });
   const byId = new Map(s.nodes.map((n) => [n.id, n]));
   const flowNext = (id: string) => s.edges.find((e) => e.source === id && e.sourceHandle === "flow-out")?.target;
   const keyOf = (n: AppNode) => (typeof n.data.values.key === "string" ? n.data.values.key : "");
@@ -32,8 +52,8 @@ export function exportGroup(s: ExportState): { json: Json; issues: Issue[] } {
   const seenKeys = new Set<string>();
   for (const n of keyNodes) {
     const k = keyOf(n);
-    if (!k) issues.push({ level: "error", message: "A Localized Text node has no key." });
-    else if (seenKeys.has(k)) issues.push({ level: "error", message: `Localized Text key "${k}" is used by more than one node.` });
+    if (!k) add("error", "A Localized Text node has no key.", n.id, { field: "key", detail: "key: set a key" });
+    else if (seenKeys.has(k)) add("error", `Localized Text key "${k}" is used by more than one node.`, n.id, { field: "key", detail: "key: another node uses this key" });
     seenKeys.add(k);
   }
 
@@ -42,13 +62,33 @@ export function exportGroup(s: ExportState): { json: Json; issues: Issue[] } {
   const langs = Object.keys(loc).sort();
   const usedKeys = keyNodes.filter((n) => keyOf(n) && s.edges.some((e) => e.source === n.id));
   if (usedKeys.length && !langs.length)
-    issues.push({ level: "warning", message: "No languages are set up, so localized fields show their raw $key in game. Add one on Group Properties." });
+    add("warning", "No languages are set up, so localized fields show their raw $key in game. Add one on Group Properties.");
   // English is the fallback for every other language, so keys without it show raw `$key` text to those players.
   if (usedKeys.length && langs.length && !loc.EN)
-    issues.push({ level: "warning", message: "There is no English (EN) file. English is the fallback for languages without a translation." });
+    add("warning", "There is no English (EN) file. English is the fallback for languages without a translation.");
   for (const n of usedKeys) {
     const missing = langs.filter((l) => !getText(loc[l], keyOf(n)));
-    if (missing.length) issues.push({ level: "warning", message: `Localized Text "${keyOf(n)}" has no translation for ${missing.join(", ")}.` });
+    if (missing.length) add("warning", `Localized Text "${keyOf(n)}" has no translation for ${missing.join(", ")}.`, n.id, { detail: `No translation for ${missing.join(", ")}.` });
+  }
+
+  // `AchievementUnlocked` inside this group must name an achievement that exists; one in another group cannot be checked (HANDOVER 3.1).
+  const names = new Set(achievementNames(s.nodes, s.edges, loc));
+  for (const n of s.nodes) {
+    const v = n.data.values;
+    if (n.data.kind !== "AchievementUnlocked" || typeof v.achievement !== "string" || !v.achievement) continue;
+    if (isInternalGroup(v.group, s.fileName) && !names.has(v.achievement))
+      add("warning", `AchievementUnlocked refers to "${v.achievement}", which is not an achievement in this group.`, n.id, { field: "achievement", detail: `achievement: no achievement named "${v.achievement}" in this group` });
+  }
+
+  // An icon that is not in Icons/<group>/ is skipped by the DLL with a log warning. Only checkable when the folder can be listed.
+  if (s.iconFiles && s.fileName) {
+    const folder = `Icons/${s.fileName.replace(/\.json$/i, "")}/`;
+    const have = new Set([...s.iconFiles, ...Object.keys(s.pendingIcons ?? {}).filter((p) => p.startsWith(folder)).map((p) => p.slice(folder.length))].map((n) => n.toLowerCase()));
+    for (const n of s.nodes) {
+      const icon = n.data.kind === "CreateAchievement" ? n.data.values.icon : undefined;
+      if (typeof icon === "string" && icon && !have.has(icon.toLowerCase()))
+        add("warning", `Icon "${icon}" is not in ${folder}.`, n.id, { field: "icon", detail: `icon: "${icon}" is not in ${folder}` });
+    }
   }
 
   /** Field values of one node, with localized pins resolved to `$key`, then its unknown keys. */
@@ -66,6 +106,7 @@ export function exportGroup(s: ExportState): { json: Json; issues: Issue[] } {
 
   const used = new Set<string>();
   const achievements: Json[] = [];
+  const refs: Refs[] = [];
   for (const create of s.nodes.filter((n) => n.data.kind === "CreateAchievement")) {
     used.add(create.id);
     const chain: AppNode[] = [];
@@ -80,40 +121,43 @@ export function exportGroup(s: ExportState): { json: Json; issues: Issue[] } {
     const adds = chain.filter((n) => n.data.kind === "AddConditions");
     const joins = chain.filter((n) => n.data.kind === "JoinType");
     const name = typeof out.achievementName === "string" ? out.achievementName : "(unnamed)";
-    if (adds.length > 1) issues.push({ level: "error", message: `Achievement "${name}" has more than one Add Conditions node.` });
-    if (joins.length > 1) issues.push({ level: "error", message: `Achievement "${name}" has more than one Join Type node.` });
+    for (const extra of adds.slice(1)) add("error", `Achievement "${name}" has more than one Add Conditions node.`, extra.id, { detail: "Only one Add Conditions per achievement" });
+    for (const extra of joins.slice(1)) add("error", `Achievement "${name}" has more than one Join Type node.`, extra.id, { detail: "Only one Join Type per achievement" });
 
     const joinType = joins[0]?.data.values.joinType;
     if (joinType !== undefined) out.joinType = joinType;
 
-        if (adds[0]) {
+    const condIds: string[] = [];
+    if (adds[0]) {
       out.conditions = s.edges
         .filter((e) => e.target === adds[0].id && e.targetHandle === "cond-in")
         .map((e) => {
           const c = byId.get(e.source)!;
           used.add(c.id);
+          condIds.push(c.id);
           return { type: c.data.kind, ...fields(c), ...c.data.extra, _editor: { id: c.id, ...xy(c) } };
         });
     }
 
-    const actions = chain
-      .filter((n) => n.data.kind === "RunCommand" || n.data.kind === "CallPapyrus")
-      .map((n) => ({ type: n.data.kind === "RunCommand" ? "command" : "papyrus", ...fields(n), ...n.data.extra }));
+    const actionNodes = chain.filter((n) => n.data.kind === "RunCommand" || n.data.kind === "CallPapyrus");
+    const actions = actionNodes.map((n) => ({ type: n.data.kind === "RunCommand" ? "command" : "papyrus", ...fields(n), ...n.data.extra }));
     if (actions.length) out.onUnlock = actions;
 
     // Unknown keys last; an actions list from the chain wins over a placeholder `onUnlock: []` kept in extra.
     for (const [k, v] of Object.entries(create.data.extra ?? {})) if (!(k in out)) out[k] = v;
     out._editor = { id: create.id, ...xy(create), chain: chain.map(xy) };
     achievements.push(out);
+    refs.push({ create: create.id, add: adds[0]?.id, join: joins[0]?.id, conds: condIds, actions: actionNodes.map((n) => n.id) });
   }
 
   // Anything not reached from an achievement would vanish on save: say so.
   for (const n of s.nodes) {
     if (used.has(n.id) || n.data.kind === "LocalizedText") continue;
-    issues.push({ level: "warning", message: `${registry[n.data.kind].title} is not connected to an achievement and will not be saved.` });
+    const msg = `${registry[n.data.kind].title} is not connected to an achievement and will not be saved.`;
+    add("warning", msg, n.id, { detail: "Not connected to an achievement: it will not be saved" });
   }
   for (const n of keyNodes) {
-    if (!s.edges.some((e) => e.source === n.id)) issues.push({ level: "warning", message: `Localized Text "${keyOf(n)}" is not used by any field.` });
+    if (!s.edges.some((e) => e.source === n.id)) add("warning", `Localized Text "${keyOf(n)}" is not used by any field.`, n.id, { detail: "Not used by any field" });
   }
 
   const keys: Record<string, { x: number; y: number }> = {};
@@ -124,10 +168,23 @@ export function exportGroup(s: ExportState): { json: Json; issues: Issue[] } {
   const parsed = GroupSchema.safeParse(json);
   if (!parsed.success)
     for (const i of parsed.error.issues) {
-      const [, idx, ...rest] = i.path;
-      const a = typeof idx === "number" ? achievements[idx] : undefined;
-      const where = a ? `Achievement "${String(a.achievementName ?? "(unnamed)")}": ` : "";
-      issues.push({ level: "error", message: `${where}${(a ? rest : i.path).join(".")} ${i.message}`.trim() });
+      const [root, idx, a, b, c] = i.path;
+      const r = root === "achievements" && typeof idx === "number" ? refs[idx] : undefined;
+      let nodeId: string | undefined;
+      let field: string | undefined;
+      if (r) {
+        if (a === "conditions" && typeof b === "number") (nodeId = r.conds[b]), (field = typeof c === "string" ? c : undefined);
+        else if (a === "conditions") nodeId = r.add ?? r.create;
+        else if (a === "onUnlock" && typeof b === "number") (nodeId = r.actions[b]), (field = typeof c === "string" ? c : undefined);
+        else if (a === "joinType") (nodeId = r.join ?? r.create), (field = "joinType");
+        else (nodeId = r.create), (field = typeof a === "string" ? a : undefined);
+      }
+      const name = field ?? String(r ? (a ?? "") : (root ?? ""));
+      const missing = i.code === "invalid_type" && /received undefined/.test(i.message);
+      const text = missing ? `${name} is required` : i.message;
+      const where = r ? `Achievement "${String(achievements[idx as number].achievementName ?? "(unnamed)")}": ` : "";
+      const path = (r ? i.path.slice(2) : i.path).join(".");
+      add(missing ? "warning" : "error", `${where}${missing ? text : `${path} ${text}`}`.trim(), nodeId, { field, detail: missing || !field ? text : `${field}: ${text}` });
     }
   return { json, issues };
 }

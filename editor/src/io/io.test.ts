@@ -76,7 +76,7 @@ describe("export", () => {
     delete level.data.values.level;
     const { json, issues } = exportGroup(snap);
     expect(JSON.stringify(json)).not.toContain("null");
-    expect(issues.some((i) => i.level === "error" && /level/.test(i.message))).toBe(true);
+    expect(issues.find((i) => /level/.test(i.message))).toMatchObject({ level: "warning", nodeId: level.id, field: "level" });
   });
 
   it("warns about nodes that would be lost", () => {
@@ -92,5 +92,28 @@ describe("withoutEditor", () => {
     const { json } = roundTrip(raw);
     expect(withoutEditor(json)).toEqual(stripEditor(raw));
     expect(JSON.stringify(withoutEditor(json))).not.toContain("_editor");
+  });
+});
+
+describe("auto-layout", () => {
+  it("stacks conditions without overlap, including nodes that show every field", () => {
+    const raw = {
+      groupName: "G",
+      plugin: "A.esp",
+      achievements: [{ achievementName: "A", description: "d", conditions: [{ type: "BaseActorDeath", formID: "1" }, { type: "BaseActorDeath", formID: "2" }, { type: "PlayerLevel", level: 1 }] }],
+    };
+    const conds = importGroup(raw).nodes.filter((n) => n.data.kind === "BaseActorDeath" || n.data.kind === "PlayerLevel");
+    // BaseActorDeath shows 5 fields (formID, editorID, name, quantity, pluginOverride) under a 28px header.
+    expect(conds[1].position.y - conds[0].position.y).toBeGreaterThanOrEqual(28 + 5 * 24);
+    expect(conds[2].position.y - conds[1].position.y).toBeGreaterThanOrEqual(28 + 5 * 24);
+  });
+});
+
+describe("auto-layout with optional fields set", () => {
+  it("leaves room for a node whose optional section opens because a field is set", () => {
+    const raw = { groupName: "G", plugin: "A.esp", achievements: [{ achievementName: "A", description: "d", icon: "x.dds", showPopup: false }, { achievementName: "B", description: "d" }] };
+    const [first, second] = importGroup(raw).nodes.filter((n) => n.data.kind === "CreateAchievement");
+    // 7 fields (name, description and the five optional ones) under a header, all showing.
+    expect(second.position.y - first.position.y).toBeGreaterThanOrEqual(28 + 7 * 24);
   });
 });

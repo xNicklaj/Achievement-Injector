@@ -8,7 +8,7 @@ import { LocalizationTable } from "./components/LocalizationTable";
 import { MenuBar } from "./components/MenuBar";
 import { NodePanel } from "./components/NodePanel";
 import { Sidebar } from "./components/Sidebar";
-import { saveFile } from "./io/fileActions";
+import { offerRecovery, saveFile } from "./io/fileActions";
 import { isDirty, useApp } from "./store";
 
 const MIN_PANEL = 80;
@@ -17,6 +17,8 @@ export function App() {
   const view = useApp((s) => s.view);
   const [panelH, setPanelH] = useState(220);
   const dragging = useRef(false);
+
+  useEffect(() => void offerRecovery(), []);
 
   useEffect(() => {
     const key = (e: KeyboardEvent) => {

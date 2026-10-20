@@ -1,14 +1,16 @@
 import { describe, expect, it } from "vitest";
 import { getText } from "./localization";
-import { filesWorkspace, folderWorkspace, groupNameError, pickedFolderWorkspace, type DirH, type FileH } from "./workspace";
+import { filesWorkspace, folderWorkspace, groupNameError, pickedFolderWorkspace, zipFiles, type DirH, type FileH } from "./workspace";
+import { writeFileSync } from "node:fs";
 
-type Mem = DirH & { files: Record<string, string>; dirs: Record<string, Mem> };
+type Content = string | Uint8Array;
+type Mem = DirH & { files: Record<string, Content>; dirs: Record<string, Mem> };
 
 /** In-memory folder with the File System Access API shape. */
-function memDir(name: string, files: Record<string, string> = {}, dirs: Record<string, Mem> = {}): Mem {
+function memDir(name: string, files: Record<string, Content> = {}, dirs: Record<string, Mem> = {}): Mem {
   const fileH = (n: string): FileH => ({
     kind: "file",
-    getFile: async () => ({ arrayBuffer: async () => new TextEncoder().encode(files[n]).buffer as ArrayBuffer }),
+    getFile: async () => ({ arrayBuffer: async () => (typeof files[n] === "string" ? new TextEncoder().encode(files[n] as string) : (files[n] as Uint8Array)).buffer as ArrayBuffer }),
     createWritable: async () => ({ write: async (d) => void (files[n] = d), close: async () => {} }),
   });
   return {
@@ -125,5 +127,55 @@ describe("picked folder workspace (directory input)", () => {
 
   it("reports nothing for a folder without group files", async () => {
     expect(await pickedFolderWorkspace([file("Mods/readme.txt")]).list()).toEqual([]);
+  });
+});
+
+describe("icons in a folder workspace", () => {
+  const bytes = (...n: number[]) => new Uint8Array(n);
+  const root = () =>
+    memDir("AchievementsData", { "G.json": group }, {
+      Icons: memDir("Icons", { "G.dds": bytes(1) }, { G: memDir("G", { "One.dds": bytes(2), "two.DDS": bytes(3), "notes.txt": "x" }), Other: memDir("Other", { "Z.dds": bytes(9) }) }),
+    });
+
+  it("lists the .dds files of one group's folder only", async () => {
+    expect(await folderWorkspace(root()).icons!.list("G")).toEqual(["One.dds", "two.DDS"]);
+    expect(await folderWorkspace(root()).icons!.list("Nope")).toEqual([]);
+  });
+  it("reads an icon by path, and returns undefined for a missing one", async () => {
+    const ws = folderWorkspace(root());
+    expect([...(await ws.icons!.read("Icons/G/One.dds"))!]).toEqual([2]);
+    expect([...(await ws.icons!.read("Icons/G.dds"))!]).toEqual([1]);
+    expect(await ws.icons!.read("Icons/G/missing.dds")).toBeUndefined();
+  });
+  it("writes binary files into nested folders it creates", async () => {
+    const d = memDir("d", { "G.json": group });
+    await folderWorkspace(d).write([{ name: "New.dds", dir: "Icons/G", data: bytes(7, 8) }]);
+    expect([...(d.dirs.Icons.dirs.G.files["New.dds"] as Uint8Array)]).toEqual([7, 8]);
+  });
+});
+
+describe("icons in a picked folder (directory input)", () => {
+  const file = (path: string, data = [0]) => Object.assign(new File([new Uint8Array(data)], path.split("/").pop()!), { webkitRelativePath: path });
+  const ws = pickedFolderWorkspace([
+    file("AchievementsData/G.json", []),
+    file("AchievementsData/Icons/G.dds", [1]),
+    file("AchievementsData/Icons/G/One.dds", [2]),
+    file("AchievementsData/Icons/g/Two.dds", [3]),
+    file("AchievementsData/Icons/Other/Z.dds", [9]),
+  ]);
+
+  it("lists and reads icons ignoring case, like Windows", async () => {
+    expect((await ws.icons!.list("G")).sort()).toEqual(["One.dds", "Two.dds"]);
+    expect([...(await ws.icons!.read("icons/G/one.DDS"))!]).toEqual([2]);
+    expect(await ws.icons!.read("Icons/G/none.dds")).toBeUndefined();
+  });
+});
+
+describe("zipFiles", () => {
+  it("writes a ZIP that standard tools can read, with folder paths", () => {
+    const nl = "\n", tab = "\t";
+    const zip = zipFiles([{ name: "G.json", text: "{}" + nl }, { name: "G_EN.txt", text: "$a" + tab + "Ä" + nl, dir: "Localizations" }, { name: "x.dds", data: new Uint8Array([1, 2, 3]), dir: "Icons/G" }]);
+    if (process.env.ZIP_OUT) writeFileSync(process.env.ZIP_OUT, zip);
+    expect(new DataView(zip.buffer).getUint16(zip.length - 14, true)).toBe(3);
   });
 });

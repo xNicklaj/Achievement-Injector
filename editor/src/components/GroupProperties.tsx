@@ -2,6 +2,7 @@ import { LANGUAGES, LOOKALIKES, languageOf } from "../io/languages";
 import { locKeys, orphanKeys } from "../io/localization";
 import { GroupSchema, describeFields } from "../schema";
 import { useApp, type GroupValues } from "../store";
+import { GroupIcon } from "./IconField";
 import { FieldWidget, pascal } from "./Widgets";
 
 // Rows come from the group schema, so the form matches validation (HANDOVER 3.4).
@@ -26,6 +27,10 @@ export function GroupProperties() {
           </label>
         ))}
       </div>
+
+      <h2 className="mb-2 mt-8 text-[14px] font-semibold">Icon</h2>
+      <p className="mb-2 max-w-xl text-[var(--text-dim)]">Shown for the group in the menu. 512×512, BC3 (DXT5) or lower. It is written to Icons/ when you save.</p>
+      <GroupIcon />
 
       <h2 className="mb-2 mt-8 text-[14px] font-semibold">Languages</h2>
       <p className="mb-2 max-w-xl text-[var(--text-dim)]">

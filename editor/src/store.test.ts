@@ -93,3 +93,115 @@ describe("translation warnings on export", () => {
     expect(messages()).toEqual([expect.stringContaining("No languages are set up")]);
   });
 });
+
+describe("deleting Localized Text", () => {
+  const field = (kind: string, name: string) => useApp.getState().nodes.find((n) => n.data.kind === kind)?.data.values[name];
+  const wired = () => useApp.getState().edges.filter((e) => e.sourceHandle === "loc-out");
+  /** Delete the way React Flow reports it: the node's wires first, then the node. */
+  const deleteKey = (id: string) => {
+    const s = useApp.getState();
+    s.onEdgesChange(s.edges.filter((e) => e.source === id).map((e) => ({ type: "remove" as const, id: e.id })));
+    s.onNodesChange([{ type: "remove", id }]);
+  };
+
+  it("fields keep the English text as plain text, in one undo step", () => {
+    deleteKey(keyNode().id);
+    expect(field("CreateAchievement", "achievementName")).toBe("Hello");
+    expect(useApp.getState().nodes.some((n) => n.data.kind === "LocalizedText")).toBe(false);
+    expect(wired()).toHaveLength(0);
+    useApp.temporal.getState().undo();
+    expect(keyNode()).toBeDefined();
+    expect(wired()).toHaveLength(1);
+    expect(field("CreateAchievement", "achievementName")).toBeUndefined();
+  });
+
+  it("falls back to the next language when there is no English, and leaves the field empty with no text at all", () => {
+    useApp.getState().load(importGroup(raw), "G.json", { GE: parseLoc("G_GE.txt", "$NAME\tHallo\r\n") }, null);
+    deleteKey(keyNode().id);
+    expect(field("CreateAchievement", "achievementName")).toBe("Hallo");
+
+    useApp.getState().load(importGroup(raw), "G.json", {}, null);
+    deleteKey(keyNode().id);
+    expect(field("CreateAchievement", "achievementName")).toBeUndefined();
+  });
+
+  it("removing only the wire does the same", () => {
+    const e = wired()[0];
+    useApp.getState().onEdgesChange([{ type: "remove", id: e.id }]);
+    expect(field("CreateAchievement", "achievementName")).toBe("Hello");
+    expect(keyNode()).toBeDefined();
+  });
+
+  it("keeps the translations: the key becomes an unused entry", () => {
+    deleteKey(keyNode().id);
+    expect(getText(useApp.getState().loc.EN, "NAME")).toBe("Hello");
+  });
+
+  it("unrelated deletes are unaffected", () => {
+    const cond = useApp.getState().nodes.find((n) => n.data.kind === "PlayerLevel")!;
+    useApp.getState().onNodesChange([{ type: "remove", id: cond.id }]);
+    expect(useApp.getState().nodes.some((n) => n.id === cond.id)).toBe(false);
+    expect(field("CreateAchievement", "achievementName")).toBeUndefined();
+  });
+});
+
+describe("renaming an achievement", () => {
+  const two = {
+    groupName: "G",
+    plugin: "A.esp",
+    achievements: [
+      { achievementName: "First", description: "d", conditions: [{ type: "PlayerLevel", level: 1 }] },
+      {
+        achievementName: "Second",
+        description: "d",
+        conditions: [
+          { type: "AchievementUnlocked", achievement: "First" },
+          { type: "AchievementUnlocked", achievement: "First", group: "G" },
+          { type: "AchievementUnlocked", achievement: "First", group: "Other" },
+          { type: "AchievementUnlocked", achievement: "Third" },
+        ],
+      },
+    ],
+  };
+  const named = (n: string) => useApp.getState().nodes.find((x) => x.data.kind === "CreateAchievement" && x.data.values.achievementName === n)!;
+  const refs = () => useApp.getState().nodes.filter((x) => x.data.kind === "AchievementUnlocked").map((x) => `${x.data.values.achievement}${x.data.values.group ? "@" + x.data.values.group : ""}`);
+  const openTwo = () => useApp.getState().load(importGroup(two), "G.json", {}, null);
+
+  it("updates references in this group, but not ones pointing at another group", () => {
+    openTwo();
+    const r = useApp.getState().renameAchievement(named("First").id, "Renamed");
+    expect(r).toEqual({ old: "First", updated: 2, existed: true });
+    expect(refs()).toEqual(["Renamed", "Renamed@G", "First@Other", "Third"]);
+    expect(named("Renamed")).toBeDefined();
+  });
+
+  it("is one undo step that restores the name and every reference", () => {
+    openTwo();
+    useApp.getState().renameAchievement(named("First").id, "Renamed");
+    expect(useApp.temporal.getState().pastStates).toHaveLength(1);
+    useApp.temporal.getState().undo();
+    expect(refs()).toEqual(["First", "First@G", "First@Other", "Third"]);
+    expect(named("First")).toBeDefined();
+  });
+
+  it("only warns for names that are already in the opened or saved file", () => {
+    openTwo();
+    const fresh = useApp.getState();
+    fresh.addNode("CreateAchievement", { x: 0, y: 0 });
+    const id = useApp.getState().nodes.at(-1)!.id;
+    useApp.getState().setValue(id, "achievementName", "Brand new");
+    expect(useApp.getState().renameAchievement(id, "Brand newer").existed).toBe(false);
+    expect(useApp.getState().renameAchievement(named("Second").id, "Second!").existed).toBe(true);
+    useApp.getState().markSaved("G.json");
+    // After saving, the renamed name is the one on disk.
+    expect(useApp.getState().renameAchievement(named("Second!").id, "Second?").existed).toBe(true);
+    expect(useApp.getState().renameAchievement(id, "Again").existed).toBe(true);
+  });
+
+  it("leaves references alone when the new name is empty or unchanged", () => {
+    openTwo();
+    expect(useApp.getState().renameAchievement(named("First").id, "First").updated).toBe(0);
+    useApp.getState().renameAchievement(named("First").id, "");
+    expect(refs()).toEqual(["First", "First@G", "First@Other", "Third"]);
+  });
+});

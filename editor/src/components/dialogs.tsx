@@ -1,4 +1,5 @@
 import { useState } from "react";
+import type { Draft } from "../io/draftStore";
 import { groupNameError } from "../io/workspace";
 import { openDialog, Button, Frame } from "./Dialog";
 
@@ -12,14 +13,14 @@ export const message = (title: string, text: string) =>
     undefined,
   );
 
-export const confirmDialog = (title: string, lines: string[], ok: string, intro?: string) =>
+export const confirmDialog = (title: string, lines: string[], ok: string, intro?: string, cancel = "Cancel") =>
   openDialog<boolean>(
     (done) => (
       <Frame
         title={title}
         footer={
           <>
-            <Button onClick={() => done(false)}>Cancel</Button>
+            <Button onClick={() => done(false)}>{cancel}</Button>
             <Button primary autoFocus onClick={() => done(true)}>{ok}</Button>
           </>
         }
@@ -89,6 +90,31 @@ export const pickGroupDialog = (folder: string, names: string[]) =>
           {names.map((n) => (
             <li key={n}>
               <button className="w-full rounded px-2 py-1 text-left hover:bg-white/10" onClick={() => done({ open: n })}>{n}</button>
+            </li>
+          ))}
+        </ul>
+      </Frame>
+    ),
+    null,
+  );
+
+export type RecoverChoice = { restore: Draft } | { discard: string } | null;
+
+/** Unsaved edits found after a crash or an accidental close. Closing the dialog keeps them for next time. */
+export const recoverDialog = (drafts: Draft[]) =>
+  openDialog<RecoverChoice>(
+    (done) => (
+      <Frame title="Recover unsaved edits?" footer={<Button onClick={() => done(null)}>Not now</Button>}>
+        <p className="mb-2 text-[var(--text-dim)]">The editor found edits that were never saved. Drafts live only in this browser.</p>
+        <ul className="space-y-1">
+          {drafts.map((d) => (
+            <li key={d.name} className="flex items-center gap-2 rounded border border-[var(--border)] px-2 py-1">
+              <span className="min-w-0 flex-1">
+                <span className="block truncate font-medium">{d.fileName ?? "Unsaved group"}</span>
+                <span className="block text-[11px] text-[var(--text-dim)]">{new Date(d.savedAt).toLocaleString()} · {d.nodes.length} nodes</span>
+              </span>
+              <Button primary onClick={() => done({ restore: d })}>Restore</Button>
+              <Button onClick={() => done({ discard: d.name })}>Discard</Button>
             </li>
           ))}
         </ul>

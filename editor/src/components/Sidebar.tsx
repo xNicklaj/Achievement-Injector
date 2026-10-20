@@ -3,8 +3,8 @@ import { useState } from "react";
 import { useApp, type View } from "../store";
 
 const ITEMS: { id: View; label: string; icon: typeof Workflow }[] = [
-  { id: "graph", label: "Graph", icon: Workflow },
   { id: "group", label: "Group Properties", icon: FileCog },
+  { id: "graph", label: "Graph", icon: Workflow },
   { id: "localization", label: "Localization", icon: Languages },
   { id: "json", label: "JSON", icon: Braces },
 ];

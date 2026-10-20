@@ -5,10 +5,11 @@ export const pascal = (s: string) => s[0].toUpperCase() + s.slice(1);
 
 export const inputClass = "nodrag nowheel w-full min-w-0 rounded border border-[var(--border)] bg-[var(--bg-app)] px-1.5 py-0.5 text-[12px] text-[var(--text)] outline-none focus:border-zinc-400";
 
-type Props = { info: FieldInfo; value: unknown; onChange: (v: unknown) => void };
+type Props = { info: FieldInfo; value: unknown; onChange: (v: unknown) => void; /** Red border: this field has an error. */ invalid?: boolean };
 
 /** One widget per field type; empty input removes the key so unset is never serialized. */
-export function FieldWidget({ info, value, onChange }: Props) {
+export function FieldWidget({ info, value, onChange, invalid }: Props) {
+  const bad = invalid ? { borderColor: "var(--status-error)" } : undefined;
   const placeholder = info.default !== undefined ? `default: ${String(info.default)}` : info.description;
   switch (info.widget) {
     case "bool":
@@ -24,7 +25,7 @@ export function FieldWidget({ info, value, onChange }: Props) {
     case "integer":
     case "float":
       return (
-        <input
+        <input style={bad}
           type="number"
           step={info.widget === "integer" ? 1 : "any"}
           className={inputClass}
@@ -37,7 +38,7 @@ export function FieldWidget({ info, value, onChange }: Props) {
       );
     case "enum":
       return (
-        <select
+        <select style={bad}
           className={inputClass}
           value={typeof value === "string" ? value : ""}
           onChange={(e) => onChange(e.target.value === "" ? undefined : e.target.value)}
@@ -50,7 +51,7 @@ export function FieldWidget({ info, value, onChange }: Props) {
       );
     case "list":
       return (
-        <input
+        <input style={bad}
           className={`${inputClass} font-mono`}
           value={Array.isArray(value) ? value.join(", ") : ""}
           placeholder="comma separated"
@@ -62,7 +63,7 @@ export function FieldWidget({ info, value, onChange }: Props) {
       );
     default:
       return (
-        <input
+        <input style={bad}
           className={`${inputClass} ${info.widget === "formId" ? "font-mono" : ""}`}
           value={typeof value === "string" ? value : ""}
           placeholder={placeholder}

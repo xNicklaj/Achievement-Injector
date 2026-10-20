@@ -10,8 +10,10 @@ import {
 } from "@xyflow/react";
 import { create } from "zustand";
 import { temporal } from "zundo";
-import { type AppNode, refuseReason } from "./graph";
-import type { Snapshot } from "./io/importGroup";
+import { type AppNode, isInternalGroup, refuseReason, restoreInline } from "./graph";
+import type { Draft } from "./io/draftStore";
+import { mkEdge, type Snapshot } from "./io/importGroup";
+import type { SpawnFrom } from "./spawn";
 import { newLocFile, renameKey, serializeLoc, setText, type LocFile } from "./io/localization";
 import { groupId, type Workspace } from "./io/workspace";
 import { registry } from "./registry";
@@ -32,6 +34,14 @@ type State = {
   /** Serialized text of each locale file as last read or saved; a file is written only when it differs. Not in undo history. */
   locOriginal: Record<string, string>;
   workspace: Workspace | null;
+  /** File names in `Icons/<group>/` as the workspace sees them; null when it cannot see icons. Not in undo history. */
+  iconFiles: string[] | null;
+  /** Icons chosen but not saved yet, by path under AchievementsData (`Icons/<group>/<file>.dds`). Written on Save. */
+  pendingIcons: Record<string, Uint8Array>;
+  /** Bumped whenever icon files change, so previews reload. */
+  iconVersion: number;
+  /** Achievement names as last opened or saved: renaming one of these breaks saved progress, so it warns. Not in undo history. */
+  savedNames: string[];
   /** `docKey` of the document as last opened or saved; differs from the current key when there are unsaved changes. */
   savedKey: string;
   /** Name of the file the document came from; the group identifier on disk, so reused for saving. */
@@ -42,12 +52,25 @@ type State = {
   onConnect: (c: Connection) => void;
   isValid: (c: Connection | Edge) => boolean;
   addNode: (kind: string, position: XYPosition) => void;
+  /** Create a node and, when it was made from a dragged wire, connect that wire to `wire.pin`: one update, one undo step. */
+  addNodeConnected: (kind: string, position: XYPosition, wire?: { from: SpawnFrom; pin: string }) => void;
   /** `undefined` removes the key: unset is not serialized. */
   setValue: (id: string, name: string, value: unknown) => void;
   setGroup: (patch: Partial<GroupValues>) => void;
   setView: (v: View) => void;
   /** Replace the whole document (open/new). Clears undo history. */
   load: (s: Snapshot, fileName: string | null, loc?: Record<string, LocFile>, workspace?: Workspace | null) => void;
+  /**
+   * Rename an achievement and update `AchievementUnlocked` references to it in this group (HANDOVER 3.1), in one undo step.
+   * Returns the old name and how many references were updated; `existed` says the old name was in the last opened or saved file.
+   */
+  renameAchievement: (id: string, name: string) => { old?: string; updated: number; existed: boolean };
+  /** Re-read which icons exist for the open group. */
+  refreshIcons: () => Promise<void>;
+  /** Queue an icon file to be written on Save. */
+  addPendingIcon: (path: string, bytes: Uint8Array) => void;
+  /** Put a recovered draft back, still unsaved. Clears undo history. */
+  restore: (d: Draft, workspace: Workspace | null) => void;
   setTranslation: (locale: string, key: string, value: string) => void;
   /** Adds an empty language; it is saved once it has a translation. */
   addLanguage: (locale: string) => void;
@@ -58,20 +81,28 @@ type State = {
 };
 
 // History tracks the document only: selection, dragging and measured sizes are transient (HANDOVER 3.11).
-const doc = (s: Pick<State, "nodes" | "edges" | "group" | "groupExtra" | "loc">) => ({
+const doc = (s: Pick<State, "nodes" | "edges" | "group" | "groupExtra" | "loc"> & Partial<Pick<State, "pendingIcons">>) => ({
   nodes: s.nodes.map(({ id, type, position, data }) => ({ id, type, position, data })),
   edges: s.edges.map(({ id, source, sourceHandle, target, targetHandle }) => ({ id, source, sourceHandle, target, targetHandle })),
   group: s.group,
   groupExtra: s.groupExtra,
   loc: s.loc,
+  // Only which icons are waiting counts as a change; their bytes are too big to compare on every edit.
+  pendingIcons: Object.keys(s.pendingIcons ?? {}).sort(),
 });
 
-type Doc = Pick<State, "nodes" | "edges" | "group" | "groupExtra" | "loc">;
+/** Names of the achievements as plain text; a localized name has no inline value. */
+const plainNames = (nodes: AppNode[]) => nodes.flatMap((n) => (n.data.kind === "CreateAchievement" && typeof n.data.values.achievementName === "string" ? [n.data.values.achievementName] : []));
+
+type Doc = Pick<State, "nodes" | "edges" | "group" | "groupExtra" | "loc" | "pendingIcons">;
 export const docKey = (s: Doc) => JSON.stringify(doc(s));
 export const isDirty = () => {
   const s = useApp.getState();
   return docKey(s) !== s.savedKey;
 };
+
+// Time of the last history entry; see `handleSet` below. Opening a document starts a fresh window.
+let lastRecorded = -Infinity;
 
 export const useApp = create<State>()(
   temporal(
@@ -83,11 +114,26 @@ export const useApp = create<State>()(
       loc: {},
       locOriginal: {},
       workspace: null,
+      iconFiles: null,
+      pendingIcons: {},
+      iconVersion: 0,
       savedKey: "",
+      savedNames: [],
       fileName: null,
       view: "graph",
-      onNodesChange: (c) => set({ nodes: applyNodeChanges(c, get().nodes) }),
-      onEdgesChange: (c) => set({ edges: applyEdgeChanges(c, get().edges) }),
+      onNodesChange: (c) => {
+        const { nodes, edges, loc } = get();
+        const removed = new Set(c.flatMap((x) => (x.type === "remove" ? [x.id] : [])));
+        if (!removed.size) return set({ nodes: applyNodeChanges(c, nodes) });
+        // Wires of a deleted node go with it in this same update, and the fields they fed keep their text.
+        const gone = edges.filter((e) => removed.has(e.source) || removed.has(e.target));
+        set({ nodes: applyNodeChanges(c, restoreInline(nodes, gone, loc)), edges: edges.filter((e) => !gone.includes(e)) });
+      },
+      onEdgesChange: (c) => {
+        const { nodes, edges, loc } = get();
+        const ids = new Set(c.flatMap((x) => (x.type === "remove" ? [x.id] : [])));
+        set({ edges: applyEdgeChanges(c, edges), nodes: ids.size ? restoreInline(nodes, edges.filter((e) => ids.has(e.id)), loc) : nodes });
+      },
       onConnect: (c) => {
         const { nodes, edges } = get();
         if (!refuseReason(nodes, edges, c as never)) set({ edges: addEdge({ ...c, type: "default" }, edges) });
@@ -96,6 +142,22 @@ export const useApp = create<State>()(
       addNode: (kind, position) => {
         if (!registry[kind]) return;
         set({ nodes: [...get().nodes, { id: crypto.randomUUID(), type: "ae", position, data: { kind, values: {} } }] });
+      },
+      addNodeConnected: (kind, position, wire) => {
+        if (!registry[kind]) return;
+        const id = crypto.randomUUID();
+        const node: AppNode = { id, type: "ae", position, data: { kind, values: {} } };
+        const { nodes, edges } = get();
+        let next = edges;
+        if (wire) {
+          const { from, pin } = wire;
+          const l =
+            from.handleType === "source"
+              ? { source: from.nodeId, sourceHandle: from.handleId, target: id, targetHandle: pin }
+              : { source: id, sourceHandle: pin, target: from.nodeId, targetHandle: from.handleId };
+          if (!refuseReason([...nodes, node], edges, l)) next = [...edges, mkEdge(l.source, l.sourceHandle, l.target, l.targetHandle)];
+        }
+        set({ nodes: [...nodes, node], edges: next });
       },
       setValue: (id, name, value) => {
         const node = get().nodes.find((n) => n.id === id);
@@ -125,10 +187,58 @@ export const useApp = create<State>()(
           loc,
           locOriginal: Object.fromEntries(Object.entries(loc).map(([l, f]) => [l, serializeLoc(f)])),
           workspace,
+          iconFiles: null,
+          pendingIcons: {},
+          iconVersion: get().iconVersion + 1,
           view: "graph",
         });
-        set({ savedKey: docKey(get()) });
+        set({ savedKey: docKey(get()), savedNames: plainNames(get().nodes) });
+        void get().refreshIcons();
         useApp.temporal.getState().clear();
+        lastRecorded = -Infinity;
+      },
+      renameAchievement: (id, name) => {
+        const { nodes, fileName, savedNames } = get();
+        const old = nodes.find((n) => n.id === id)?.data.values.achievementName;
+        if (typeof old !== "string" || old === name) return { old: typeof old === "string" ? old : undefined, updated: 0, existed: false };
+        let updated = 0;
+        set({
+          nodes: nodes.map((n) => {
+            const v = n.data.values;
+            if (n.id === id) {
+              const { achievementName: _, ...rest } = v;
+              return { ...n, data: { ...n.data, values: name ? { ...rest, achievementName: name } : rest } };
+            }
+            // References to the old name follow it, but never ones that point into another group.
+            if (name && n.data.kind === "AchievementUnlocked" && v.achievement === old && isInternalGroup(v.group, fileName)) {
+              updated++;
+              return { ...n, data: { ...n.data, values: { ...v, achievement: name } } };
+            }
+            return n;
+          }),
+        });
+        return { old, updated, existed: savedNames.includes(old) };
+      },
+      restore: (d, workspace) => {
+        set({
+          nodes: d.nodes as AppNode[],
+          edges: d.edges,
+          group: d.group,
+          groupExtra: d.groupExtra,
+          loc: d.loc,
+          locOriginal: d.locOriginal,
+          savedKey: d.savedKey,
+          savedNames: d.savedNames ?? [],
+          pendingIcons: d.pendingIcons ?? {},
+          iconFiles: null,
+          iconVersion: get().iconVersion + 1,
+          fileName: d.fileName,
+          workspace,
+          view: "graph",
+        });
+        void get().refreshIcons();
+        useApp.temporal.getState().clear();
+        lastRecorded = -Infinity;
       },
       setTranslation: (locale, key, value) => {
         const f = get().loc[locale];
@@ -146,17 +256,37 @@ export const useApp = create<State>()(
         const { [locale]: _, ...rest } = loc;
         set({ loc: rest });
       },
+      refreshIcons: async () => {
+        const { workspace, fileName } = get();
+        const files = workspace?.icons && fileName ? await workspace.icons.list(groupId(fileName)).catch(() => null) : null;
+        // The document may have changed while listing; only keep the answer if it is still for this group.
+        if (get().workspace === workspace && get().fileName === fileName) set({ iconFiles: files, iconVersion: get().iconVersion + 1 });
+      },
+      addPendingIcon: (path, bytes) => set({ pendingIcons: { ...get().pendingIcons, [path]: bytes }, iconVersion: get().iconVersion + 1 }),
       markSaved: (fileName) => {
-        set({ fileName, locOriginal: Object.fromEntries(Object.entries(get().loc).map(([l, f]) => [l, serializeLoc(f)])) });
-        set({ savedKey: docKey(get()) });
+        set({ fileName, pendingIcons: {}, iconVersion: get().iconVersion + 1, locOriginal: Object.fromEntries(Object.entries(get().loc).map(([l, f]) => [l, serializeLoc(f)])) });
+        set({ savedKey: docKey(get()), savedNames: plainNames(get().nodes) });
       },
     }),
     {
       partialize: (s) => ({ nodes: s.nodes, edges: s.edges, group: s.group, groupExtra: s.groupExtra, loc: s.loc }),
       equality: (a, b) => JSON.stringify(doc(a as State)) === JSON.stringify(doc(b as State)),
+      // Deleting selected elements arrives as several store updates (wires first, then nodes). Updates within 30ms
+      // of the last recorded one share its history entry, so one Delete is one undo step.
+      handleSet: (handleSet) => {
+        return (pastState, replace, ...rest) => {
+          const t = performance.now();
+          if (t - lastRecorded < 30) return;
+          lastRecorded = t;
+          (handleSet as (...a: unknown[]) => void)(pastState, replace, ...rest);
+        };
+      },
     },
   ),
 );
+
+// A blank editor is not "unsaved": its saved state is itself.
+useApp.setState({ savedKey: docKey(useApp.getState()) });
 
 /** One undo entry per node drag: pause on start, record the pre-drag state on drop. */
 let dragStart: ReturnType<typeof doc> | null = null;
