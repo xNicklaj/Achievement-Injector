@@ -1,0 +1,85 @@
+@import "tailwindcss";
+
+/* Palette lives here only (HANDOVER 3.6): pin dots, edges, node list icons read these variables. */
+:root {
+  --pin-flow: #f5f5f5;
+  --pin-bool: #e5484d;
+  --pin-integer: #2dd4bf;
+  --pin-float: #4ade80;
+  --pin-string: #e879f9;
+  --pin-localized: #fb9a8c;
+  --pin-editorId: #a78bfa;
+  --pin-formbase: #3b82f6;
+  --pin-formref: #7dd3fc;
+  --pin-enum: #0f766e;
+  --pin-list: #94a3b8;
+  --pin-condition: #f59e0b;
+
+  --cat-entry: #b91c1c;
+  --cat-flow: #52525b;
+  --cat-condition: #b45309;
+  --cat-localization: #be185d;
+
+  --status-error: #ef4444;
+  --status-warning: #f59e0b;
+
+  --bg-app: #18181b;
+  --bg-panel: #202024;
+  --bg-node: #27272a;
+  --border: #3f3f46;
+  --text: #e4e4e7;
+  --text-dim: #a1a1aa;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  background: var(--bg-app);
+  color: var(--text);
+  font: 13px/1.4 system-ui, sans-serif;
+}
+
+.react-flow__edge-path {
+  stroke-width: 2;
+}
+.react-flow__attribution {
+  display: none;
+}
+
+/* Pins are 12px; a touchpad needs a bigger target. The invisible ring is part of the handle, so dropping a wire on it connects. */
+.react-flow__handle::after {
+  content: "";
+  position: absolute;
+  inset: -8px;
+}
+
+/* No spinner buttons on number fields: values are typed. */
+input[type="number"] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* JSON view syntax colours (a $key value uses the localized pin colour). */
+:root {
+  --syn-key: #8fc7ff;
+  --syn-string: #e3a07f;
+  --syn-number: #b5cea8;
+  --syn-literal: #6aa6e8;
+  --syn-punct: #8b8b95;
+}
+
+/* JSON view syntax colours (a $key value uses the localized pin colour). */
+:root {
+  --syn-key: #8fc7ff;
+  --syn-string: #e3a07f;
+  --syn-number: #b5cea8;
+  --syn-literal: #6aa6e8;
+  --syn-punct: #8b8b95;
+}

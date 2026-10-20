@@ -1,0 +1,3464 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "groupName": {
+      "type": "string",
+      "minLength": 1,
+      "widget": "localizedString",
+      "since": "1.4.0"
+    },
+    "plugin": {
+      "type": "string",
+      "pattern": "\\.(esp|esm|esl)$",
+      "widget": "plugin",
+      "since": "1.4.0",
+      "description": "Base plugin for every condition without pluginOverride"
+    },
+    "showInMenu": {
+      "widget": "bool",
+      "since": "1.4.0",
+      "default": true,
+      "type": "boolean"
+    },
+    "achievements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "achievementName": {
+            "type": "string",
+            "minLength": 1,
+            "widget": "localizedString",
+            "since": "1.4.0",
+            "description": "Unique within the group; progress and the API key off it"
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "widget": "localizedString",
+            "since": "1.4.0"
+          },
+          "hideDescription": {
+            "widget": "bool",
+            "since": "1.4.0",
+            "default": false,
+            "type": "boolean"
+          },
+          "showInMenu": {
+            "widget": "bool",
+            "since": "1.4.0",
+            "default": true,
+            "type": "boolean"
+          },
+          "showPopup": {
+            "widget": "bool",
+            "since": "1.4.0",
+            "default": true,
+            "type": "boolean"
+          },
+          "icon": {
+            "widget": "iconPath",
+            "since": "1.4.0",
+            "description": "File name in Icons/<Group>/ (512x512 DDS, BC3 max)",
+            "type": "string",
+            "minLength": 1
+          },
+          "notificationSound": {
+            "widget": "string",
+            "since": "1.4.0",
+            "description": "Ignored when the MCM sound override is on",
+            "type": "string"
+          },
+          "joinType": {
+            "widget": "enum",
+            "since": "1.4.0",
+            "default": "OR",
+            "options": [
+              "AND",
+              "OR"
+            ],
+            "type": "string",
+            "enum": [
+              "AND",
+              "OR"
+            ]
+          },
+          "conditions": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "const": "QuestStageDone"
+                    },
+                    "formID": {
+                      "type": "string",
+                      "pattern": "^[0-9a-fA-F]{1,8}$",
+                      "widget": "formId",
+                      "since": "1.4.0",
+                      "formKind": "base"
+                    },
+                    "operation": {
+                      "widget": "enum",
+                      "since": "1.4.0",
+                      "default": ">=",
+                      "options": [
+                        ">=",
+                        "GT",
+                        "==",
+                        "EQ"
+                      ],
+                      "type": "string",
+                      "enum": [
+                        ">=",
+                        "GT",
+                        "==",
+                        "EQ"
+                      ]
+                    },
+                    "stage": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991,
+                      "widget": "integer",
+                      "since": "1.4.0"
+                    },
+                    "pluginOverride": {
+                      "widget": "plugin",
+                      "since": "1.4.0",
+                      "description": "Defaults to the group's base plugin",
+                      "type": "string",
+                      "pattern": "\\.(esp|esm|esl)$"
+                    },
+                    "onUnlock": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "command"
+                              },
+                              "command": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "command"
+                            ],
+                            "additionalProperties": {}
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "papyrus"
+                              },
+                              "script": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "function": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "script",
+                              "function"
+                            ],
+                            "additionalProperties": {}
+                          }
+                        ]
+                      }
+                    },
+                    "_editor": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "x": {
+                          "type": "number"
+                        },
+                        "y": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "x",
+                        "y"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "formID",
+                    "stage"
+                  ],
+                  "additionalProperties": {},
+                  "title": "Quest stage done"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "const": "PlayerLevel"
+                    },
+                    "level": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991,
+                      "widget": "integer",
+                      "since": "1.4.0"
+                    },
+                    "pluginOverride": {
+                      "widget": "plugin",
+                      "since": "1.4.0",
+                      "description": "Defaults to the group's base plugin",
+                      "type": "string",
+                      "pattern": "\\.(esp|esm|esl)$"
+                    },
+                    "onUnlock": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "command"
+                              },
+                              "command": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "command"
+                            ],
+                            "additionalProperties": {}
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "papyrus"
+                              },
+                              "script": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "function": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "script",
+                              "function"
+                            ],
+                            "additionalProperties": {}
+                          }
+                        ]
+                      }
+                    },
+                    "_editor": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "x": {
+                          "type": "number"
+                        },
+                        "y": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "x",
+                        "y"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "level"
+                  ],
+                  "additionalProperties": {},
+                  "title": "Player level"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "const": "SkillLevel"
+                    },
+                    "skill": {
+                      "type": "string",
+                      "widget": "enum",
+                      "since": "1.4.0",
+                      "options": [
+                        "alchemy",
+                        "alteration",
+                        "marksman",
+                        "block",
+                        "conjuration",
+                        "destruction",
+                        "enchanting",
+                        "heavyarmor",
+                        "illusion",
+                        "lightarmor",
+                        "lockpicking",
+                        "onehanded",
+                        "pickpocket",
+                        "restoration",
+                        "smithing",
+                        "sneak",
+                        "speechcraft",
+                        "twohanded"
+                      ]
+                    },
+                    "level": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991,
+                      "widget": "integer",
+                      "since": "1.4.0"
+                    },
+                    "pluginOverride": {
+                      "widget": "plugin",
+                      "since": "1.4.0",
+                      "description": "Defaults to the group's base plugin",
+                      "type": "string",
+                      "pattern": "\\.(esp|esm|esl)$"
+                    },
+                    "onUnlock": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "command"
+                              },
+                              "command": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "command"
+                            ],
+                            "additionalProperties": {}
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "papyrus"
+                              },
+                              "script": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "function": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "script",
+                              "function"
+                            ],
+                            "additionalProperties": {}
+                          }
+                        ]
+                      }
+                    },
+                    "_editor": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "x": {
+                          "type": "number"
+                        },
+                        "y": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "x",
+                        "y"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "skill",
+                    "level"
+                  ],
+                  "additionalProperties": {},
+                  "title": "Skill level"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "const": "ItemInInventory"
+                    },
+                    "formID": {
+                      "type": "string",
+                      "pattern": "^[0-9a-fA-F]{1,8}$",
+                      "widget": "formId",
+                      "since": "1.4.0",
+                      "formKind": "base"
+                    },
+                    "quantity": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991,
+                      "widget": "integer",
+                      "since": "1.4.0"
+                    },
+                    "pluginOverride": {
+                      "widget": "plugin",
+                      "since": "1.4.0",
+                      "description": "Defaults to the group's base plugin",
+                      "type": "string",
+                      "pattern": "\\.(esp|esm|esl)$"
+                    },
+                    "onUnlock": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "command"
+                              },
+                              "command": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "command"
+                            ],
+                            "additionalProperties": {}
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "papyrus"
+                              },
+                              "script": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "function": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "script",
+                              "function"
+                            ],
+                            "additionalProperties": {}
+                          }
+                        ]
+                      }
+                    },
+                    "_editor": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "x": {
+                          "type": "number"
+                        },
+                        "y": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "x",
+                        "y"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "formID",
+                    "quantity"
+                  ],
+                  "additionalProperties": {},
+                  "title": "Item in inventory"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "const": "LocationDiscovery"
+                    },
+                    "formID": {
+                      "widget": "formId",
+                      "since": "1.4.0",
+                      "description": "Map marker reference; takes precedence over locationID",
+                      "formKind": "reference",
+                      "type": "string",
+                      "pattern": "^[0-9a-fA-F]{1,8}$"
+                    },
+                    "locationID": {
+                      "widget": "localizedString",
+                      "since": "1.4.0",
+                      "description": "Map marker name",
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "worldspaceID": {
+                      "widget": "editorId",
+                      "since": "1.4.0",
+                      "description": "Absent = any worldspace",
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "pluginOverride": {
+                      "widget": "plugin",
+                      "since": "1.4.0",
+                      "description": "Defaults to the group's base plugin",
+                      "type": "string",
+                      "pattern": "\\.(esp|esm|esl)$"
+                    },
+                    "onUnlock": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "command"
+                              },
+                              "command": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "command"
+                            ],
+                            "additionalProperties": {}
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "papyrus"
+                              },
+                              "script": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "function": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "script",
+                              "function"
+                            ],
+                            "additionalProperties": {}
+                          }
+                        ]
+                      }
+                    },
+                    "_editor": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "x": {
+                          "type": "number"
+                        },
+                        "y": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "x",
+                        "y"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "type"
+                  ],
+                  "additionalProperties": {},
+                  "title": "Location discovery"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "const": "DragonSoulAbsorbed"
+                    },
+                    "quantity": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991,
+                      "widget": "integer",
+                      "since": "1.4.0"
+                    },
+                    "pluginOverride": {
+                      "widget": "plugin",
+                      "since": "1.4.0",
+                      "description": "Defaults to the group's base plugin",
+                      "type": "string",
+                      "pattern": "\\.(esp|esm|esl)$"
+                    },
+                    "onUnlock": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "command"
+                              },
+                              "command": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "command"
+                            ],
+                            "additionalProperties": {}
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "papyrus"
+                              },
+                              "script": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "function": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "script",
+                              "function"
+                            ],
+                            "additionalProperties": {}
+                          }
+                        ]
+                      }
+                    },
+                    "_editor": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "x": {
+                          "type": "number"
+                        },
+                        "y": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "x",
+                        "y"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "quantity"
+                  ],
+                  "additionalProperties": {},
+                  "title": "Dragon souls absorbed"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "const": "PlayerActivation"
+                    },
+                    "formID": {
+                      "type": "string",
+                      "pattern": "^[0-9a-fA-F]{1,8}$",
+                      "widget": "formId",
+                      "since": "1.4.0",
+                      "formKind": "reference"
+                    },
+                    "quantity": {
+                      "widget": "integer",
+                      "since": "1.4.1",
+                      "default": 1,
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "pluginOverride": {
+                      "widget": "plugin",
+                      "since": "1.4.0",
+                      "description": "Defaults to the group's base plugin",
+                      "type": "string",
+                      "pattern": "\\.(esp|esm|esl)$"
+                    },
+                    "onUnlock": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "command"
+                              },
+                              "command": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "command"
+                            ],
+                            "additionalProperties": {}
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "papyrus"
+                              },
+                              "script": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "function": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "script",
+                              "function"
+                            ],
+                            "additionalProperties": {}
+                          }
+                        ]
+                      }
+                    },
+                    "_editor": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "x": {
+                          "type": "number"
+                        },
+                        "y": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "x",
+                        "y"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "formID"
+                  ],
+                  "additionalProperties": {},
+                  "title": "Player activation"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "const": "SpellCast"
+                    },
+                    "formID": {
+                      "type": "string",
+                      "pattern": "^[0-9a-fA-F]{1,8}$",
+                      "widget": "formId",
+                      "since": "1.4.0",
+                      "formKind": "base"
+                    },
+                    "quantity": {
+                      "widget": "integer",
+                      "since": "1.4.0",
+                      "default": 1,
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "pluginOverride": {
+                      "widget": "plugin",
+                      "since": "1.4.0",
+                      "description": "Defaults to the group's base plugin",
+                      "type": "string",
+                      "pattern": "\\.(esp|esm|esl)$"
+                    },
+                    "onUnlock": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "command"
+                              },
+                              "command": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "command"
+                            ],
+                            "additionalProperties": {}
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "papyrus"
+                              },
+                              "script": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "function": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "script",
+                              "function"
+                            ],
+                            "additionalProperties": {}
+                          }
+                        ]
+                      }
+                    },
+                    "_editor": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "x": {
+                          "type": "number"
+                        },
+                        "y": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "x",
+                        "y"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "formID"
+                  ],
+                  "additionalProperties": {},
+                  "title": "Spell cast"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "const": "MagicEffectApplied"
+                    },
+                    "formID": {
+                      "type": "string",
+                      "pattern": "^[0-9a-fA-F]{1,8}$",
+                      "widget": "formId",
+                      "since": "1.4.0",
+                      "formKind": "base"
+                    },
+                    "quantity": {
+                      "widget": "integer",
+                      "since": "1.4.0",
+                      "default": 1,
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "pluginOverride": {
+                      "widget": "plugin",
+                      "since": "1.4.0",
+                      "description": "Defaults to the group's base plugin",
+                      "type": "string",
+                      "pattern": "\\.(esp|esm|esl)$"
+                    },
+                    "onUnlock": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "command"
+                              },
+                              "command": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "command"
+                            ],
+                            "additionalProperties": {}
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "papyrus"
+                              },
+                              "script": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "function": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "script",
+                              "function"
+                            ],
+                            "additionalProperties": {}
+                          }
+                        ]
+                      }
+                    },
+                    "_editor": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "x": {
+                          "type": "number"
+                        },
+                        "y": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "x",
+                        "y"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "formID"
+                  ],
+                  "additionalProperties": {},
+                  "title": "Magic effect applied"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "const": "FactionRank"
+                    },
+                    "formID": {
+                      "type": "string",
+                      "pattern": "^[0-9a-fA-F]{1,8}$",
+                      "widget": "formId",
+                      "since": "1.4.0",
+                      "formKind": "base"
+                    },
+                    "rank": {
+                      "widget": "integer",
+                      "since": "1.4.0",
+                      "default": 0,
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "pluginOverride": {
+                      "widget": "plugin",
+                      "since": "1.4.0",
+                      "description": "Defaults to the group's base plugin",
+                      "type": "string",
+                      "pattern": "\\.(esp|esm|esl)$"
+                    },
+                    "onUnlock": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "command"
+                              },
+                              "command": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "command"
+                            ],
+                            "additionalProperties": {}
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "papyrus"
+                              },
+                              "script": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "function": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "script",
+                              "function"
+                            ],
+                            "additionalProperties": {}
+                          }
+                        ]
+                      }
+                    },
+                    "_editor": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "x": {
+                          "type": "number"
+                        },
+                        "y": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "x",
+                        "y"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "formID"
+                  ],
+                  "additionalProperties": {},
+                  "title": "Faction rank"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "const": "ItemEquipped"
+                    },
+                    "formID": {
+                      "type": "string",
+                      "pattern": "^[0-9a-fA-F]{1,8}$",
+                      "widget": "formId",
+                      "since": "1.4.0",
+                      "formKind": "base"
+                    },
+                    "pluginOverride": {
+                      "widget": "plugin",
+                      "since": "1.4.0",
+                      "description": "Defaults to the group's base plugin",
+                      "type": "string",
+                      "pattern": "\\.(esp|esm|esl)$"
+                    },
+                    "onUnlock": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "command"
+                              },
+                              "command": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "command"
+                            ],
+                            "additionalProperties": {}
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "papyrus"
+                              },
+                              "script": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "function": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "script",
+                              "function"
+                            ],
+                            "additionalProperties": {}
+                          }
+                        ]
+                      }
+                    },
+                    "_editor": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "x": {
+                          "type": "number"
+                        },
+                        "y": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "x",
+                        "y"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "formID"
+                  ],
+                  "additionalProperties": {},
+                  "title": "Item equipped"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "const": "FirstEnterCell"
+                    },
+                    "cellID": {
+                      "type": "string",
+                      "pattern": "^[0-9a-fA-F]{1,8}$",
+                      "widget": "formId",
+                      "since": "1.4.0",
+                      "formKind": "base"
+                    },
+                    "pluginOverride": {
+                      "widget": "plugin",
+                      "since": "1.4.0",
+                      "description": "Defaults to the group's base plugin",
+                      "type": "string",
+                      "pattern": "\\.(esp|esm|esl)$"
+                    },
+                    "onUnlock": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "command"
+                              },
+                              "command": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "command"
+                            ],
+                            "additionalProperties": {}
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "papyrus"
+                              },
+                              "script": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "function": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "script",
+                              "function"
+                            ],
+                            "additionalProperties": {}
+                          }
+                        ]
+                      }
+                    },
+                    "_editor": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "x": {
+                          "type": "number"
+                        },
+                        "y": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "x",
+                        "y"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "cellID"
+                  ],
+                  "additionalProperties": {},
+                  "title": "First enter cell"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "const": "ItemCrafted"
+                    },
+                    "formID": {
+                      "type": "string",
+                      "pattern": "^[0-9a-fA-F]{1,8}$",
+                      "widget": "formId",
+                      "since": "1.4.0",
+                      "formKind": "base"
+                    },
+                    "quantity": {
+                      "widget": "integer",
+                      "since": "1.4.1",
+                      "default": 1,
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "pluginOverride": {
+                      "widget": "plugin",
+                      "since": "1.4.0",
+                      "description": "Defaults to the group's base plugin",
+                      "type": "string",
+                      "pattern": "\\.(esp|esm|esl)$"
+                    },
+                    "onUnlock": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "command"
+                              },
+                              "command": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "command"
+                            ],
+                            "additionalProperties": {}
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "papyrus"
+                              },
+                              "script": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "function": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "script",
+                              "function"
+                            ],
+                            "additionalProperties": {}
+                          }
+                        ]
+                      }
+                    },
+                    "_editor": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "x": {
+                          "type": "number"
+                        },
+                        "y": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "x",
+                        "y"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "formID"
+                  ],
+                  "additionalProperties": {},
+                  "title": "Item crafted"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "const": "BookRead"
+                    },
+                    "formID": {
+                      "widget": "formId",
+                      "since": "1.4.0",
+                      "description": "Takes precedence over bookID",
+                      "formKind": "base",
+                      "type": "string",
+                      "pattern": "^[0-9a-fA-F]{1,8}$"
+                    },
+                    "bookID": {
+                      "widget": "localizedString",
+                      "since": "1.4.0",
+                      "description": "Book name",
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "pluginOverride": {
+                      "widget": "plugin",
+                      "since": "1.4.0",
+                      "description": "Defaults to the group's base plugin",
+                      "type": "string",
+                      "pattern": "\\.(esp|esm|esl)$"
+                    },
+                    "onUnlock": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "command"
+                              },
+                              "command": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "command"
+                            ],
+                            "additionalProperties": {}
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "papyrus"
+                              },
+                              "script": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "function": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "script",
+                              "function"
+                            ],
+                            "additionalProperties": {}
+                          }
+                        ]
+                      }
+                    },
+                    "_editor": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "x": {
+                          "type": "number"
+                        },
+                        "y": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "x",
+                        "y"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "type"
+                  ],
+                  "additionalProperties": {},
+                  "title": "Book read"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "const": "ActorDeath"
+                    },
+                    "formID": {
+                      "type": "string",
+                      "pattern": "^[0-9a-fA-F]{1,8}$",
+                      "widget": "formId",
+                      "since": "1.4.0",
+                      "formKind": "reference"
+                    },
+                    "pluginOverride": {
+                      "widget": "plugin",
+                      "since": "1.4.0",
+                      "description": "Defaults to the group's base plugin",
+                      "type": "string",
+                      "pattern": "\\.(esp|esm|esl)$"
+                    },
+                    "onUnlock": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "command"
+                              },
+                              "command": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "command"
+                            ],
+                            "additionalProperties": {}
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "papyrus"
+                              },
+                              "script": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "function": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "script",
+                              "function"
+                            ],
+                            "additionalProperties": {}
+                          }
+                        ]
+                      }
+                    },
+                    "_editor": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "x": {
+                          "type": "number"
+                        },
+                        "y": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "x",
+                        "y"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "formID"
+                  ],
+                  "additionalProperties": {},
+                  "title": "Actor death"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "const": "GlobalVariableState"
+                    },
+                    "formID": {
+                      "type": "string",
+                      "pattern": "^[0-9a-fA-F]{1,8}$",
+                      "widget": "formId",
+                      "since": "1.4.0",
+                      "formKind": "base"
+                    },
+                    "operation": {
+                      "widget": "enum",
+                      "since": "1.4.1",
+                      "default": ">=",
+                      "options": [
+                        ">=",
+                        "GT",
+                        "==",
+                        "EQ"
+                      ],
+                      "type": "string",
+                      "enum": [
+                        ">=",
+                        "GT",
+                        "==",
+                        "EQ"
+                      ]
+                    },
+                    "value": {
+                      "type": "number",
+                      "widget": "float",
+                      "since": "1.4.0"
+                    },
+                    "pluginOverride": {
+                      "widget": "plugin",
+                      "since": "1.4.0",
+                      "description": "Defaults to the group's base plugin",
+                      "type": "string",
+                      "pattern": "\\.(esp|esm|esl)$"
+                    },
+                    "onUnlock": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "command"
+                              },
+                              "command": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "command"
+                            ],
+                            "additionalProperties": {}
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "papyrus"
+                              },
+                              "script": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "function": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "script",
+                              "function"
+                            ],
+                            "additionalProperties": {}
+                          }
+                        ]
+                      }
+                    },
+                    "_editor": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "x": {
+                          "type": "number"
+                        },
+                        "y": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "x",
+                        "y"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "formID",
+                    "value"
+                  ],
+                  "additionalProperties": {},
+                  "title": "Global variable state"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "const": "CustomSkillLevel"
+                    },
+                    "skill": {
+                      "type": "string",
+                      "widget": "string",
+                      "since": "1.4.0",
+                      "description": "Custom Skills Framework skill ID"
+                    },
+                    "level": {
+                      "type": "number",
+                      "widget": "float",
+                      "since": "1.4.0"
+                    },
+                    "pluginOverride": {
+                      "widget": "plugin",
+                      "since": "1.4.0",
+                      "description": "Defaults to the group's base plugin",
+                      "type": "string",
+                      "pattern": "\\.(esp|esm|esl)$"
+                    },
+                    "onUnlock": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "command"
+                              },
+                              "command": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "command"
+                            ],
+                            "additionalProperties": {}
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "papyrus"
+                              },
+                              "script": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "function": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "script",
+                              "function"
+                            ],
+                            "additionalProperties": {}
+                          }
+                        ]
+                      }
+                    },
+                    "_editor": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "x": {
+                          "type": "number"
+                        },
+                        "y": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "x",
+                        "y"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "skill",
+                    "level"
+                  ],
+                  "additionalProperties": {},
+                  "title": "Custom skill level"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "const": "QueryStatValue"
+                    },
+                    "stat": {
+                      "type": "string",
+                      "widget": "string",
+                      "since": "1.4.0",
+                      "description": "Tracked stat name, as in the Stats menu"
+                    },
+                    "operation": {
+                      "widget": "enum",
+                      "since": "1.4.1",
+                      "default": ">=",
+                      "options": [
+                        ">=",
+                        "GT",
+                        "==",
+                        "EQ"
+                      ],
+                      "type": "string",
+                      "enum": [
+                        ">=",
+                        "GT",
+                        "==",
+                        "EQ"
+                      ]
+                    },
+                    "value": {
+                      "type": "number",
+                      "widget": "float",
+                      "since": "1.4.0"
+                    },
+                    "pluginOverride": {
+                      "widget": "plugin",
+                      "since": "1.4.0",
+                      "description": "Defaults to the group's base plugin",
+                      "type": "string",
+                      "pattern": "\\.(esp|esm|esl)$"
+                    },
+                    "onUnlock": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "command"
+                              },
+                              "command": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "command"
+                            ],
+                            "additionalProperties": {}
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "papyrus"
+                              },
+                              "script": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "function": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "script",
+                              "function"
+                            ],
+                            "additionalProperties": {}
+                          }
+                        ]
+                      }
+                    },
+                    "_editor": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "x": {
+                          "type": "number"
+                        },
+                        "y": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "x",
+                        "y"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "stat",
+                    "value"
+                  ],
+                  "additionalProperties": {},
+                  "title": "Query stat value"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "const": "PapyrusVariable"
+                    },
+                    "formID": {
+                      "type": "string",
+                      "pattern": "^[0-9a-fA-F]{1,8}$",
+                      "widget": "formId",
+                      "since": "1.4.0",
+                      "formKind": "reference"
+                    },
+                    "script": {
+                      "type": "string",
+                      "widget": "string",
+                      "since": "1.4.0"
+                    },
+                    "variable": {
+                      "type": "string",
+                      "widget": "string",
+                      "since": "1.4.0"
+                    },
+                    "value": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991,
+                      "widget": "integer",
+                      "since": "1.4.0"
+                    },
+                    "pluginOverride": {
+                      "widget": "plugin",
+                      "since": "1.4.0",
+                      "description": "Defaults to the group's base plugin",
+                      "type": "string",
+                      "pattern": "\\.(esp|esm|esl)$"
+                    },
+                    "onUnlock": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "command"
+                              },
+                              "command": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "command"
+                            ],
+                            "additionalProperties": {}
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "papyrus"
+                              },
+                              "script": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "function": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "script",
+                              "function"
+                            ],
+                            "additionalProperties": {}
+                          }
+                        ]
+                      }
+                    },
+                    "_editor": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "x": {
+                          "type": "number"
+                        },
+                        "y": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "x",
+                        "y"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "formID",
+                    "script",
+                    "variable",
+                    "value"
+                  ],
+                  "additionalProperties": {},
+                  "title": "Papyrus variable"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "const": "BaseActorDeath"
+                    },
+                    "formID": {
+                      "widget": "formId",
+                      "since": "1.4.0",
+                      "description": "Wins over editorID and name",
+                      "formKind": "base",
+                      "type": "string",
+                      "pattern": "^[0-9a-fA-F]{1,8}$"
+                    },
+                    "editorID": {
+                      "widget": "editorId",
+                      "since": "1.4.0",
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "name": {
+                      "widget": "localizedString",
+                      "since": "1.4.0",
+                      "description": "Actor display name",
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "quantity": {
+                      "widget": "integer",
+                      "since": "1.4.0",
+                      "default": 1,
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "pluginOverride": {
+                      "widget": "plugin",
+                      "since": "1.4.0",
+                      "description": "Defaults to the group's base plugin",
+                      "type": "string",
+                      "pattern": "\\.(esp|esm|esl)$"
+                    },
+                    "onUnlock": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "command"
+                              },
+                              "command": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "command"
+                            ],
+                            "additionalProperties": {}
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "papyrus"
+                              },
+                              "script": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "function": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "script",
+                              "function"
+                            ],
+                            "additionalProperties": {}
+                          }
+                        ]
+                      }
+                    },
+                    "_editor": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "x": {
+                          "type": "number"
+                        },
+                        "y": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "x",
+                        "y"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "type"
+                  ],
+                  "additionalProperties": {},
+                  "title": "Base actor death"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "const": "SpellLearned"
+                    },
+                    "formID": {
+                      "type": "string",
+                      "pattern": "^[0-9a-fA-F]{1,8}$",
+                      "widget": "formId",
+                      "since": "1.4.0",
+                      "formKind": "base"
+                    },
+                    "pluginOverride": {
+                      "widget": "plugin",
+                      "since": "1.4.0",
+                      "description": "Defaults to the group's base plugin",
+                      "type": "string",
+                      "pattern": "\\.(esp|esm|esl)$"
+                    },
+                    "onUnlock": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "command"
+                              },
+                              "command": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "command"
+                            ],
+                            "additionalProperties": {}
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "papyrus"
+                              },
+                              "script": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "function": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "script",
+                              "function"
+                            ],
+                            "additionalProperties": {}
+                          }
+                        ]
+                      }
+                    },
+                    "_editor": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "x": {
+                          "type": "number"
+                        },
+                        "y": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "x",
+                        "y"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "formID"
+                  ],
+                  "additionalProperties": {},
+                  "title": "Spell learned"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "const": "LocationCleared"
+                    },
+                    "formID": {
+                      "type": "string",
+                      "pattern": "^[0-9a-fA-F]{1,8}$",
+                      "widget": "formId",
+                      "since": "1.4.0",
+                      "formKind": "base"
+                    },
+                    "pluginOverride": {
+                      "widget": "plugin",
+                      "since": "1.4.0",
+                      "description": "Defaults to the group's base plugin",
+                      "type": "string",
+                      "pattern": "\\.(esp|esm|esl)$"
+                    },
+                    "onUnlock": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "command"
+                              },
+                              "command": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "command"
+                            ],
+                            "additionalProperties": {}
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "papyrus"
+                              },
+                              "script": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "function": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "script",
+                              "function"
+                            ],
+                            "additionalProperties": {}
+                          }
+                        ]
+                      }
+                    },
+                    "_editor": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "x": {
+                          "type": "number"
+                        },
+                        "y": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "x",
+                        "y"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "formID"
+                  ],
+                  "additionalProperties": {},
+                  "title": "Location cleared"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "const": "ShoutLearned"
+                    },
+                    "formID": {
+                      "type": "string",
+                      "pattern": "^[0-9a-fA-F]{1,8}$",
+                      "widget": "formId",
+                      "since": "1.4.0",
+                      "formKind": "base"
+                    },
+                    "words": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991,
+                      "widget": "integer",
+                      "since": "1.4.0"
+                    },
+                    "pluginOverride": {
+                      "widget": "plugin",
+                      "since": "1.4.0",
+                      "description": "Defaults to the group's base plugin",
+                      "type": "string",
+                      "pattern": "\\.(esp|esm|esl)$"
+                    },
+                    "onUnlock": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "command"
+                              },
+                              "command": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "command"
+                            ],
+                            "additionalProperties": {}
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "papyrus"
+                              },
+                              "script": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "function": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "script",
+                              "function"
+                            ],
+                            "additionalProperties": {}
+                          }
+                        ]
+                      }
+                    },
+                    "_editor": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "x": {
+                          "type": "number"
+                        },
+                        "y": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "x",
+                        "y"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "formID",
+                    "words"
+                  ],
+                  "additionalProperties": {},
+                  "title": "Shout learned"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "const": "QuestObjectiveDone"
+                    },
+                    "formID": {
+                      "type": "string",
+                      "pattern": "^[0-9a-fA-F]{1,8}$",
+                      "widget": "formId",
+                      "since": "1.4.0",
+                      "formKind": "base"
+                    },
+                    "objective": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991,
+                      "widget": "integer",
+                      "since": "1.4.0"
+                    },
+                    "pluginOverride": {
+                      "widget": "plugin",
+                      "since": "1.4.0",
+                      "description": "Defaults to the group's base plugin",
+                      "type": "string",
+                      "pattern": "\\.(esp|esm|esl)$"
+                    },
+                    "onUnlock": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "command"
+                              },
+                              "command": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "command"
+                            ],
+                            "additionalProperties": {}
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "papyrus"
+                              },
+                              "script": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "function": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "script",
+                              "function"
+                            ],
+                            "additionalProperties": {}
+                          }
+                        ]
+                      }
+                    },
+                    "_editor": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "x": {
+                          "type": "number"
+                        },
+                        "y": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "x",
+                        "y"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "formID",
+                    "objective"
+                  ],
+                  "additionalProperties": {},
+                  "title": "Quest objective done"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "const": "AchievementUnlocked"
+                    },
+                    "achievement": {
+                      "type": "string",
+                      "minLength": 1,
+                      "widget": "achievementRef",
+                      "since": "1.4.0"
+                    },
+                    "group": {
+                      "widget": "string",
+                      "since": "1.4.0",
+                      "description": "Group file name; absent = this group",
+                      "type": "string"
+                    },
+                    "pluginOverride": {
+                      "widget": "plugin",
+                      "since": "1.4.0",
+                      "description": "Defaults to the group's base plugin",
+                      "type": "string",
+                      "pattern": "\\.(esp|esm|esl)$"
+                    },
+                    "onUnlock": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "command"
+                              },
+                              "command": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "command"
+                            ],
+                            "additionalProperties": {}
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "papyrus"
+                              },
+                              "script": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "function": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "script",
+                              "function"
+                            ],
+                            "additionalProperties": {}
+                          }
+                        ]
+                      }
+                    },
+                    "_editor": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "x": {
+                          "type": "number"
+                        },
+                        "y": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "x",
+                        "y"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "achievement"
+                  ],
+                  "additionalProperties": {},
+                  "title": "Achievement unlocked"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "const": "ObjectState"
+                    },
+                    "formID": {
+                      "type": "string",
+                      "pattern": "^[0-9a-fA-F]{1,8}$",
+                      "widget": "formId",
+                      "since": "1.4.0",
+                      "formKind": "reference"
+                    },
+                    "enabled": {
+                      "type": "boolean",
+                      "widget": "bool",
+                      "since": "1.4.0"
+                    },
+                    "pluginOverride": {
+                      "widget": "plugin",
+                      "since": "1.4.0",
+                      "description": "Defaults to the group's base plugin",
+                      "type": "string",
+                      "pattern": "\\.(esp|esm|esl)$"
+                    },
+                    "onUnlock": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "command"
+                              },
+                              "command": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "command"
+                            ],
+                            "additionalProperties": {}
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "papyrus"
+                              },
+                              "script": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "function": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "script",
+                              "function"
+                            ],
+                            "additionalProperties": {}
+                          }
+                        ]
+                      }
+                    },
+                    "_editor": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "x": {
+                          "type": "number"
+                        },
+                        "y": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "x",
+                        "y"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "formID",
+                    "enabled"
+                  ],
+                  "additionalProperties": {},
+                  "title": "Object state"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "const": "PapyrusBinding"
+                    },
+                    "pluginOverride": {
+                      "widget": "plugin",
+                      "since": "1.4.0",
+                      "description": "Defaults to the group's base plugin",
+                      "type": "string",
+                      "pattern": "\\.(esp|esm|esl)$"
+                    },
+                    "onUnlock": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "command"
+                              },
+                              "command": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "command"
+                            ],
+                            "additionalProperties": {}
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "papyrus"
+                              },
+                              "script": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "function": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "script",
+                              "function"
+                            ],
+                            "additionalProperties": {}
+                          }
+                        ]
+                      }
+                    },
+                    "_editor": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "x": {
+                          "type": "number"
+                        },
+                        "y": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "x",
+                        "y"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "type"
+                  ],
+                  "additionalProperties": {},
+                  "title": "Papyrus binding",
+                  "description": "Met only from Papyrus; carries no fields"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "const": "PlayerCrime"
+                    },
+                    "factions": {
+                      "minItems": 1,
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "pattern": "^[0-9a-fA-F]{1,8}$"
+                      },
+                      "widget": "list",
+                      "since": "1.4.0",
+                      "item": "formId",
+                      "formKind": "base"
+                    },
+                    "threshold": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991,
+                      "widget": "integer",
+                      "since": "1.4.0"
+                    },
+                    "pluginOverride": {
+                      "widget": "plugin",
+                      "since": "1.4.0",
+                      "description": "Defaults to the group's base plugin",
+                      "type": "string",
+                      "pattern": "\\.(esp|esm|esl)$"
+                    },
+                    "onUnlock": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "command"
+                              },
+                              "command": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "command"
+                            ],
+                            "additionalProperties": {}
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "papyrus"
+                              },
+                              "script": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "function": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "script",
+                              "function"
+                            ],
+                            "additionalProperties": {}
+                          }
+                        ]
+                      }
+                    },
+                    "_editor": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "x": {
+                          "type": "number"
+                        },
+                        "y": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "x",
+                        "y"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "factions",
+                    "threshold"
+                  ],
+                  "additionalProperties": {},
+                  "title": "Player crime"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "const": "WorldspaceDiscovery"
+                    },
+                    "worldspaceID": {
+                      "type": "string",
+                      "minLength": 1,
+                      "widget": "editorId",
+                      "since": "1.4.0"
+                    },
+                    "requiredCount": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991,
+                      "widget": "integer",
+                      "since": "1.4.0"
+                    },
+                    "pluginOverride": {
+                      "widget": "plugin",
+                      "since": "1.4.0",
+                      "description": "Defaults to the group's base plugin",
+                      "type": "string",
+                      "pattern": "\\.(esp|esm|esl)$"
+                    },
+                    "onUnlock": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "command"
+                              },
+                              "command": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "command"
+                            ],
+                            "additionalProperties": {}
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "papyrus"
+                              },
+                              "script": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "function": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "script",
+                              "function"
+                            ],
+                            "additionalProperties": {}
+                          }
+                        ]
+                      }
+                    },
+                    "_editor": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "x": {
+                          "type": "number"
+                        },
+                        "y": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "x",
+                        "y"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "worldspaceID",
+                    "requiredCount"
+                  ],
+                  "additionalProperties": {},
+                  "title": "Worldspace discovery"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "const": "HasPerk"
+                    },
+                    "formID": {
+                      "type": "string",
+                      "pattern": "^[0-9a-fA-F]{1,8}$",
+                      "widget": "formId",
+                      "since": "1.4.0",
+                      "formKind": "base"
+                    },
+                    "pluginOverride": {
+                      "widget": "plugin",
+                      "since": "1.4.0",
+                      "description": "Defaults to the group's base plugin",
+                      "type": "string",
+                      "pattern": "\\.(esp|esm|esl)$"
+                    },
+                    "onUnlock": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "command"
+                              },
+                              "command": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "command"
+                            ],
+                            "additionalProperties": {}
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "papyrus"
+                              },
+                              "script": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "function": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "script",
+                              "function"
+                            ],
+                            "additionalProperties": {}
+                          }
+                        ]
+                      }
+                    },
+                    "_editor": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "x": {
+                          "type": "number"
+                        },
+                        "y": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "x",
+                        "y"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "formID"
+                  ],
+                  "additionalProperties": {},
+                  "title": "Has perk"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "const": "HasPerks"
+                    },
+                    "perks": {
+                      "minItems": 1,
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "pattern": "^[0-9a-fA-F]{1,8}$"
+                      },
+                      "widget": "list",
+                      "since": "1.4.0",
+                      "item": "formId",
+                      "formKind": "base"
+                    },
+                    "threshold": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991,
+                      "widget": "integer",
+                      "since": "1.4.0"
+                    },
+                    "pluginOverride": {
+                      "widget": "plugin",
+                      "since": "1.4.0",
+                      "description": "Defaults to the group's base plugin",
+                      "type": "string",
+                      "pattern": "\\.(esp|esm|esl)$"
+                    },
+                    "onUnlock": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "command"
+                              },
+                              "command": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "command"
+                            ],
+                            "additionalProperties": {}
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "papyrus"
+                              },
+                              "script": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "function": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "script",
+                              "function"
+                            ],
+                            "additionalProperties": {}
+                          }
+                        ]
+                      }
+                    },
+                    "_editor": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "x": {
+                          "type": "number"
+                        },
+                        "y": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "x",
+                        "y"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "perks",
+                    "threshold"
+                  ],
+                  "additionalProperties": {},
+                  "title": "Has perks"
+                }
+              ]
+            }
+          },
+          "onUnlock": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "const": "command"
+                    },
+                    "command": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "command"
+                  ],
+                  "additionalProperties": {}
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "const": "papyrus"
+                    },
+                    "script": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "function": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "script",
+                    "function"
+                  ],
+                  "additionalProperties": {}
+                }
+              ]
+            }
+          },
+          "_editor": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "x": {
+                "type": "number"
+              },
+              "y": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "id",
+              "x",
+              "y"
+            ]
+          }
+        },
+        "required": [
+          "achievementName",
+          "description"
+        ],
+        "additionalProperties": {}
+      }
+    },
+    "_editor": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "schemaVersion"
+      ]
+    }
+  },
+  "required": [
+    "groupName",
+    "plugin",
+    "achievements"
+  ],
+  "additionalProperties": {}
+}
