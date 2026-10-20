@@ -2,7 +2,7 @@ name: Deploy editor to GitHub Pages
 
 on:
   push:
-    branches: [main]
+    branches: [editor]
     paths: [editor/**, .github/workflows/pages.yml]
   workflow_dispatch:
 
