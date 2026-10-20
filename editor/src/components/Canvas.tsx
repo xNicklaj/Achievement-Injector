@@ -5,6 +5,7 @@ import { pinKind, type AppNode } from "../graph";
 import { registry } from "../registry";
 import { beginDrag, endDrag, useApp } from "../store";
 import { useValidation } from "../validation";
+import { remembered } from "../viewport";
 import { createWheelClassifier, wheelPixels, zoomFactor } from "../wheel";
 import { spawnOptions, type SpawnFrom, type SpawnOption } from "../spawn";
 import { GraphNode } from "./GraphNode";
@@ -50,6 +51,28 @@ export function Canvas() {
     return () => el.removeEventListener("wheel", onWheel, { capture: true });
   }, [getViewport, setViewport]);
 
+  // Ctrl+Space opens the same menu as right-click, at the pointer (or the middle of the canvas when it has not been over it).
+  const pointer = useRef<{ x: number; y: number } | null>(null);
+  useEffect(() => {
+    const key = (e: KeyboardEvent) => {
+      if (!(e.ctrlKey || e.metaKey) || e.code !== "Space" || (e.target as HTMLElement).closest("input, textarea, select")) return;
+      const el = box.current;
+      if (!el) return;
+      e.preventDefault();
+      const r = el.getBoundingClientRect();
+      setMenu({ x: pointer.current?.x ?? r.left + r.width / 2, y: pointer.current?.y ?? r.top + r.height / 2, from: null });
+    };
+    window.addEventListener("keydown", key);
+    return () => window.removeEventListener("keydown", key);
+  }, []);
+
+  // "Tidy up" moves every node; look at the result.
+  useEffect(() => {
+    const fit = () => void fitView({ duration: 300 });
+    window.addEventListener("ae-fit", fit);
+    return () => window.removeEventListener("ae-fit", fit);
+  }, [fitView]);
+
   // Flow lines are white, data lines are coloured by type (HANDOVER 3.6).
   const styledEdges = useMemo(
     () => edges.map((e) => ({ ...e, style: { stroke: EDGE_COLOR[pinKind(e.sourceHandle) ?? "flow"] } })),
@@ -74,7 +97,7 @@ export function Canvas() {
   };
 
   return (
-    <div ref={box} className="h-full w-full">
+    <div ref={box} className="h-full w-full" onPointerMove={(e) => (pointer.current = { x: e.clientX, y: e.clientY })}>
     <ReactFlow
       colorMode="dark"
       nodes={nodes}
@@ -107,7 +130,9 @@ export function Canvas() {
       onPaneClick={closeMenu}
       onMoveStart={closeMenu}
       deleteKeyCode={["Delete", "Backspace"]}
-      fitView
+      fitView={!remembered.viewport}
+      defaultViewport={remembered.viewport ?? undefined}
+      onMoveEnd={(_, v) => (remembered.viewport = v)}
       minZoom={MIN_ZOOM}
       maxZoom={MAX_ZOOM}
       // A touchpad tap jitters; without a threshold it nudges nodes. A double-tap must not zoom.

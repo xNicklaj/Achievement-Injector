@@ -8,6 +8,7 @@ import { LocalizationTable } from "./components/LocalizationTable";
 import { MenuBar } from "./components/MenuBar";
 import { NodePanel } from "./components/NodePanel";
 import { Sidebar } from "./components/Sidebar";
+import { copySelection, duplicateSelection, hasClipboard, paste } from "./clipboard";
 import { offerRecovery, saveFile } from "./io/fileActions";
 import { isDirty, useApp } from "./store";
 
@@ -26,6 +27,12 @@ export function App() {
       // Ctrl+S saves even from a text field; undo/redo must leave text fields to the browser.
       if (e.key === "s") return (e.preventDefault(), saveFile());
       if ((e.target as HTMLElement).closest("input,textarea,select")) return;
+      // Copy, paste and duplicate act on the graph; in a text field they stay with the browser.
+      if (useApp.getState().view === "graph") {
+        if (e.key === "c" && copySelection()) return e.preventDefault();
+        if (e.key === "v" && hasClipboard()) return (e.preventDefault(), void paste());
+        if (e.key === "d") return (e.preventDefault(), void duplicateSelection());
+      }
       const t = useApp.temporal.getState();
       if (e.key === "z") (e.preventDefault(), e.shiftKey ? t.redo() : t.undo());
       if (e.key === "y") (e.preventDefault(), t.redo());

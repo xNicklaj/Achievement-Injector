@@ -1,8 +1,9 @@
-import { CircleHelp, Redo2, Undo2 } from "lucide-react";
+import { CircleHelp, LayoutGrid, Redo2, Undo2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useStore } from "zustand";
 import { message } from "./dialogs";
 import { newGroup, openFiles, openFolder, saveFile } from "../io/fileActions";
+import { tidyUp } from "../layout";
 import { TARGET_VERSION } from "../schema";
 import { isDirty, useApp } from "../store";
 
@@ -16,6 +17,9 @@ const NAV_HELP = [
   "Drag on empty space: select several nodes.",
   "Right-drag, middle-drag or Space + drag: pan.",
   "Delete or Backspace: remove the selected nodes or wires.",
+  "Ctrl + C, Ctrl + V, Ctrl + D: copy, paste and duplicate the selected nodes (Localized Text nodes are not copied; their text is).",
+  "Double-click a node: zoom to it.",
+  "Right-click empty space, or Ctrl + Space: add a node.",
 ].join("\n");
 
 const hasFolderAccess = typeof window !== "undefined" && "showDirectoryPicker" in window;
@@ -97,11 +101,13 @@ export function MenuBar() {
   const fileName = useApp((s) => s.fileName);
   const workspace = useApp((s) => s.workspace);
   const dirty = useDirty();
+  const view = useApp((s) => s.view);
   return (
     <header className="flex h-6 shrink-0 items-center gap-1 border-b border-[var(--border)] bg-[var(--bg-panel)] px-2 text-[12px]">
       <FileMenu />
       <button className={btn} onClick={() => undo()} disabled={!pastStates.length} title="Undo (Ctrl+Z)"><Undo2 size={13} />Undo</button>
       <button className={btn} onClick={() => redo()} disabled={!futureStates.length} title="Redo (Ctrl+Shift+Z)"><Redo2 size={13} />Redo</button>
+      <button className={btn} disabled={view !== "graph"} onClick={() => (tidyUp(), setTimeout(() => window.dispatchEvent(new Event("ae-fit")), 50))} title="Rearrange all nodes, one achievement per row"><LayoutGrid size={13} />Tidy up</button>
       {fileName && (
         <span className="ml-3 text-[var(--text-dim)]" title={dirty ? "Unsaved changes" : workspace ? `In ${workspace.label}` : undefined}>
           {workspace?.kind === "folder" && `${workspace.label} / `}
