@@ -36,6 +36,10 @@ export type NodeDef = {
   /** At most one per flow chain. */
   unique: boolean;
   fields: FieldInfo[];
+  /** Sits between a condition and Add Conditions, passing the condition through with a flag set (Live, Negate). */
+  modifier?: boolean;
+  /** First DLL version that reads this node. Absent = BASELINE_VERSION. */
+  since?: string;
   /** Exists only to carry data (an unknown condition type): never offered for creation. */
   hidden?: boolean;
 };
@@ -51,12 +55,12 @@ const achievementFields = describeFields(
 );
 
 const flowNodes: NodeDef[] = [
-  { ...base, kind: "CreateAchievement", category: "entry", title: "Create Achievement", flowOut: true, achOut: true, keywords: ["achievement", "start", "entry"], fields: achievementFields },
-  { ...base, kind: "AddConditions", category: "flow", title: "Add Conditions", flowIn: true, flowOut: true, condIn: true, unique: true, keywords: ["conditions", "collect"], fields: [] },
+  { ...base, kind: "CreateAchievement", description: "The achievement itself. Its Unlock pin feeds an Achievement Unlocked condition; the flow pin continues to Add Conditions, Join Type and On Unlock actions.", category: "entry", title: "Create Achievement", flowOut: true, achOut: true, keywords: ["achievement", "start", "entry"], fields: achievementFields },
+  { ...base, kind: "AddConditions", description: "Collects the conditions that must be met. Wire each condition (directly or through Live / Negate) into its input. Only one per achievement.", category: "flow", title: "Add Conditions", flowIn: true, flowOut: true, condIn: true, unique: true, keywords: ["conditions", "collect"], fields: [] },
   {
     ...base,
     kind: "JoinType",
-    category: "flow",
+    description: "How the conditions combine. Without this node the default is OR. Only one per achievement.", category: "flow",
     title: "Join Type",
     flowIn: true,
     flowOut: true,
@@ -65,10 +69,12 @@ const flowNodes: NodeDef[] = [
     // The node exists to set this value, so it is required here even though the key is optional in the JSON.
     fields: describeFields(AchievementSchema, new Set(Object.keys(AchievementSchema.shape).filter((k) => k !== "joinType"))).map((f) => ({ ...f, optional: false })),
   },
-  { ...base, kind: "RunCommand", category: "flow", title: "Run Command", flowIn: true, flowOut: true, keywords: ["console", "onUnlock", "action"], fields: [field({ name: "command", widget: "string" })] },
-  { ...base, kind: "CallPapyrus", category: "flow", title: "Call Papyrus", flowIn: true, flowOut: true, keywords: ["script", "function", "onUnlock", "action"], fields: [field({ name: "script", widget: "string" }), field({ name: "function", widget: "string", description: "Must be a Global function" })] },
-  { ...base, kind: "Icon", category: "asset", title: "Icon", iconOut: true, keywords: ["image", "dds", "texture", "picture"], fields: [field({ name: "file", widget: "iconPath", description: "File name in Icons/<Group>/" })] },
-  { ...base, kind: "LocalizedText", category: "localization", title: "Localized Text", locOut: true, keywords: ["translation", "key", "language"], fields: [field({ name: "key", widget: "string", description: "Written as $key" })] },
+  { ...base, kind: "Live", category: "flow", title: "Live", description: "Re-checked whenever another condition fires instead of latching once met. Place between a condition and Add Conditions.", modifier: true, condOut: true, since: "1.4.1", keywords: ["live", "realtime", "state"], fields: [] },
+  { ...base, kind: "Negate", category: "flow", title: "Negate", description: "Met while the condition is false. Needs a Live node between the condition and this node.", modifier: true, condOut: true, since: "1.4.1", keywords: ["negate", "not", "invert", "live"], fields: [] },
+  { ...base, kind: "RunCommand", description: "Runs a console command when this achievement or condition unlocks.", category: "flow", title: "Run Command", flowIn: true, flowOut: true, keywords: ["console", "onUnlock", "action"], fields: [field({ name: "command", widget: "string" })] },
+  { ...base, kind: "CallPapyrus", description: "Calls a Global Papyrus function when this achievement or condition unlocks.", category: "flow", title: "Call Papyrus", flowIn: true, flowOut: true, keywords: ["script", "function", "onUnlock", "action"], fields: [field({ name: "script", widget: "string" }), field({ name: "function", widget: "string", description: "Must be a Global function" })] },
+  { ...base, kind: "Icon", description: "An .dds image from Icons/<Group>/ to use as an achievement icon. Wire it into an achievement's Icon field.", category: "asset", title: "Icon", iconOut: true, keywords: ["image", "dds", "texture", "picture"], fields: [field({ name: "file", widget: "iconPath", description: "File name in Icons/<Group>/" })] },
+  { ...base, kind: "LocalizedText", description: "A translation key written as $key. Wire it into any text field, and fill in each language on this node.", category: "localization", title: "Localized Text", locOut: true, keywords: ["translation", "key", "language"], fields: [field({ name: "key", widget: "string", description: "Written as $key" })] },
 ];
 
 const conditionNodes: NodeDef[] = Object.values(conditionRegistry).map((c) => ({

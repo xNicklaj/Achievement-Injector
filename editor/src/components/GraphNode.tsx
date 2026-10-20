@@ -1,5 +1,5 @@
 import { Handle, Position, useStore, type NodeProps } from "@xyflow/react";
-import { AlertTriangle, CircleAlert } from "lucide-react";
+import { AlertTriangle, CircleAlert, CircleHelp } from "lucide-react";
 import { achievementNames, conditionsSummary, isInternalGroup, linkedText, type AppNode } from "../graph";
 import { searchFor, usePlugins } from "../io/plugins";
 import { getText } from "../io/localization";
@@ -168,6 +168,7 @@ export function GraphNode({ id, data, selected }: NodeProps<AppNode>) {
   // Nodes with no required field (e.g. the one-of conditions) show everything; the rest fold optional rows away,
   // opened on first render when one is already set.
   const flat = required.length === 0;
+  const [help, setHelp] = useState(false);
   const [opened, setOpened] = useState(() => optional.some((f) => data.values[f.name] !== undefined));
   // A folded row has no pin of its own, so the pins of wired optional fields move to the "Optional" header while it is
   // folded and the wires stay attached.
@@ -210,8 +211,14 @@ export function GraphNode({ id, data, selected }: NodeProps<AppNode>) {
       }}
     >
       <div className="relative flex items-center gap-1.5 rounded-t-sm px-3.5 py-2 font-semibold text-white" style={{ background: `var(--cat-${def.category})` }}>
+        {def.modifier && <Handle type="target" id="cond-in" position={Position.Left} style={dot("var(--pin-condition)")} />}
         {def.flowIn && <Handle type="target" id="flow-in" position={Position.Left} className={flowHandle} />}
         <span className="flex-1 truncate">{data.kind === UNKNOWN_CONDITION ? `Unknown: ${String(data.extra?.type)}` : def.title}</span>
+        {def.description && (
+          <button type="button" aria-label="Info" aria-expanded={help} title="Info" onClick={() => setHelp(!help)} className="nodrag cursor-pointer text-white/80 hover:text-white">
+            <CircleHelp size={14} />
+          </button>
+        )}
         {status && (
           <span title={problems} aria-label={problems} tabIndex={0} className="cursor-help">
             {status === "error" ? <CircleAlert size={14} /> : <AlertTriangle size={14} />}
@@ -261,6 +268,7 @@ export function GraphNode({ id, data, selected }: NodeProps<AppNode>) {
             <Handle type="source" id="cond-out" position={Position.Right} style={dot("var(--pin-condition)")} />
           </div>
         )}
+        {help && def.description && <div className="px-3.5 py-1 text-[12px] text-[var(--text-dim)]">{def.description}</div>}
       </div>
     </div>
   );

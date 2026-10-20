@@ -40,6 +40,11 @@ describe("schema", () => {
     expect(GroupSchema.safeParse(ach([c])).success).toBe(false);
   });
 
+  it("accepts the 1.4.1 operators and live/negate", () => {
+    expect(GroupSchema.safeParse(ach([{ type: "PlayerLevel", level: 5, operation: "<=" }])).success).toBe(true);
+    expect(GroupSchema.safeParse(ach([{ type: "HasPerk", formID: "1", negate: true, live: true }])).success).toBe(true);
+  });
+
   it("accepts case-insensitive skills and omitted optional fields", () => {
     expect(GroupSchema.safeParse(ach([{ type: "SkillLevel", skill: "OneHanded", level: 5 }])).success).toBe(true);
     expect(GroupSchema.safeParse(ach([{ type: "PlayerActivation", formID: "1A" }])).success).toBe(true);
