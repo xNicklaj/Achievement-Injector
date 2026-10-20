@@ -8,7 +8,7 @@ import { inputClass } from "./Widgets";
 function KeyCell({ k, warnings }: { k: string; warnings: string[] }) {
   const text = warnings.join("\n");
   return (
-    <div role="cell" className="flex min-w-0 items-center gap-1.5 px-4 py-1">
+    <div role="cell" className="flex min-w-0 items-center gap-1.5 px-4 py-1.5">
       <span className="truncate font-mono text-[12px]" title={`$${k}`}>${k}</span>
       {warnings.length > 0 && (
         <span title={text} aria-label={text} tabIndex={0} className="shrink-0 cursor-help text-[var(--status-warning)]">
@@ -87,7 +87,7 @@ export function LocalizationTable() {
                 {locales.map((l) => {
                   const v = getText(loc[l], r.key) ?? "";
                   return (
-                    <div role="cell" key={l} className="px-2 py-0.5">
+                    <div role="cell" key={l} className="px-2 py-1">
                       <input
                         className={inputClass}
                         style={!v ? { borderColor: "var(--status-warning)" } : undefined}

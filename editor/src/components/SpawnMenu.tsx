@@ -67,7 +67,7 @@ export function SpawnMenu({ x, y, options, onPick, onClose, title }: { x: number
                 role="option"
                 aria-selected={i === active}
                 data-active={i === active}
-                className={`flex w-full items-center gap-2 px-3 py-1 text-left ${i === active ? "bg-white/10" : "hover:bg-white/5"}`}
+                className={`flex w-full items-center gap-2 px-3 py-1.5 text-left ${i === active ? "bg-white/10" : "hover:bg-white/5"}`}
                 onMouseMove={() => setActive(i)}
                 onClick={() => onPick(o)}
               >

@@ -7,8 +7,8 @@ import { tidyUp } from "../layout";
 import { TARGET_VERSION } from "../schema";
 import { isDirty, useApp } from "../store";
 
-const btn = "flex items-center gap-1 rounded px-2 py-0.5 hover:bg-white/10 disabled:opacity-40 disabled:hover:bg-transparent";
-const item = "flex w-full items-center justify-between gap-6 px-3 py-1 text-left hover:bg-white/10 disabled:opacity-40 disabled:hover:bg-transparent";
+const btn = "flex items-center gap-1 rounded px-2.5 py-1 hover:bg-white/10 disabled:opacity-40 disabled:hover:bg-transparent";
+const item = "flex w-full items-center justify-between gap-6 px-3.5 py-1.5 text-left hover:bg-white/10 disabled:opacity-40 disabled:hover:bg-transparent";
 
 const NAV_HELP = [
   "Scroll (touchpad two-finger or mouse wheel): a touchpad scroll pans, a mouse wheel zooms at the cursor.",
@@ -103,7 +103,7 @@ export function MenuBar() {
   const dirty = useDirty();
   const view = useApp((s) => s.view);
   return (
-    <header className="flex h-6 shrink-0 items-center gap-1 border-b border-[var(--border)] bg-[var(--bg-panel)] px-2 text-[12px]">
+    <header className="flex h-8 shrink-0 items-center gap-1 border-b border-[var(--border)] bg-[var(--bg-panel)] px-2 text-[13px]">
       <FileMenu />
       <button className={btn} onClick={() => undo()} disabled={!pastStates.length} title="Undo (Ctrl+Z)"><Undo2 size={13} />Undo</button>
       <button className={btn} onClick={() => redo()} disabled={!futureStates.length} title="Redo (Ctrl+Shift+Z)"><Redo2 size={13} />Redo</button>

@@ -11,9 +11,9 @@ import { parseNodeStatus, useValidation } from "../validation";
 import { IconField } from "./IconField";
 import { FieldWidget, inputClass, pascal } from "./Widgets";
 
-const flowHandle = "!h-3 !w-3 !rounded-sm !border-0 !bg-[var(--pin-flow)]";
+const flowHandle = "!h-3.5 !w-3.5 !rounded-sm !border-0 !bg-[var(--pin-flow)]";
 // Inline, not a Tailwind class: the colour is a runtime string Tailwind cannot scan.
-const dot = (color: string) => ({ background: color, width: 12, height: 12, border: 0 });
+const dot = (color: string) => ({ background: color, width: 14, height: 14, border: 0 });
 
 /**
  * The achievement's name. It is committed on blur or Enter (Escape reverts), because a rename is one decision:
@@ -85,13 +85,13 @@ export function TranslationRows({ keyName }: { keyName: string }) {
   const loc = useApp((s) => s.loc);
   const setTranslation = useApp((s) => s.setTranslation);
   const locales = Object.keys(loc).sort();
-  if (!locales.length) return <div className="px-3 py-0.5 text-[11px] text-[var(--text-dim)]">No languages yet: add one on Group Properties.</div>;
+  if (!locales.length) return <div className="px-3.5 py-1 text-[12px] text-[var(--text-dim)]">No languages yet: add one on Group Properties.</div>;
   return (
     <>
       {locales.map((l) => {
         const v = getText(loc[l], keyName) ?? "";
         return (
-          <div key={l} className="flex items-center gap-1.5 py-0.5 pl-3 pr-2">
+          <div key={l} className="flex items-center gap-2 py-1 pl-3.5 pr-3">
             <span className="w-28 shrink-0 font-mono text-[var(--text-dim)]" title={loc[l].fileName}>{l}</span>
             <input
               className={inputClass}
@@ -140,7 +140,7 @@ export function GraphNode({ id, data, selected }: NodeProps<AppNode>) {
     const isLoc = isLocalizable(f);
     const connected = isLoc && localized.includes(f.name);
     return (
-      <div key={f.name} className="relative flex items-center gap-1.5 py-0.5 pl-3 pr-2">
+      <div key={f.name} className="relative flex items-center gap-2 py-1 pl-3.5 pr-3">
         {isLoc && <Handle type="target" id={`loc:${f.name}`} position={Position.Left} style={dot("var(--pin-localized)")} />}
         <span className="flex w-28 shrink-0 items-center gap-1 text-[var(--text-dim)]" title={f.description ? `${f.name}: ${f.description}` : f.name}>
           <span className="truncate">{pascal(f.name)}</span>
@@ -149,7 +149,7 @@ export function GraphNode({ id, data, selected }: NodeProps<AppNode>) {
           )}
         </span>
         {connected ? (
-          <span className="text-[11px] italic text-[var(--pin-localized)]">localized</span>
+          <span className="text-[12px] italic text-[var(--pin-localized)]">localized</span>
         ) : def.kind === "CreateAchievement" && f.name === "achievementName" ? (
           <NameField id={id} value={data.values.achievementName} invalid={invalid.includes("achievementName")} />
         ) : f.widget === "iconPath" ? (
@@ -165,14 +165,14 @@ export function GraphNode({ id, data, selected }: NodeProps<AppNode>) {
 
   return (
     <div
-      className="w-72 rounded-md bg-[var(--bg-node)] text-[12px] shadow-lg"
+      className="w-72 rounded-md bg-[var(--bg-node)] text-[13px] shadow-lg"
       style={{
         // Selection is a soft glow; status is a solid border (HANDOVER 3.9).
         border: `2px solid ${status === "error" ? "var(--status-error)" : status === "warning" ? "var(--status-warning)" : "var(--border)"}`,
         boxShadow: selected ? "0 0 0 3px rgba(255,255,255,.18)" : undefined,
       }}
     >
-      <div className="relative flex items-center gap-1.5 rounded-t-sm px-3 py-1 font-semibold text-white" style={{ background: `var(--cat-${def.category})` }}>
+      <div className="relative flex items-center gap-1.5 rounded-t-sm px-3.5 py-2 font-semibold text-white" style={{ background: `var(--cat-${def.category})` }}>
         {def.flowIn && <Handle type="target" id="flow-in" position={Position.Left} className={flowHandle} />}
         <span className="flex-1 truncate">{data.kind === UNKNOWN_CONDITION ? `Unknown: ${String(data.extra?.type)}` : def.title}</span>
         {status && (
@@ -184,21 +184,21 @@ export function GraphNode({ id, data, selected }: NodeProps<AppNode>) {
         {def.condOut && def.category !== "condition" && <Handle type="source" id="cond-out" position={Position.Right} style={dot("var(--pin-condition)")} />}
         {def.locOut && <Handle type="source" id="loc-out" position={Position.Right} style={dot("var(--pin-localized)")} />}
       </div>
-      <div className="py-1">
+      <div className="py-2">
         {def.condIn && (
-          <div className="relative py-0.5 pl-3 pr-2">
+          <div className="relative py-1 pl-3.5 pr-3">
             <Handle type="target" id="cond-in" position={Position.Left} style={dot("var(--pin-condition)")} />
             <span className={level === "error" ? "text-[var(--status-error)]" : level === "warning" ? "text-[var(--status-warning)]" : "text-[var(--text-dim)]"}>
               {text}
             </span>
           </div>
         )}
-        {data.kind === UNKNOWN_CONDITION && <div className="px-3 py-0.5 text-[11px] text-[var(--text-dim)]">Not a type this editor knows. It is kept as it is.</div>}
+        {data.kind === UNKNOWN_CONDITION && <div className="px-3.5 py-1 text-[12px] text-[var(--text-dim)]">Not a type this editor knows. It is kept as it is.</div>}
         {(flat ? def.fields : required).map(row)}
         {data.kind === "LocalizedText" && <TranslationRows keyName={typeof data.values.key === "string" ? data.values.key : ""} />}
         {!flat && optional.length > 0 && (
           <details className="nodrag" open={startOpen}>
-            <summary className="cursor-pointer select-none px-3 py-0.5 text-[11px] text-[var(--text-dim)]">
+            <summary className="cursor-pointer select-none px-3.5 py-1 text-[12px] text-[var(--text-dim)]">
               Optional ({optional.filter((f) => data.values[f.name] !== undefined).length}/{optional.length})
             </summary>
             {optional.map(row)}
@@ -206,7 +206,7 @@ export function GraphNode({ id, data, selected }: NodeProps<AppNode>) {
         )}
         {def.category === "condition" && (
           // The flow pin sits in the header like every other node's; the condition output moves to its own row.
-          <div className="relative py-0.5 pl-3 pr-4 text-right text-[11px] text-[var(--text-dim)]" title="Connect to Add Conditions">
+          <div className="relative py-1 pl-3.5 pr-4 text-right text-[12px] text-[var(--text-dim)]" title="Connect to Add Conditions">
             Condition
             <Handle type="source" id="cond-out" position={Position.Right} style={dot("var(--pin-condition)")} />
           </div>

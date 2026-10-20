@@ -23,9 +23,9 @@ export function GroupProperties() {
   const keys = [...new Set([...used, ...Object.values(loc).flatMap((f) => [...locKeys(f)])])].sort();
   const orphans = orphanKeys(loc, used);
   return (
-    <div className="h-full overflow-auto bg-[var(--bg-panel)] p-6">
+    <div className="h-full overflow-auto bg-[var(--bg-panel)] p-8">
       <h1 className="mb-4 text-lg font-semibold">Group Properties</h1>
-      <div className="grid max-w-xl gap-2">
+      <div className="grid max-w-xl gap-3">
         {fields.map((f) => (
           <div key={f.name}>
             <label className="flex items-center gap-3">

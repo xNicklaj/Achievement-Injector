@@ -33,7 +33,7 @@ export const estimateHeight = (def: NodeDef, values: Json = {}) => {
   const open = def.fields.some((f) => f.optional && values[f.name] !== undefined);
   const rows = required === 0 || open ? def.fields.length + (required === 0 ? 0 : 1) : required + 1;
   // Plus the condition's On Unlock row, or an unknown condition's notice.
-  return 40 + (def.condIn ? 26 : 0) + (def.category === "condition" ? 26 : 0) + (def.kind === UNKNOWN_CONDITION ? 26 : 0) + rows * 26 + (def.kind === "LocalizedText" ? 26 : 0);
+  return 48 + (def.condIn ? 32 : 0) + (def.category === "condition" ? 32 : 0) + (def.kind === UNKNOWN_CONDITION ? 32 : 0) + rows * 36 + (def.kind === "LocalizedText" ? 36 : 0);
 };
 
 const FLOW_KIND = { command: "RunCommand", papyrus: "CallPapyrus" } as const;

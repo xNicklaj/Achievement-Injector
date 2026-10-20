@@ -3,7 +3,7 @@ import type { FieldInfo } from "../schema";
 /** Field names are shown in PascalCase; the JSON keys stay camelCase. */
 export const pascal = (s: string) => s[0].toUpperCase() + s.slice(1);
 
-export const inputClass = "nodrag nowheel w-full min-w-0 rounded border border-[var(--border)] bg-[var(--bg-app)] px-1.5 py-0.5 text-[12px] text-[var(--text)] outline-none focus:border-zinc-400";
+export const inputClass = "nodrag nowheel w-full min-w-0 rounded border border-[var(--border)] bg-[var(--bg-app)] px-2 py-[3px] text-[13px] text-[var(--text)] outline-none focus:border-zinc-400";
 
 type Props = { info: FieldInfo; value: unknown; onChange: (v: unknown) => void; /** Red border: this field has an error. */ invalid?: boolean };
 

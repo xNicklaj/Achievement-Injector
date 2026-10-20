@@ -45,6 +45,6 @@ export function Frame({ title, children, footer }: { title: string; children: Re
 export const Button = ({ primary, ...p }: React.ButtonHTMLAttributes<HTMLButtonElement> & { primary?: boolean }) => (
   <button
     {...p}
-    className={`rounded px-3 py-1 text-[12px] disabled:opacity-40 ${primary ? "bg-blue-600 text-white hover:bg-blue-500" : "border border-[var(--border)] hover:bg-white/10"}`}
+    className={`rounded px-4 py-1.5 text-[13px] disabled:opacity-40 ${primary ? "bg-blue-600 text-white hover:bg-blue-500" : "border border-[var(--border)] hover:bg-white/10"}`}
   />
 );
