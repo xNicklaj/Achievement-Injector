@@ -43,6 +43,7 @@ Built in `editor/` (Vite 8, React 19, `@xyflow/react`, Tailwind 4, Zustand + zun
 - **Canvas position** is kept while another view is open and reset when a document opens (`viewport.ts`).
 - **Typing undo**: edits to one text field within 1.5 s join one history entry per word (a space ends the word); any other change ends it.
 - **Group name** accepts a `$key` (suggestions from the keys in use and in the language files), edits its translations on Group Properties, counts as using the key, and warns on missing translations.
+- **Ask the DeepWiki** (3.17): a side panel on the graph for asking the DeepWiki chatbot about the mod; the only feature that talks to a server.
 - **Not built yet:** error count next to Save (4.1), the round-trip CI test (4.3; the Pages deploy workflow exists), a README.
 - **Deviations:** plain Tailwind instead of shadcn/ui and the React Flow UI kit so far. Checked in Edge with a scripted session: import rendering, translation rows, the Languages section, the File menu and dialogs.
 
@@ -226,6 +227,10 @@ No mode switch. The scheme is Blueprint/Figma-like and works on any device:
 - **Touchpad ergonomics:** pins have an 8px invisible hit ring and a 32px connect radius, node drags start only after 4px (taps jitter), double-click does not zoom, number fields blur on wheel so scrolling cannot edit them, and fields and the minimap keep their own wheel (`nowheel`).
 - A **Controls** button in the menu bar lists these gestures.
 - The wheel classifier is a heuristic. Known weak spot: a free-spinning mouse wheel (small deltas) reads as a touchpad and pans; Ctrl + wheel zooms instead. Verified with scripted wheel, pinch and drag events in Edge; not on a physical touchpad or mouse.
+
+### 3.17 Ask the DeepWiki
+
+A side panel on the graph view (menu bar "Ask", `components/AskPanel.tsx`) that sends one question to DeepWiki's public MCP server (`https://mcp.deepwiki.com/mcp`, tool `ask_question`, repo `xNicklaj/Achievement-Injector`; no key, CORS open, so no backend). Each question stands alone (the tool has no memory); answers are markdown, shown by a small renderer (`Markdown.tsx`: headings, bullets, code, links; never raw HTML; wiki links resolve to deepwiki.com). The panel says the question goes to a third party and that answers come from DeepWiki's index and can lag the code (they used the old wiki's condition names), so the schema stays the reference. A chip asks about the selected node. This is the only network call the editor makes, and it sends only what the user types, never group files.
 
 ## 4. Proposed, not yet confirmed
 

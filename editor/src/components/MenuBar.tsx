@@ -1,6 +1,7 @@
-import { CircleHelp, LayoutGrid, Redo2, Undo2 } from "lucide-react";
+import { CircleHelp, LayoutGrid, MessageCircleQuestion, Redo2, Undo2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useStore } from "zustand";
+import { useAsk } from "./AskPanel";
 import { message } from "./dialogs";
 import { newGroup, openFiles, openFolder, saveFile } from "../io/fileActions";
 import { tidyUp } from "../layout";
@@ -116,6 +117,7 @@ export function MenuBar() {
         </span>
       )}
       <button className={`${btn} ml-auto`} onClick={() => void message("Moving around the canvas", NAV_HELP)}><CircleHelp size={13} />Controls</button>
+      <button className={btn} disabled={view !== "graph"} onClick={() => useAsk.getState().toggle()} title="Ask the DeepWiki about Achievement Injector"><MessageCircleQuestion size={13} />Ask</button>
       <span className="ml-3 text-[var(--text-dim)]">Targets Achievement Injector {TARGET_VERSION}</span>
     </header>
   );

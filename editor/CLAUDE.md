@@ -37,4 +37,5 @@ Before finishing a change: `npm test` and `npm run typecheck` must pass.
 - **Validation has one source.** `exportGroup` returns issues pinned to nodes (`nodeId`, `field`); `validation.ts` runs it once, debounced, and nodes, minimap and the JSON view all read that. Do not recompute problems in components.
 - **Tests that touch IndexedDB** use `fake-indexeddb`. In a real-browser script never `deleteDatabase` while the page has the DB open: the request stays pending and wipes the data when the page closes. Delete records instead.
 - **Locale codes are not ISO.** They are the first two letters of `sLanguage` (`EN FR GE IT SP PO RU JA CH`, see `src/io/languages.ts`). Never offer `DE`, `ES`, `PL` or `ZH`: such files never load.
+- **The editor is local-only except the Ask panel**, which sends the typed question (never group data) to DeepWiki (`io/deepwiki.ts`). Do not add other network calls without saying so in the UI.
 - Editor UI is English only. Targets the latest DLL version; show it in the footer/menu bar.

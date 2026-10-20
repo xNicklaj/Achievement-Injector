@@ -1,5 +1,6 @@
 import { ReactFlowProvider } from "@xyflow/react";
 import { useEffect, useRef, useState } from "react";
+import { AskPanel, useAsk } from "./components/AskPanel";
 import { Canvas } from "./components/Canvas";
 import { DialogHost } from "./components/Dialog";
 import { GroupProperties } from "./components/GroupProperties";
@@ -17,6 +18,7 @@ const MIN_PANEL = 80;
 
 export function App() {
   const view = useApp((s) => s.view);
+  const askOpen = useAsk((s) => s.open);
   const [panelH, setPanelH] = useState(220);
   const dragging = useRef(false);
 
@@ -61,6 +63,8 @@ export function App() {
           ) : view === "json" ? (
             <JsonView />
           ) : (
+            <div className="flex min-h-0 flex-1">
+            <div className="flex min-w-0 flex-1 flex-col">
             <ReactFlowProvider>
               <div className="min-h-0 flex-1">
                 <Canvas />
@@ -79,6 +83,9 @@ export function App() {
                 <NodePanel />
               </div>
             </ReactFlowProvider>
+            </div>
+            {askOpen && <AskPanel />}
+            </div>
           )}
         </main>
       </div>
