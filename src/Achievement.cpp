@@ -357,6 +357,15 @@ void Achievement::OnConditionMet(void) {
         break;
     }
 
+    // A live condition that fails means this firing doesn't count: don't latch the others, or they could never re-trigger the check
+    if (!allConditionsMet && std::any_of(conditions.begin(), conditions.end(), [](Condition* c) { return c->live; })) {
+        for (size_t j = 0; j < conditions.size(); j++) {
+            if (conditions[j]->live) continue;
+            conditions[j]->isMet = false;
+            conditionMet[j] = false;
+        }
+    }
+
     // Zero conditions: only ForceUnlock dispatches here
     if (allConditionsMet || conditions.empty()) {
         unlocked = true;
