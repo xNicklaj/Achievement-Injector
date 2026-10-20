@@ -31,9 +31,9 @@ export const GroupSchema = z
     plugin: pluginFile({ hint: "Base plugin for every condition without pluginOverride" }),
     showInMenu: bool({ optional: true, default: true }),
     achievements: z.array(AchievementSchema),
-    // `keys` holds the canvas position of each LocalizedText node, which has no JSON object of its own.
+    // `keys` and `icons` hold the canvas position of each LocalizedText and Icon node, which have no JSON object of their own.
     // `modVersion` is the oldest mod version that reads everything in the file; an editor that targets an older one refuses to open it.
-    _editor: z.object({ schemaVersion: z.number().int(), modVersion: z.string().optional(), keys: z.record(z.string(), XY).optional() }).optional(),
+    _editor: z.object({ schemaVersion: z.number().int(), modVersion: z.string().optional(), keys: z.record(z.string(), XY).optional(), icons: z.record(z.string(), XY).optional() }).optional(),
   })
   .superRefine((g, ctx) => {
     const seen = new Set<string>();

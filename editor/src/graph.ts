@@ -1,15 +1,15 @@
 import type { Edge, Node } from "@xyflow/react";
 import { fallbackText, type LocFile } from "./io/localization";
-import { isAction, isCondition, missingRequired, registry, wiredFields } from "./registry";
+import { isAction, isCondition, LINK_KINDS, missingRequired, registry, wiredFields, type LinkKind } from "./registry";
 
 /** `values`: fields the editor has a widget for (unset = absent). `extra`: unknown keys, kept so import/export is lossless. */
 export type NodeData = { kind: string; values: Record<string, unknown>; extra?: Record<string, unknown> };
 export type AppNode = Node<NodeData, "ae">;
 
-// Handle ids: `flow-in|flow-out`, `cond-in|cond-out`, `loc-out`, and `loc:<field>` for a localizable field's input pin.
-export type PinKind = "flow" | "cond" | "loc";
+// Handle ids: `flow-in|flow-out`, `cond-in|cond-out`, and for text, achievement and icon links `<kind>-out` and `<kind>:<field>`.
+export type PinKind = "flow" | "cond" | LinkKind;
 export const pinKind = (handle: string | null | undefined): PinKind | null =>
-  handle?.startsWith("flow") ? "flow" : handle?.startsWith("cond") ? "cond" : handle?.startsWith("loc") ? "loc" : null;
+  handle?.startsWith("flow") ? "flow" : handle?.startsWith("cond") ? "cond" : LINK_KINDS.find((k) => handle?.startsWith(k)) ?? null;
 
 const walk = (edges: Edge[], start: string, next: (id: string) => string[]) => {
   const seen = new Set<string>();
@@ -57,8 +57,28 @@ export function refuseReason(nodes: AppNode[], edges: Edge[], c: Link): string |
   }
   // A condition node feeds one AddConditions only (HANDOVER 3.2); a localizable field takes one text node.
   if (kind === "cond" && used(c.sourceHandle, "source", c.source)) return "Condition already used";
-  if (kind === "loc" && used(c.targetHandle, "target", c.target)) return "Field already localized";
+  if (kind !== "flow" && kind !== "cond" && used(c.targetHandle, "target", c.target)) return kind === "loc" ? "Field already localized" : "Field already linked";
+  // An achievement cannot wait for itself: the condition's own achievement is the one whose chain holds it.
+  if (kind === "ach" && ownerOf(nodes, edges, c.target) === c.source) return "An achievement cannot wait for itself";
   return null;
+}
+
+/** The achievement a condition node belongs to: the Create Achievement at the head of the chain its Add Conditions is in. */
+export function ownerOf(nodes: AppNode[], edges: Edge[], condition: string): string | undefined {
+  const add = edges.find((e) => e.source === condition && e.sourceHandle === "cond-out")?.target;
+  if (!add) return undefined;
+  return [...upstream(edges, add)].find((id) => nodes.find((n) => n.id === id)?.data.kind === "CreateAchievement");
+}
+
+/** What a link wire stands for: the text of a Localized Text key, an achievement name, or an icon file. Undefined when the source has none yet. */
+export function linkedText(nodes: AppNode[], edges: Edge[], loc: Record<string, LocFile>, source: AppNode, kind: LinkKind): string | undefined {
+  const translated = (key: unknown) => (typeof key === "string" && key ? fallbackText(loc, key) : undefined);
+  const plain = (v: unknown) => (typeof v === "string" && v ? v : undefined);
+  if (kind === "loc") return translated(source.data.values.key);
+  if (kind === "icon") return plain(source.data.values.file);
+  // A localized achievement name counts as its fallback text: the DLL compares plain text.
+  const wire = edges.find((e) => e.target === source.id && e.targetHandle === "loc:achievementName");
+  return wire ? translated(nodes.find((n) => n.id === wire.source)?.data.values.key) : plain(source.data.values.achievementName);
 }
 
 /**
@@ -67,13 +87,8 @@ export function refuseReason(nodes: AppNode[], edges: Edge[], c: Link): string |
  */
 export function achievementNames(nodes: AppNode[], edges: Edge[], loc: Record<string, LocFile>): string[] {
   const names = new Set<string>();
-  for (const n of nodes) {
-    if (n.data.kind !== "CreateAchievement") continue;
-    const wire = edges.find((e) => e.target === n.id && e.targetHandle === "loc:achievementName");
-    const key = wire ? nodes.find((x) => x.id === wire.source)?.data.values.key : undefined;
-    const name = wire ? (typeof key === "string" ? fallbackText(loc, key) : undefined) : n.data.values.achievementName;
-    if (typeof name === "string" && name) names.add(name);
-  }
+  for (const n of nodes) if (n.data.kind === "CreateAchievement") names.add(linkedText(nodes, edges, loc, n, "ach") ?? "");
+  names.delete("");
   return [...names].sort((a, b) => a.localeCompare(b));
 }
 
@@ -82,17 +97,19 @@ export const isInternalGroup = (group: unknown, groupFile: string | null | undef
   group === undefined || group === "" || (typeof group === "string" && !!groupFile && group.toLowerCase() === groupFile.replace(/\.json$/i, "").toLowerCase());
 
 /**
- * Fields fed by a LocalizedText wire that is going away keep the text as plain inline text, so removing the node
- * (or only its wire) never silently empties a field. No translation anywhere means the field stays empty.
+ * Fields fed by a link wire (text, achievement or icon) that is going away keep the value as plain inline text, so removing
+ * the node (or only its wire) never silently empties a field. `edges` are all wires before the removal.
+ * Nothing to keep (no translation, no name yet) means the field stays empty.
  */
-export function restoreInline(nodes: AppNode[], gone: Edge[], loc: Record<string, LocFile>): AppNode[] {
+export function restoreInline(nodes: AppNode[], gone: Edge[], loc: Record<string, LocFile>, edges: Edge[]): AppNode[] {
   const byId = new Map(nodes.map((n) => [n.id, n]));
   const patches = new Map<string, Record<string, string>>();
   for (const e of gone) {
-    if (e.sourceHandle !== "loc-out" || !e.targetHandle?.startsWith("loc:") || !byId.has(e.target)) continue;
-    const key = byId.get(e.source)?.data.values.key;
-    const text = typeof key === "string" && key ? fallbackText(loc, key) : undefined;
-    if (text !== undefined) patches.set(e.target, { ...patches.get(e.target), [e.targetHandle.slice(4)]: text });
+    const kind = LINK_KINDS.find((k) => e.sourceHandle === `${k}-out` && e.targetHandle?.startsWith(`${k}:`));
+    const source = byId.get(e.source);
+    if (!kind || !source || !byId.has(e.target)) continue;
+    const text = linkedText(nodes, edges, loc, source, kind);
+    if (text !== undefined) patches.set(e.target, { ...patches.get(e.target), [e.targetHandle!.slice(kind.length + 1)]: text });
   }
   if (!patches.size) return nodes;
   return nodes.map((n) => (patches.has(n.id) ? { ...n, data: { ...n.data, values: { ...n.data.values, ...patches.get(n.id) } } } : n));

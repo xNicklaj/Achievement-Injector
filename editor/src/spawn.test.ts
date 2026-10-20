@@ -59,7 +59,7 @@ describe("spawn menu options", () => {
     withKey.nodes.push({ id: "k", type: "ae", position: { x: 0, y: 0 }, data: { kind: "LocalizedText", values: { key: "K" } } });
     const fields = spawnOptions(withKey.nodes, withKey.edges, from("k", "loc-out", "source"));
     expect(fields.map((o) => o.label)).toEqual(
-      expect.arrayContaining(["Create Achievement · AchievementName", "Create Achievement · Description", "Book read · BookID", "Location discovery · LocationID", "Base actor death · Name"]),
+      expect.arrayContaining(["Create Achievement · AchievementName", "Create Achievement · Description", "Book Read · BookID", "Location Discovery · LocationID", "Base Actor Death · Name"]),
     );
     expect(fields.every((o) => o.pin?.startsWith("loc:"))).toBe(true);
   });

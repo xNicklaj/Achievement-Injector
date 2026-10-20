@@ -1,18 +1,48 @@
 import { Handle, Position, useStore, type NodeProps } from "@xyflow/react";
 import { AlertTriangle, CircleAlert } from "lucide-react";
-import { achievementNames, conditionsSummary, isInternalGroup, type AppNode } from "../graph";
+import { achievementNames, conditionsSummary, isInternalGroup, linkedText, type AppNode } from "../graph";
 import { searchFor, usePlugins } from "../io/plugins";
 import { getText } from "../io/localization";
-import { isLocalizable, registry, UNKNOWN_CONDITION } from "../registry";
+import { linkKind, registry, UNKNOWN_CONDITION, wiredFields, type LinkKind } from "../registry";
+import { achievementIconPath, groupId } from "../io/workspace";
 import { BASELINE_VERSION, compareVersions } from "../schema";
 import { useState } from "react";
 import { confirmDialog } from "./dialogs";
 import { useApp } from "../store";
 import { parseNodeStatus, useValidation } from "../validation";
 import { IconField } from "./IconField";
+import { IconThumb } from "./icons";
 import { FieldWidget, inputClass, pascal } from "./Widgets";
 
 const flowHandle = "!h-3.5 !w-3.5 !rounded-sm !border-0 !bg-[var(--pin-flow)]";
+/** Pin colours by link kind, as CSS variables. */
+const LINK_COLOR: Record<LinkKind, string> = { loc: "var(--pin-localized)", ach: "var(--pin-achievement)", icon: "var(--pin-icon)" };
+
+/** What a linked field shows in place of its input: the achievement name or icon file its wire stands for. */
+function LinkedValue({ id, field, kind }: { id: string; field: string; kind: LinkKind }) {
+  const value = useApp((s) => {
+    const wire = s.edges.find((e) => e.target === id && e.targetHandle === `${kind}:${field}`);
+    const source = wire && s.nodes.find((n) => n.id === wire.source);
+    return source ? (linkedText(s.nodes, s.edges, s.loc, source, kind) ?? "") : "";
+  });
+  return (
+    <span className="min-w-0 flex-1 truncate text-[12px] italic" style={{ color: LINK_COLOR[kind] }} title={value}>
+      {kind === "loc" ? "localized" : value ? `→ ${value}` : "linked (no value yet)"}
+    </span>
+  );
+}
+
+/** A large look at the icon an Icon node names. */
+function IconPreview({ file }: { file: unknown }) {
+  const fileName = useApp((s) => s.fileName);
+  const name = typeof file === "string" ? file : "";
+  return (
+    <div className="px-3.5 py-1">
+      <IconThumb path={fileName && name ? achievementIconPath(groupId(fileName), name) : undefined} size={96} title={name} />
+    </div>
+  );
+}
+
 // Inline, not a Tailwind class: the colour is a runtime string Tailwind cannot scan.
 const dot = (color: string) => ({ background: color, width: 14, height: 14, border: 0 });
 
@@ -124,11 +154,8 @@ export function GraphNode({ id, data, selected }: NodeProps<AppNode>) {
     const r = conditionsSummary(s.nodes, s.edges, id);
     return `${r.level}|${r.text}`;
   });
-  const localized = useApp((s) => {
-    const set = new Set<string>();
-    for (const e of s.edges) if (e.target === id && e.targetHandle?.startsWith("loc:")) set.add(e.targetHandle.slice(4));
-    return [...set].sort().join(",");
-  }).split(",");
+  // Fields fed by a wire (text, achievement or icon), as a string so the selector stays stable.
+  const linked = useApp((s) => [...wiredFields(s.edges, id)].sort().join(",")).split(",");
   const [level, text] = summary.split("|");
   // Problems come from the shared validation (one pass over the whole file); the AddConditions summary is live and local.
   const checked = parseNodeStatus(useValidation((s) => s.byNode[id]));
@@ -141,22 +168,25 @@ export function GraphNode({ id, data, selected }: NodeProps<AppNode>) {
   // Nodes with no required field (e.g. the one-of conditions) show everything; the rest fold optional rows away,
   // opened on first render when one is already set.
   const flat = required.length === 0;
-  const [startOpen] = useState(() => optional.some((f) => data.values[f.name] !== undefined));
+  const [opened, setOpened] = useState(() => optional.some((f) => data.values[f.name] !== undefined));
+  // A folded row has no pin of its own, so the pins of wired optional fields move to the "Optional" header while it is
+  // folded and the wires stay attached.
+  const folded = !opened ? optional.filter((f) => linkKind(def, f) && linked.includes(f.name)) : [];
 
   const row = (f: (typeof def.fields)[number]) => {
-    const isLoc = isLocalizable(f);
-    const connected = isLoc && localized.includes(f.name);
+    const lk = linkKind(def, f);
+    const connected = lk !== null && linked.includes(f.name);
     return (
-      <div key={f.name} className="relative flex items-center gap-2 py-1 pl-3.5 pr-3">
-        {isLoc && <Handle type="target" id={`loc:${f.name}`} position={Position.Left} style={dot("var(--pin-localized)")} />}
-        <span className="flex w-28 shrink-0 items-center gap-1 text-[var(--text-dim)]" title={f.description ? `${f.name}: ${f.description}` : f.name}>
+      <div key={f.name} className={`relative flex gap-2 py-1 pl-3.5 pr-3 ${f.widget === "list" ? "items-start" : "items-center"}`}>
+        {lk && <Handle type="target" id={`${lk}:${f.name}`} position={Position.Left} style={dot(LINK_COLOR[lk])} />}
+        <span className={`flex w-28 shrink-0 items-center gap-1 text-[var(--text-dim)] ${f.widget === "list" ? "pt-1" : ""}`} title={f.description ? `${f.name}: ${f.description}` : f.name}>
           <span className="truncate">{pascal(f.name)}</span>
           {f.since && compareVersions(f.since, BASELINE_VERSION) > 0 && (
             <span className="shrink-0 rounded bg-white/10 px-1 text-[9px] leading-tight" title={`Needs Achievement Injector ${f.since} or newer`}>{f.since}</span>
           )}
         </span>
         {connected ? (
-          <span className="text-[12px] italic text-[var(--pin-localized)]">localized</span>
+          <LinkedValue id={id} field={f.name} kind={lk} />
         ) : def.kind === "CreateAchievement" && f.name === "achievementName" ? (
           <NameField id={id} value={data.values.achievementName} invalid={invalid.includes("achievementName")} />
         ) : f.widget === "iconPath" ? (
@@ -190,6 +220,7 @@ export function GraphNode({ id, data, selected }: NodeProps<AppNode>) {
         {def.flowOut && <Handle type="source" id="flow-out" position={Position.Right} className={flowHandle} title={def.category === "condition" ? "On Unlock: commands and Papyrus calls to run when this condition is met" : undefined} />}
         {def.condOut && def.category !== "condition" && <Handle type="source" id="cond-out" position={Position.Right} style={dot("var(--pin-condition)")} />}
         {def.locOut && <Handle type="source" id="loc-out" position={Position.Right} style={dot("var(--pin-localized)")} />}
+        {def.iconOut && <Handle type="source" id="icon-out" position={Position.Right} style={dot("var(--pin-icon)")} />}
       </div>
       <div className="py-2" inert={locked}>
         {def.condIn && (
@@ -202,14 +233,26 @@ export function GraphNode({ id, data, selected }: NodeProps<AppNode>) {
         )}
         {data.kind === UNKNOWN_CONDITION && <div className="px-3.5 py-1 text-[12px] text-[var(--text-dim)]">Not a type this editor knows. It is kept as it is.</div>}
         {(flat ? def.fields : required).map(row)}
+        {data.kind === "Icon" && <IconPreview file={data.values.file} />}
         {data.kind === "LocalizedText" && <TranslationRows keyName={typeof data.values.key === "string" ? data.values.key : ""} />}
         {!flat && optional.length > 0 && (
-          <details className="nodrag" open={startOpen}>
-            <summary className="cursor-pointer select-none px-3.5 py-1 text-[12px] text-[var(--text-dim)]">
-              Optional ({optional.filter((f) => data.values[f.name] !== undefined).length}/{optional.length})
-            </summary>
-            {optional.map(row)}
-          </details>
+          <div className="nodrag">
+            <button type="button" aria-expanded={opened} onClick={() => setOpened(!opened)} className="relative flex w-full cursor-pointer select-none items-center gap-1 px-3.5 py-1 text-left text-[12px] text-[var(--text-dim)]">
+              <span className="w-3 text-[9px]">{opened ? "▼" : "▶"}</span>
+              Optional ({optional.filter((f) => data.values[f.name] !== undefined || linked.includes(f.name)).length}/{optional.length})
+              {folded.map((f) => {
+                const lk = linkKind(def, f)!;
+                return <Handle key={f.name} type="target" id={`${lk}:${f.name}`} position={Position.Left} style={dot(LINK_COLOR[lk])} />;
+              })}
+            </button>
+            {opened && optional.map(row)}
+          </div>
+        )}
+        {def.achOut && (
+          <div className="relative py-1 pl-3.5 pr-4 text-right text-[12px] text-[var(--text-dim)]" title="Connect to an Achievement Unlocked condition that waits for this achievement">
+            Unlock
+            <Handle type="source" id="ach-out" position={Position.Right} style={dot(LINK_COLOR.ach)} />
+          </div>
         )}
         {def.category === "condition" && (
           // The flow pin sits in the header like every other node's; the condition output moves to its own row.

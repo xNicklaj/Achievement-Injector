@@ -100,9 +100,9 @@ describe("icon validation", () => {
   };
   const node = (v: ReturnType<typeof check>) => Object.keys(v.byNode)[0];
 
-  it("warns, on the achievement's icon field, when the file is not in the group's icon folder", () => {
+  it("warns, on the Icon node's file field, when the file is not in the group's icon folder", () => {
     const v = check("Gone.dds", ["A.dds"]);
-    expect(parseNodeStatus(v.byNode[node(v)])).toEqual({ level: "warning", messages: ['icon: "Gone.dds" is not in Icons/G/'] });
+    expect(parseNodeStatus(v.byNode[node(v)])).toEqual({ level: "warning", messages: ['file: "Gone.dds" is not in Icons/G/'] });
   });
   it("accepts an icon that exists, ignoring case, or one queued to be saved", () => {
     expect(check("a.DDS", ["A.dds"]).issues).toEqual([]);

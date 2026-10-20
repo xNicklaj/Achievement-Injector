@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { exportGroup } from "./io/exportGroup";
 import { importGroup, mkEdge } from "./io/importGroup";
 import { changedLocFiles, getText, parseLoc } from "./io/localization";
+import { linkedText } from "./graph";
 import { isDirty, useApp } from "./store";
 
 const raw = {
@@ -164,7 +165,17 @@ describe("renaming an achievement", () => {
     ],
   };
   const named = (n: string) => useApp.getState().nodes.find((x) => x.data.kind === "CreateAchievement" && x.data.values.achievementName === n)!;
-  const refs = () => useApp.getState().nodes.filter((x) => x.data.kind === "AchievementUnlocked").map((x) => `${x.data.values.achievement}${x.data.values.group ? "@" + x.data.values.group : ""}`);
+  // A reference is a wire to its achievement when it names one of this group, otherwise typed text.
+  const refs = () => {
+    const { nodes, edges, loc } = useApp.getState();
+    return nodes
+      .filter((x) => x.data.kind === "AchievementUnlocked")
+      .map((x) => {
+        const wire = edges.find((e) => e.target === x.id && e.targetHandle === "ach:achievement");
+        const name = wire ? linkedText(nodes, edges, loc, nodes.find((n) => n.id === wire.source)!, "ach") : x.data.values.achievement;
+        return `${name}${x.data.values.group ? "@" + x.data.values.group : ""}`;
+      });
+  };
   const openTwo = () => useApp.getState().load(importGroup(two), "G.json", {}, null);
 
   it("updates references in this group, but not ones pointing at another group", () => {
@@ -198,11 +209,11 @@ describe("renaming an achievement", () => {
     expect(useApp.getState().renameAchievement(id, "Again").existed).toBe(true);
   });
 
-  it("leaves references alone when the new name is empty or unchanged", () => {
+  it("leaves typed references alone when the new name is empty or unchanged; a wire just has no name until there is one", () => {
     openTwo();
     expect(useApp.getState().renameAchievement(named("First").id, "First").updated).toBe(0);
     useApp.getState().renameAchievement(named("First").id, "");
-    expect(refs()).toEqual(["First", "First@G", "First@Other", "Third"]);
+    expect(refs()).toEqual(["undefined", "First@G", "First@Other", "Third"]);
   });
 });
 

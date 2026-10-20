@@ -1,7 +1,7 @@
 import type { Edge } from "@xyflow/react";
-import { achievementNames, type AppNode } from "./graph";
+import { achievementNames, linkedText, type AppNode } from "./graph";
+import { LINK_KINDS } from "./registry";
 import { mkEdge } from "./io/importGroup";
-import { fallbackText } from "./io/localization";
 import { useApp } from "./store";
 
 let clip: { nodes: AppNode[]; edges: Edge[]; pastes: number } | null = null;
@@ -17,15 +17,17 @@ export function copySelection(): number {
   if (!picked.length) return 0;
   const ids = new Set(picked.map((n) => n.id));
   const inline = new Map<string, Record<string, string>>();
+  // A wire from a node that is not copied (text, an achievement, an icon) is copied as its value, so the paste reads the same.
   for (const e of edges) {
-    if (e.sourceHandle !== "loc-out" || !e.targetHandle?.startsWith("loc:") || !ids.has(e.target)) continue;
-    const key = nodes.find((n) => n.id === e.source)?.data.values.key;
-    const text = typeof key === "string" && key ? fallbackText(loc, key) : undefined;
-    if (text !== undefined) inline.set(e.target, { ...inline.get(e.target), [e.targetHandle.slice(4)]: text });
+    const kind = LINK_KINDS.find((k) => e.sourceHandle === `${k}-out` && e.targetHandle?.startsWith(`${k}:`));
+    const source = nodes.find((n) => n.id === e.source);
+    if (!kind || !source || ids.has(e.source) || !ids.has(e.target)) continue;
+    const text = linkedText(nodes, edges, loc, source, kind);
+    if (text !== undefined) inline.set(e.target, { ...inline.get(e.target), [e.targetHandle!.slice(kind.length + 1)]: text });
   }
   clip = {
     nodes: picked.map((n) => ({ ...n, selected: false, data: structuredClone({ ...n.data, values: { ...n.data.values, ...inline.get(n.id) } }) })),
-    edges: edges.filter((e) => ids.has(e.source) && ids.has(e.target) && e.sourceHandle !== "loc-out"),
+    edges: edges.filter((e) => ids.has(e.source) && ids.has(e.target)),
     pastes: 0,
   };
   return picked.length;

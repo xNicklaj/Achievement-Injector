@@ -17,7 +17,7 @@ const nodeTypes = { ae: GraphNode };
 const MIN_ZOOM = 0.1;
 const MAX_ZOOM = 2;
 
-const EDGE_COLOR = { flow: "var(--pin-flow)", cond: "var(--pin-condition)", loc: "var(--pin-localized)" };
+const EDGE_COLOR = { flow: "var(--pin-flow)", cond: "var(--pin-condition)", loc: "var(--pin-localized)", ach: "var(--pin-achievement)", icon: "var(--pin-icon)" };
 
 export function Canvas() {
   const { nodes, edges, onNodesChange, onEdgesChange, onConnect, isValid, addNode, addNodeConnected } = useApp();

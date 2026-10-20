@@ -112,11 +112,11 @@ let coalesce = false;
 const joinsTyping = (key: string, s: Pick<State, "nodes" | "loc">) =>
   !!typing && typing.key === key && performance.now() - typing.at < 1500 && !typing.space && typing.nodes === s.nodes && typing.loc === s.loc;
 const markTyping = (key: string, value: unknown, s: Pick<State, "nodes" | "loc">) => {
-  typing = typeof value === "string" || typeof value === "number" ? { key, at: performance.now(), space: typeof value === "string" && /\s$/.test(value), nodes: s.nodes, loc: s.loc } : null;
+  typing = typeof value === "string" || typeof value === "number" || Array.isArray(value) ? { key, at: performance.now(), space: typeof value === "string" && /\s$/.test(value), nodes: s.nodes, loc: s.loc } : null;
 };
 /** Run an update that continues the current word, so history does not record it separately. */
 const edit = (key: string, value: unknown, get: () => State, update: () => void) => {
-  coalesce = (typeof value === "string" || typeof value === "number") && joinsTyping(key, get());
+  coalesce = (typeof value === "string" || typeof value === "number" || Array.isArray(value)) && joinsTyping(key, get());
   update();
   coalesce = false;
   markTyping(key, value, get());
@@ -145,12 +145,12 @@ export const useApp = create<State>()(
         if (!removed.size) return set({ nodes: applyNodeChanges(c, nodes) });
         // Wires of a deleted node go with it in this same update, and the fields they fed keep their text.
         const gone = edges.filter((e) => removed.has(e.source) || removed.has(e.target));
-        set({ nodes: applyNodeChanges(c, restoreInline(nodes, gone, loc)), edges: edges.filter((e) => !gone.includes(e)) });
+        set({ nodes: applyNodeChanges(c, restoreInline(nodes, gone, loc, edges)), edges: edges.filter((e) => !gone.includes(e)) });
       },
       onEdgesChange: (c) => {
         const { nodes, edges, loc } = get();
         const ids = new Set(c.flatMap((x) => (x.type === "remove" ? [x.id] : [])));
-        set({ edges: applyEdgeChanges(c, edges), nodes: ids.size ? restoreInline(nodes, edges.filter((e) => ids.has(e.id)), loc) : nodes });
+        set({ edges: applyEdgeChanges(c, edges), nodes: ids.size ? restoreInline(nodes, edges.filter((e) => ids.has(e.id)), loc, edges) : nodes });
       },
       onConnect: (c) => {
         const { nodes, edges } = get();
@@ -219,7 +219,7 @@ export const useApp = create<State>()(
         remembered.viewport = null;
       },
       renameAchievement: (id, name) => {
-        const { nodes, fileName, savedNames } = get();
+        const { nodes, edges, fileName, savedNames } = get();
         const raw = nodes.find((n) => n.id === id)?.data.values.achievementName;
         // An unset name (a new node, or a field whose Localized Text wire was removed) is "", so typing a first name works.
         const old = typeof raw === "string" ? raw : undefined;
@@ -240,6 +240,8 @@ export const useApp = create<State>()(
             return n;
           }),
         });
+        // Wires follow the achievement by themselves; they count as updated references too.
+        if (old) updated += edges.filter((e) => e.source === id && e.sourceHandle === "ach-out").length;
         return { old, updated, existed: !!old && savedNames.includes(old) };
       },
       restore: (d, workspace) => {

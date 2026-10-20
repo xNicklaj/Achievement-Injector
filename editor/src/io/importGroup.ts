@@ -33,7 +33,8 @@ export const estimateHeight = (def: NodeDef, values: Json = {}) => {
   const open = def.fields.some((f) => f.optional && values[f.name] !== undefined);
   const rows = required === 0 || open ? def.fields.length + (required === 0 ? 0 : 1) : required + 1;
   // Plus the condition's On Unlock row, or an unknown condition's notice.
-  return 48 + (def.condIn ? 32 : 0) + (def.category === "condition" ? 32 : 0) + (def.kind === UNKNOWN_CONDITION ? 32 : 0) + rows * 36 + (def.kind === "LocalizedText" ? 36 : 0);
+  const listRows = def.fields.reduce((n, f) => n + (f.widget === "list" && Array.isArray(values[f.name]) ? (values[f.name] as unknown[]).length : 0), 0);
+  return 48 + listRows * 36 + (def.condIn ? 32 : 0) + (def.category === "condition" ? 32 : 0) + (def.kind === UNKNOWN_CONDITION ? 32 : 0) + (def.kind === "Icon" ? 120 : 0) + rows * 36 + (def.kind === "LocalizedText" ? 36 : 0);
 };
 
 const FLOW_KIND = { command: "RunCommand", papyrus: "CallPapyrus" } as const;
@@ -92,6 +93,24 @@ export function importGroup(raw: unknown): Snapshot {
     return node;
   };
 
+  // An `icon` file name becomes one Icon node shared by every achievement that names it, wired to each.
+  const iconNodes = new Map<string, AppNode>();
+  const iconPos = isObj(editor.icons) ? editor.icons : {};
+  const linkIcon = (node: AppNode) => {
+    const file = node.data.values.icon;
+    if (node.data.kind !== "CreateAchievement" || typeof file !== "string" || !file) return;
+    let icon = iconNodes.get(file);
+    if (!icon) {
+      const at = iconPos[file];
+      const p = isObj(at) && num(at.x) && num(at.y) ? { x: at.x, y: at.y } : { x: -COL, y: locY };
+      locY += 230;
+      icon = add("Icon", { file }, {}, p);
+      iconNodes.set(file, icon);
+    }
+    delete node.data.values.icon;
+    edges.push(mkEdge(icon.id, "icon-out", node.id, "icon:icon"));
+  };
+
   /** `$key` in a localizable field becomes one shared LocalizedText node wired to every use (HANDOVER 3.13). */
   const localize = (node: AppNode) => {
     for (const f of registry[node.data.kind].fields.filter(isLocalizable)) {
@@ -131,6 +150,7 @@ export function importGroup(raw: unknown): Snapshot {
   if (unknown.length) throw new ImportError(`Unsupported entries: ${unknown.join(", ")}.`);
 
   let bandY = 0;
+  const owner = new Map<string, string>(); // condition node -> its achievement
   for (const a of raw.achievements as Json[]) {
     const ed = isObj(a._editor) ? a._editor : {};
     const hasPos = num(ed.x) && num(ed.y);
@@ -173,6 +193,7 @@ export function importGroup(raw: unknown): Snapshot {
       const pos = num(cEd.x) && num(cEd.y) ? { x: cEd.x, y: cEd.y } : { x: COL, y };
       y += condHeights[j];
       const cn = add(def.kind, cs.values, cs.extra, pos, cEd.id);
+      owner.set(cn.id, create.id);
       edges.push(mkEdge(cn.id, "cond-out", addNode!.id, "cond-in"));
       localize(cn);
 
@@ -189,7 +210,24 @@ export function importGroup(raw: unknown): Snapshot {
       });
     });
     localize(create);
+    linkIcon(create);
     bandY += bandH + 80;
+  }
+
+  // A reference to an achievement of this group by plain name becomes a wire to it. Names that are localized, ambiguous,
+  // point into another group or name the condition's own achievement stay as typed text.
+  const byName = new Map<string, AppNode[]>();
+  for (const n of nodes) {
+    const name = n.data.kind === "CreateAchievement" ? n.data.values.achievementName : undefined;
+    if (typeof name === "string" && name) byName.set(name, [...(byName.get(name) ?? []), n]);
+  }
+  for (const n of nodes) {
+    const { achievement, group } = n.data.values;
+    if (n.data.kind !== "AchievementUnlocked" || typeof achievement !== "string" || (group !== undefined && group !== "")) continue;
+    const hit = byName.get(achievement);
+    if (hit?.length !== 1 || hit[0].id === owner.get(n.id)) continue;
+    delete n.data.values.achievement;
+    edges.push(mkEdge(hit[0].id, "ach-out", n.id, "ach:achievement"));
   }
 
   const group: GroupValues = {};

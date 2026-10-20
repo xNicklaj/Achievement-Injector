@@ -1,6 +1,6 @@
 import type { Edge } from "@xyflow/react";
 import { pinKind, refuseReason, type AppNode } from "./graph";
-import { CATEGORIES, isLocalizable, nodeDefs, type NodeDef } from "./registry";
+import { CATEGORIES, linkKind, linkOut, nodeDefs, type NodeDef } from "./registry";
 
 /** The pin a wire was dragged from. `source` is an output pin, `target` an input pin. */
 export type SpawnFrom = { nodeId: string; handleId: string; handleType: "source" | "target" };
@@ -23,12 +23,12 @@ export function spawnOptions(nodes: AppNode[], edges: Edge[], from: SpawnFrom | 
     if (from.handleType === "source") {
       if (kind === "flow") return def.flowIn ? [{ pin: "flow-in", label: def.title }] : [];
       if (kind === "cond") return def.condIn ? [{ pin: "cond-in", label: def.title }] : [];
-      // A text output can feed any localizable field; each field is its own choice.
-      return def.fields.filter(isLocalizable).map((f) => ({ pin: `loc:${f.name}`, label: `${def.title} · ${f.name[0].toUpperCase()}${f.name.slice(1)}` }));
+      // A link output (text, achievement, icon) can feed any field that takes it; each field is its own choice.
+      return def.fields.filter((f) => linkKind(def, f) === kind).map((f) => ({ pin: `${kind}:${f.name}`, label: `${def.title} · ${f.name[0].toUpperCase()}${f.name.slice(1)}` }));
     }
     if (kind === "flow") return def.flowOut ? [{ pin: "flow-out", label: def.title }] : [];
     if (kind === "cond") return def.condOut ? [{ pin: "cond-out", label: def.title }] : [];
-    return def.locOut ? [{ pin: "loc-out", label: def.title }] : [];
+    return kind && linkOut(def) === kind ? [{ pin: `${kind}-out`, label: def.title }] : [];
   };
 
   const out: SpawnOption[] = [];

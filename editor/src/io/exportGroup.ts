@@ -1,6 +1,6 @@
 import type { Edge } from "@xyflow/react";
-import { achievementNames, isInternalGroup, type AppNode } from "../graph";
-import { isAction, isLocalizable, registry, UNKNOWN_CONDITION } from "../registry";
+import { achievementNames, isInternalGroup, linkedText, type AppNode } from "../graph";
+import { isAction, linkKind, registry, UNKNOWN_CONDITION } from "../registry";
 import { BASELINE_VERSION, compareVersions, GroupSchema, SCHEMA_VERSION } from "../schema";
 import type { GroupValues } from "../store";
 import type { Json } from "./importGroup";
@@ -98,20 +98,28 @@ export function exportGroup(s: ExportState): { json: Json; issues: Issue[] } {
     const folder = `Icons/${s.fileName.replace(/\.json$/i, "")}/`;
     const have = new Set([...s.iconFiles, ...Object.keys(s.pendingIcons ?? {}).filter((p) => p.startsWith(folder)).map((p) => p.slice(folder.length))].map((n) => n.toLowerCase()));
     for (const n of s.nodes) {
-      const icon = n.data.kind === "CreateAchievement" ? n.data.values.icon : undefined;
-      if (typeof icon === "string" && icon && !have.has(icon.toLowerCase()))
-        add("warning", `Icon "${icon}" is not in ${folder}.`, n.id, { field: "icon", detail: `icon: "${icon}" is not in ${folder}` });
+      const own = n.data.kind === "CreateAchievement" ? "icon" : n.data.kind === "Icon" ? "file" : undefined;
+      const icon = own ? n.data.values[own] : undefined;
+      if (own && typeof icon === "string" && icon && !have.has(icon.toLowerCase()))
+        add("warning", `Icon "${icon}" is not in ${folder}.`, n.id, { field: own, detail: `${own}: "${icon}" is not in ${folder}` });
     }
   }
+  for (const n of s.nodes.filter((x) => x.data.kind === "Icon")) {
+    if (!n.data.values.file) add("warning", "An Icon node has no file.", n.id, { field: "file", detail: "file is required" });
+    if (!s.edges.some((e) => e.source === n.id)) add("warning", "An Icon node is not used by any achievement.", n.id, { detail: "Not used by any achievement" });
+  }
 
-  /** Field values of one node, with localized pins resolved to `$key`, then its unknown keys. */
+  /** Field values of one node: wired fields take what their wire stands for (`$key`, achievement name, icon file), then its unknown keys. */
   const fields = (n: AppNode): Json => {
     const out: Json = {};
-    for (const f of registry[n.data.kind].fields) {
-      const wire = isLocalizable(f) ? s.edges.find((e) => e.target === n.id && e.targetHandle === `loc:${f.name}`) : undefined;
-      if (wire) {
-        const k = keyOf(byId.get(wire.source)!);
-        if (k) out[f.name] = `$${k}`;
+    const def = registry[n.data.kind];
+    for (const f of def.fields) {
+      const kind = linkKind(def, f);
+      const wire = kind ? s.edges.find((e) => e.target === n.id && e.targetHandle === `${kind}:${f.name}`) : undefined;
+      if (wire && kind) {
+        const source = byId.get(wire.source)!;
+        const value = kind === "loc" ? (keyOf(source) ? `$${keyOf(source)}` : undefined) : linkedText(s.nodes, s.edges, loc, source, kind);
+        if (value) out[f.name] = value;
       } else if (n.data.values[f.name] !== undefined) out[f.name] = n.data.values[f.name];
     }
     return out;
@@ -182,9 +190,30 @@ export function exportGroup(s: ExportState): { json: Json; issues: Issue[] } {
     refs.push({ create: create.id, add: adds[0]?.id, join: joins[0]?.id, conds: condIds, actions: actionNodes.map((n) => n.id), condActions });
   }
 
+  // Achievements that wait for each other, directly or through others, can never unlock.
+  const creates = new Map(s.nodes.filter((n) => n.data.kind === "CreateAchievement").map((n) => [n.id, n]));
+  const byName = new Map([...creates.values()].map((n) => [linkedText(s.nodes, s.edges, loc, n, "ach") ?? "", n.id]));
+  const waits = new Map<string, Set<string>>();
+  refs.forEach((r) => {
+    for (const id of r.conds) {
+      const c = byId.get(id)!;
+      if (c.data.kind !== "AchievementUnlocked") continue;
+      const wire = s.edges.find((e) => e.target === id && e.targetHandle === "ach:achievement");
+      const target = wire ? wire.source : isInternalGroup(c.data.values.group, s.fileName) ? byName.get(String(c.data.values.achievement ?? "")) : undefined;
+      if (target) waits.set(r.create, (waits.get(r.create) ?? new Set()).add(target));
+    }
+  });
+  const reaches = (from: string, goal: string, seen = new Set<string>()): boolean =>
+    [...(waits.get(from) ?? [])].some((t) => t === goal || (!seen.has(t) && (seen.add(t), reaches(t, goal, seen))));
+  for (const id of waits.keys()) {
+    if (!reaches(id, id)) continue;
+    const name = linkedText(s.nodes, s.edges, loc, creates.get(id)!, "ach") ?? "(unnamed)";
+    add("error", `Achievement "${name}" waits for itself through AchievementUnlocked conditions, so it can never unlock.`, id, { detail: "Waits for itself through AchievementUnlocked conditions: it can never unlock" });
+  }
+
   // Anything not reached from an achievement would vanish on save: say so.
   for (const n of s.nodes) {
-    if (used.has(n.id) || n.data.kind === "LocalizedText") continue;
+    if (used.has(n.id) || n.data.kind === "LocalizedText" || n.data.kind === "Icon") continue;
     const msg = `${registry[n.data.kind].title} is not connected to an achievement and will not be saved.`;
     add("warning", msg, n.id, { detail: "Not connected to an achievement: it will not be saved" });
   }
@@ -202,7 +231,10 @@ export function exportGroup(s: ExportState): { json: Json; issues: Issue[] } {
     for (const f of registry[n.data.kind].fields) if (n.data.values[f.name] !== undefined && f.since && compareVersions(f.since, modVersion) > 0) modVersion = f.since;
   }
 
-  const json: Json = { ...s.group, ...s.groupExtra, achievements, _editor: { schemaVersion: SCHEMA_VERSION, modVersion, ...(keyNodes.length ? { keys } : {}) } };
+  const icons: Record<string, { x: number; y: number }> = {};
+  for (const n of s.nodes) if (n.data.kind === "Icon" && typeof n.data.values.file === "string" && n.data.values.file) icons[n.data.values.file] = xy(n);
+
+  const json: Json = { ...s.group, ...s.groupExtra, achievements, _editor: { schemaVersion: SCHEMA_VERSION, modVersion, ...(keyNodes.length ? { keys } : {}), ...(Object.keys(icons).length ? { icons } : {}) } };
 
   const parsed = GroupSchema.safeParse(json);
   if (!parsed.success)
