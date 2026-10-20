@@ -1,7 +1,7 @@
 import type { Edge } from "@xyflow/react";
-import { achievementNames, isInternalGroup, linkedText, type AppNode } from "../graph";
+import { achievementNames, behind, isInternalGroup, linkedText, type AppNode } from "../graph";
 import { isAction, linkKind, registry, UNKNOWN_CONDITION } from "../registry";
-import { BASELINE_VERSION, compareVersions, GroupSchema, SCHEMA_VERSION } from "../schema";
+import { BASELINE_VERSION, compareVersions, GroupSchema, LIVE_TYPES, SCHEMA_VERSION } from "../schema";
 import type { GroupValues } from "../store";
 import type { Json } from "./importGroup";
 import { getText, type LocFile } from "./localization";
@@ -160,8 +160,13 @@ export function exportGroup(s: ExportState): { json: Json; issues: Issue[] } {
     if (adds[0]) {
       out.conditions = s.edges
         .filter((e) => e.target === adds[0].id && e.targetHandle === "cond-in")
-        .map((e) => {
-          const c = byId.get(e.source)!;
+        .flatMap((e) => {
+          const { root: c, mods } = behind(s.nodes, s.edges, e.source);
+          for (const m of mods) used.add(m.id);
+          if (!c) {
+            for (const m of mods) add("warning", `${registry[m.data.kind].title} has no condition, so it will not be saved.`, m.id, { detail: "No condition connected: it will not be saved" });
+            return [];
+          }
           used.add(c.id);
           condIds.push(c.id);
           if (c.data.kind === UNKNOWN_CONDITION) {
@@ -169,14 +174,24 @@ export function exportGroup(s: ExportState): { json: Json; issues: Issue[] } {
             const type = String(c.data.extra?.type);
             add("error", `Achievement "${name}": "${type}" is not a condition type this editor knows.`, c.id, { detail: `Unknown condition "${type}": it is kept as it is, but may be from a newer mod version or a typo` });
           }
+          if (mods.length && !LIVE_TYPES.has(c.data.kind))
+            add("error", `${registry[c.data.kind].title} does not support ${mods[0].data.kind}.`, mods[0].id, { detail: `${registry[c.data.kind].title} does not support Live or Negate: the mod skips it` });
+          // The mod accepts Negate alone, but this editor requires an explicit Live before it.
+          const negate = mods.findIndex((m) => m.data.kind === "Negate");
+          if (negate >= 0 && !mods.slice(0, negate).some((m) => m.data.kind === "Live"))
+            add("error", `Achievement "${name}": a Negate node needs a Live node between its condition and it.`, mods[negate].id, { detail: "Needs a Live node between the condition and this node" });
           // The condition's own actions: the chain hanging off its flow pin.
           const acts = chainFrom(c.id).filter((n) => isAction(n.data.kind));
           condActions.push(acts.map((n) => n.id));
           const o: Json = { type: c.data.kind, ...fields(c), ...c.data.extra };
+          for (const m of mods) o[m.data.kind.toLowerCase()] = true;
           if (acts.length) o.onUnlock = acts.map(actionJson);
-          o._editor = { id: c.id, ...xy(c), ...(acts.length ? { chain: acts.map(xy) } : {}) };
-          return o;
+          o._editor = { id: c.id, ...xy(c), ...(acts.length ? { chain: acts.map(xy) } : {}), ...(mods.length ? { mods: mods.map((m) => ({ kind: m.data.kind, id: m.id, ...xy(m) })) } : {}) };
+          return [o];
         });
+      // The mod only evaluates live conditions when another condition fires, so an all-live achievement never unlocks.
+      if ((out.conditions as Json[]).length && (out.conditions as Json[]).every((o) => o.live || o.negate))
+        add("warning", `Achievement "${name}" has only live conditions, so it can never unlock.`, adds[0].id, { detail: "Only live conditions: it can never unlock. Add a condition that is not live" });
     }
 
     const actionNodes = chain.filter((n) => isAction(n.data.kind));
@@ -228,6 +243,8 @@ export function exportGroup(s: ExportState): { json: Json; issues: Issue[] } {
   let modVersion = BASELINE_VERSION;
   for (const id of used) {
     const n = byId.get(id)!;
+    const since = registry[n.data.kind].since;
+    if (since && compareVersions(since, modVersion) > 0) modVersion = since;
     for (const f of registry[n.data.kind].fields) if (n.data.values[f.name] !== undefined && f.since && compareVersions(f.since, modVersion) > 0) modVersion = f.since;
   }
 

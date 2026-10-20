@@ -22,7 +22,7 @@ export function spawnOptions(nodes: AppNode[], edges: Edge[], from: SpawnFrom | 
   const pins = (def: NodeDef): { pin: string; label: string }[] => {
     if (from.handleType === "source") {
       if (kind === "flow") return def.flowIn ? [{ pin: "flow-in", label: def.title }] : [];
-      if (kind === "cond") return def.condIn ? [{ pin: "cond-in", label: def.title }] : [];
+      if (kind === "cond") return def.condIn || def.modifier ? [{ pin: "cond-in", label: def.title }] : [];
       // A link output (text, achievement, icon) can feed any field that takes it; each field is its own choice.
       return def.fields.filter((f) => linkKind(def, f) === kind).map((f) => ({ pin: `${kind}:${f.name}`, label: `${def.title} · ${f.name[0].toUpperCase()}${f.name.slice(1)}` }));
     }

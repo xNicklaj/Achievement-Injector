@@ -1,5 +1,5 @@
 import type { Edge } from "@xyflow/react";
-import type { AppNode } from "./graph";
+import { behind, type AppNode } from "./graph";
 import { COL, estimateHeight } from "./io/importGroup";
 import { registry } from "./registry";
 import { useApp } from "./store";
@@ -41,20 +41,21 @@ export function tidyPositions(nodes: AppNode[], edges: Edge[]): Map<string, Pos>
     text(create);
     const main = chain(create.id);
     const add = main.find((n) => n.data.kind === "AddConditions");
-    const chainX = (i: number) => (add ? COL * 2 : COL) + i * COL;
+    // Live / Negate nodes sit in columns between the conditions and Add Conditions.
+    const fed = add ? edges.filter((x) => x.target === add.id && x.targetHandle === "cond-in").map((e) => behind(nodes, edges, e.source)) : [];
+    const chainX = (i: number) => (add ? COL * (2 + Math.max(0, ...fed.map((f) => f.mods.length))) : COL) + i * COL;
     main.forEach((n, i) => put(n, chainX(i), bandY));
 
     let cy = bandY;
-    if (add)
-      for (const e of edges.filter((x) => x.target === add.id && x.targetHandle === "cond-in")) {
-        const c = byId.get(e.source);
-        if (!c || placed.has(c.id)) continue;
-        put(c, COL, cy);
-        text(c);
-        const actions = chain(c.id);
-        actions.forEach((a, k) => put(a, chainX(main.length) + k * COL, cy));
-        cy += Math.max(height(c), ...actions.map(height)) + 20;
-      }
+    for (const { root: c, mods } of fed) {
+      if (!c || placed.has(c.id)) continue;
+      put(c, COL, cy);
+      mods.forEach((m, k) => put(m, COL * (2 + k), cy));
+      text(c);
+      const actions = chain(c.id);
+      actions.forEach((a, k) => put(a, chainX(main.length) + k * COL, cy));
+      cy += Math.max(height(c), ...actions.map(height)) + 20;
+    }
     y += Math.max(height(create), cy - bandY, loc - bandY) + 80;
   }
 

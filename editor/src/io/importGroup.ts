@@ -1,7 +1,7 @@
 import type { Edge } from "@xyflow/react";
 import type { AppNode } from "../graph";
 import { isLocalizable, registry, UNKNOWN_CONDITION, type NodeDef } from "../registry";
-import { compareVersions, SCHEMA_VERSION, TARGET_VERSION } from "../schema";
+import { compareVersions, LIVE_TYPES, SCHEMA_VERSION, TARGET_VERSION } from "../schema";
 import type { GroupValues } from "../store";
 
 export type Json = Record<string, unknown>;
@@ -36,6 +36,11 @@ export const estimateHeight = (def: NodeDef, values: Json = {}) => {
   const listRows = def.fields.reduce((n, f) => n + (f.widget === "list" && Array.isArray(values[f.name]) ? (values[f.name] as unknown[]).length : 0), 0);
   return 48 + listRows * 36 + (def.condIn ? 32 : 0) + (def.category === "condition" ? 32 : 0) + (def.kind === UNKNOWN_CONDITION ? 32 : 0) + (def.kind === "Icon" ? 120 : 0) + rows * 36 + (def.kind === "LocalizedText" ? 36 : 0);
 };
+
+/** `live`/`negate` on a type that supports them become Live / Negate nodes; on any other type they stay as plain keys. */
+const MODIFIER_KIND = { live: "Live", negate: "Negate" } as const;
+const modifiersOf = (c: Json) =>
+  (Object.keys(MODIFIER_KIND) as (keyof typeof MODIFIER_KIND)[]).filter((k) => typeof c.type === "string" && LIVE_TYPES.has(c.type) && c[k] === true);
 
 const FLOW_KIND = { command: "RunCommand", papyrus: "CallPapyrus" } as const;
 
@@ -171,7 +176,9 @@ export function importGroup(raw: unknown): Snapshot {
     const saved = Array.isArray(ed.chain) && ed.chain.length === chainSpec.length && ed.chain.every((p) => isObj(p) && num(p.x) && num(p.y)) ? (ed.chain as { x: number; y: number }[]) : null;
     const condHeights = conds.map((c) => estimateHeight(registry[c.type as string]?.category === "condition" ? registry[c.type as string] : registry[UNKNOWN_CONDITION], c) + 20);
     const bandH = Math.max(estimateHeight(registry.CreateAchievement, a), condHeights.reduce((s, h) => s + h, 0));
-    const chainX = (i: number) => (hasConds ? COL * 2 : COL) + i * COL;
+    // Live / Negate nodes sit in columns between the conditions and Add Conditions.
+    const modCols = Math.max(0, ...conds.map((c) => modifiersOf(c).length));
+    const chainX = (i: number) => (hasConds ? COL * (2 + modCols) : COL) + i * COL;
 
     const create = add("CreateAchievement", created.values, created.extra, hasPos ? { x: ed.x as number, y: ed.y as number } : { x: 0, y: bandY }, ed.id);
     const chain = chainSpec.map((s, i) => add(s.kind, s.values, s.extra, saved ? saved[i] : { x: chainX(i), y: bandY }));
@@ -192,9 +199,19 @@ export function importGroup(raw: unknown): Snapshot {
       const cEd = isObj(c._editor) ? c._editor : {};
       const pos = num(cEd.x) && num(cEd.y) ? { x: cEd.x, y: cEd.y } : { x: COL, y };
       y += condHeights[j];
+      const flags = modifiersOf(c);
+      for (const k of flags) delete cs.extra[k];
       const cn = add(def.kind, cs.values, cs.extra, pos, cEd.id);
       owner.set(cn.id, create.id);
-      edges.push(mkEdge(cn.id, "cond-out", addNode!.id, "cond-in"));
+      const savedMods = Array.isArray(cEd.mods) ? cEd.mods.filter(isObj) : [];
+      let last = cn;
+      flags.forEach((k, m) => {
+        const sm = savedMods.find((x) => x.kind === MODIFIER_KIND[k] && num(x.x) && num(x.y));
+        const mn = add(MODIFIER_KIND[k], {}, {}, sm ? { x: sm.x as number, y: sm.y as number } : { x: pos.x + (m + 1) * COL, y: pos.y }, sm?.id);
+        edges.push(mkEdge(last.id, "cond-out", mn.id, "cond-in"));
+        last = mn;
+      });
+      edges.push(mkEdge(last.id, "cond-out", addNode!.id, "cond-in"));
       localize(cn);
 
       // The condition's own `onUnlock` is a chain of action nodes hanging off its flow pin, placed past the achievement's chain.

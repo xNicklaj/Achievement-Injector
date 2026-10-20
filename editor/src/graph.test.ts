@@ -6,13 +6,13 @@ import { nodeDefs, registry } from "./registry";
 const node = (id: string, kind: string, values = {}): AppNode => ({ id, type: "ae", position: { x: 0, y: 0 }, data: { kind, values } });
 const flow = (source: string, target: string): Edge => ({ id: `${source}-${target}`, source, target, sourceHandle: "flow-out", targetHandle: "flow-in" });
 
-const nodes = [node("c", "CreateAchievement"), node("a1", "AddConditions"), node("a2", "AddConditions"), node("j", "JoinType"), node("q", "PlayerLevel"), node("r", "RunCommand")];
+const nodes = [node("live", "Live"), node("neg", "Negate"), node("drag", "DragonSoulAbsorbed"), node("c", "CreateAchievement"), node("a1", "AddConditions"), node("a2", "AddConditions"), node("j", "JoinType"), node("q", "PlayerLevel"), node("r", "RunCommand")];
 const link = (source: string, target: string, sourceHandle: string, targetHandle: string) => ({ source, target, sourceHandle, targetHandle });
 
 describe("registry", () => {
-  it("has every condition type plus the seven non-condition nodes", () => {
+  it("has every condition type plus nine non-condition nodes", () => {
     expect(nodeDefs.filter((d) => d.category === "condition")).toHaveLength(31);
-    expect(nodeDefs).toHaveLength(38);
+    expect(nodeDefs).toHaveLength(40);
   });
   it("localizable fields come from the schema", () => {
     expect(registry.CreateAchievement.fields.filter((f) => f.widget === "localizedString").map((f) => f.name)).toEqual(["achievementName", "description"]);
@@ -62,5 +62,19 @@ describe("a condition's On Unlock chain", () => {
   it("is not offered a creatable unknown-condition node", () => {
     expect(nodeDefs.some((d) => d.kind === "UnknownCondition")).toBe(false);
     expect(registry.UnknownCondition.flowOut).toBe(true);
+  });
+});
+
+describe("Live and Negate nodes", () => {
+  const cond = (source: string, target: string, sh = "cond-out", th = "cond-in"): Edge => ({ id: `${source}-${target}`, source, target, sourceHandle: sh, targetHandle: th });
+  it("sit between a condition and Add Conditions", () => {
+    expect(refuseReason(nodes, [], link("q", "live", "cond-out", "cond-in"))).toBeNull();
+    expect(refuseReason(nodes, [cond("q", "live")], link("live", "a1", "cond-out", "cond-in"))).toBeNull();
+    expect(refuseReason(nodes, [cond("q", "live")], link("live", "neg", "cond-out", "cond-in"))).toBeNull();
+  });
+  it("refuse a condition the mod cannot evaluate live, a second input and a loop", () => {
+    expect(refuseReason(nodes, [], link("drag", "live", "cond-out", "cond-in"))).toMatch(/does not support/);
+    expect(refuseReason(nodes, [cond("q", "live")], link("drag", "live", "cond-out", "cond-in"))).toMatch(/already has/i);
+    expect(refuseReason(nodes, [cond("live", "neg")], link("neg", "live", "cond-out", "cond-in"))).toMatch(/loop/);
   });
 });

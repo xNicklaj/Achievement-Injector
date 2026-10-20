@@ -182,3 +182,33 @@ describe("group name key", () => {
     expect(has).toEqual([]);
   });
 });
+
+describe("live conditions", () => {
+  const raw = (conditions: Json[]) => ({ groupName: "G", plugin: "A.esp", achievements: [{ achievementName: "A", description: "d", conditions }] });
+
+  it("round-trips live/negate/operation and warns when every condition is live", () => {
+    const input = raw([{ type: "PlayerLevel", level: 5, operation: "<", live: true }, { type: "HasPerk", formID: "1", negate: true }]);
+    const { json, issues } = roundTrip(input);
+    expect(stripEditor(json)).toEqual(input);
+    expect(issues.some((i) => i.level === "warning" && /only live/.test(i.message))).toBe(true);
+  });
+
+  it("turns live/negate into nodes between the condition and Add Conditions, and keeps them on types that do not support them", () => {
+    const input = raw([{ type: "PlayerLevel", level: 5, live: true, negate: true }, { type: "DragonSoulAbsorbed", quantity: 1, live: true }]);
+    const snap = importGroup(input);
+    expect(snap.nodes.filter((n) => ["Live", "Negate"].includes(n.data.kind))).toHaveLength(2);
+    expect(snap.nodes.find((n) => n.data.kind === "PlayerLevel")!.data.values.live).toBeUndefined();
+    expect(stripEditor(exportGroup(snap).json)).toEqual(input);
+  });
+
+  it("errors on a Negate with no Live before it", () => {
+    const err = (c: Json) => roundTrip(raw([c, { type: "DragonSoulAbsorbed", quantity: 1 }])).issues.some((i) => i.level === "error" && /Negate/.test(i.message));
+    expect(err({ type: "HasPerk", formID: "1", negate: true })).toBe(true);
+    expect(err({ type: "HasPerk", formID: "1", live: true, negate: true })).toBe(false);
+  });
+
+  it("does not warn when one condition latches", () => {
+    const { issues } = roundTrip(raw([{ type: "PlayerLevel", level: 5, live: true }, { type: "DragonSoulAbsorbed", quantity: 1 }]));
+    expect(issues.some((i) => /only live/.test(i.message))).toBe(false);
+  });
+});
