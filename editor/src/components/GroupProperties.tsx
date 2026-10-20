@@ -3,7 +3,8 @@ import { locKeys, orphanKeys } from "../io/localization";
 import { GroupSchema, describeFields } from "../schema";
 import { useApp, type GroupValues } from "../store";
 import { GroupIcon } from "./IconField";
-import { FieldWidget, pascal } from "./Widgets";
+import { TranslationRows } from "./GraphNode";
+import { FieldWidget, inputClass, pascal } from "./Widgets";
 
 // Rows come from the group schema, so the form matches validation (HANDOVER 3.4).
 const fields = describeFields(GroupSchema as never, new Set(["achievements", "_editor"]));
@@ -15,16 +16,35 @@ export function GroupProperties() {
   const { loc, nodes, fileName, addLanguage, removeLanguage } = useApp();
   const locales = Object.keys(loc).sort();
   const used = new Set(nodes.flatMap((n) => (n.data.kind === "LocalizedText" && typeof n.data.values.key === "string" ? [n.data.values.key] : [])));
+  // The group name may be a `$key` too; it has no node, so it is edited here and counts as using the key.
+  const name = typeof group.groupName === "string" ? group.groupName : "";
+  const nameKey = name.startsWith("$") && name.length > 1 ? name.slice(1) : null;
+  if (nameKey) used.add(nameKey);
+  const keys = [...new Set([...used, ...Object.values(loc).flatMap((f) => [...locKeys(f)])])].sort();
   const orphans = orphanKeys(loc, used);
   return (
     <div className="h-full overflow-auto bg-[var(--bg-panel)] p-6">
       <h1 className="mb-4 text-lg font-semibold">Group Properties</h1>
       <div className="grid max-w-xl gap-2">
         {fields.map((f) => (
-          <label key={f.name} className="flex items-center gap-3">
-            <span className="w-32 shrink-0 whitespace-nowrap text-[var(--text-dim)]" title={f.description}>{pascal(f.name)}{f.optional ? "" : " *"}</span>
-            <FieldWidget info={f} value={group[f.name as keyof GroupValues]} onChange={(v) => setGroup({ [f.name]: v })} />
-          </label>
+          <div key={f.name}>
+            <label className="flex items-center gap-3">
+              <span className="w-32 shrink-0 whitespace-nowrap text-[var(--text-dim)]" title={f.description}>{pascal(f.name)}{f.optional ? "" : " *"}</span>
+              {f.name === "groupName" ? (
+                <>
+                  <input className={inputClass} list="group-keys" value={name} placeholder="Name, or $key to translate it" onChange={(e) => setGroup({ groupName: e.target.value === "" ? undefined : e.target.value })} />
+                  <datalist id="group-keys">{keys.map((k) => <option key={k} value={`$${k}`} />)}</datalist>
+                </>
+              ) : (
+                <FieldWidget info={f} value={group[f.name as keyof GroupValues]} onChange={(v) => setGroup({ [f.name]: v })} />
+              )}
+            </label>
+            {f.name === "groupName" && nameKey && (
+              <div className="ml-32 mt-1">
+                <TranslationRows keyName={nameKey} />
+              </div>
+            )}
+          </div>
         ))}
       </div>
 
