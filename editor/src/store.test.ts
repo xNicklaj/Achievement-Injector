@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { exportGroup } from "./io/exportGroup";
-import { importGroup } from "./io/importGroup";
+import { importGroup, mkEdge } from "./io/importGroup";
 import { changedLocFiles, getText, parseLoc } from "./io/localization";
 import { isDirty, useApp } from "./store";
 
@@ -203,5 +203,63 @@ describe("renaming an achievement", () => {
     expect(useApp.getState().renameAchievement(named("First").id, "First").updated).toBe(0);
     useApp.getState().renameAchievement(named("First").id, "");
     expect(refs()).toEqual(["First", "First@G", "First@Other", "Third"]);
+  });
+});
+
+describe("undo while typing", () => {
+  const wait = () => new Promise((r) => setTimeout(r, 40));
+  const type = async (id: string, texts: string[]) => {
+    for (const t of texts) {
+      useApp.getState().setValue(id, "description", t);
+      await wait();
+    }
+  };
+  const desc = (id: string) => useApp.getState().nodes.find((n) => n.id === id)!.data.values.description;
+
+  it("undoes one word at a time", async () => {
+    open();
+    const id = useApp.getState().nodes.find((n) => n.data.kind === "CreateAchievement")!.id;
+    useApp.getState().setValue(id, "icon", "x.dds");
+    await wait();
+    useApp.temporal.getState().clear();
+    await type(id, ["h", "he", "hel", "hello ", "hello w", "hello wo"]);
+    expect(useApp.temporal.getState().pastStates).toHaveLength(2);
+    useApp.temporal.getState().undo();
+    expect(desc(id)).toBe("hello ");
+    useApp.temporal.getState().undo();
+    expect(desc(id)).toBe("d");
+  });
+  it("does not join edits to different fields or after another change", async () => {
+    open();
+    const id = useApp.getState().nodes.find((n) => n.data.kind === "CreateAchievement")!.id;
+    useApp.temporal.getState().clear();
+    await type(id, ["a", "ab"]);
+    useApp.getState().setValue(id, "icon", "x.dds");
+    await wait();
+    await type(id, ["abc"]);
+    expect(useApp.temporal.getState().pastStates).toHaveLength(3);
+  });
+});
+
+describe("naming a new achievement", () => {
+  it("keeps the name typed into a field that was empty", () => {
+    useApp.getState().load({ nodes: [], edges: [], group: { groupName: "G", plugin: "A.esp" }, groupExtra: {} }, "G.json", {}, null);
+    useApp.getState().addNode("CreateAchievement", { x: 0, y: 0 });
+    const id = useApp.getState().nodes[0].id;
+    const r = useApp.getState().renameAchievement(id, "Brand new");
+    expect(useApp.getState().nodes[0].data.values.achievementName).toBe("Brand new");
+    expect(r).toMatchObject({ updated: 0, existed: false });
+  });
+  it("keeps it after a Localized Text wire into the field is removed", () => {
+    useApp.getState().load({ nodes: [], edges: [], group: { groupName: "G", plugin: "A.esp" }, groupExtra: {} }, "G.json", {}, null);
+    useApp.getState().addNode("CreateAchievement", { x: 0, y: 0 });
+    useApp.getState().addNode("LocalizedText", { x: 0, y: 0 });
+    const [create, text] = useApp.getState().nodes.map((n) => n.id);
+    const wire = mkEdge(text, "loc-out", create, "loc:achievementName");
+    useApp.setState({ edges: [wire] });
+    useApp.getState().onEdgesChange([{ type: "remove", id: wire.id }]);
+    expect(useApp.getState().nodes.find((n) => n.id === create)!.data.values.achievementName).toBeUndefined();
+    useApp.getState().renameAchievement(create, "Typed after");
+    expect(useApp.getState().nodes.find((n) => n.id === create)!.data.values.achievementName).toBe("Typed after");
   });
 });

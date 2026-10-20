@@ -17,6 +17,7 @@ import type { SpawnFrom } from "./spawn";
 import { newLocFile, renameKey, serializeLoc, setText, type LocFile } from "./io/localization";
 import { groupId, type Workspace } from "./io/workspace";
 import { registry } from "./registry";
+import { remembered } from "./viewport";
 
 export type View = "graph" | "group" | "localization" | "json";
 
@@ -104,6 +105,23 @@ export const isDirty = () => {
 // Time of the last history entry; see `handleSet` below. Opening a document starts a fresh window.
 let lastRecorded = -Infinity;
 
+// Typing in one field is undone a word at a time, like an editor: edits to the same field within a moment, with no
+// whitespace typed before them, join the entry the word started. Anything else that changes the document ends the word.
+let typing: { key: string; at: number; space: boolean; nodes: unknown; loc: unknown } | null = null;
+let coalesce = false;
+const joinsTyping = (key: string, s: Pick<State, "nodes" | "loc">) =>
+  !!typing && typing.key === key && performance.now() - typing.at < 1500 && !typing.space && typing.nodes === s.nodes && typing.loc === s.loc;
+const markTyping = (key: string, value: unknown, s: Pick<State, "nodes" | "loc">) => {
+  typing = typeof value === "string" || typeof value === "number" ? { key, at: performance.now(), space: typeof value === "string" && /\s$/.test(value), nodes: s.nodes, loc: s.loc } : null;
+};
+/** Run an update that continues the current word, so history does not record it separately. */
+const edit = (key: string, value: unknown, get: () => State, update: () => void) => {
+  coalesce = (typeof value === "string" || typeof value === "number") && joinsTyping(key, get());
+  update();
+  coalesce = false;
+  markTyping(key, value, get());
+};
+
 export const useApp = create<State>()(
   temporal(
     (set, get) => ({
@@ -165,14 +183,16 @@ export const useApp = create<State>()(
         const old = node?.data.kind === "LocalizedText" && name === "key" ? node.data.values.key : undefined;
         const renamed = typeof old === "string" && typeof value === "string";
         // One set, so one undo step covers both the node and its translations.
-        set({
-          ...(renamed && { loc: Object.fromEntries(Object.entries(get().loc).map(([l, f]) => [l, renameKey(f, old, value)])) }),
-          nodes: get().nodes.map((n) => {
-            if (n.id !== id) return n;
-            const { [name]: _, ...rest } = n.data.values;
-            return { ...n, data: { ...n.data, values: value === undefined ? rest : { ...rest, [name]: value } } };
+        edit(`${id}:${name}`, value, get, () =>
+          set({
+            ...(renamed && { loc: Object.fromEntries(Object.entries(get().loc).map(([l, f]) => [l, renameKey(f, old, value)])) }),
+            nodes: get().nodes.map((n) => {
+              if (n.id !== id) return n;
+              const { [name]: _, ...rest } = n.data.values;
+              return { ...n, data: { ...n.data, values: value === undefined ? rest : { ...rest, [name]: value } } };
+            }),
           }),
-        });
+        );
       },
       setGroup: (patch) => {
         const next = { ...get().group, ...patch };
@@ -196,11 +216,14 @@ export const useApp = create<State>()(
         void get().refreshIcons();
         useApp.temporal.getState().clear();
         lastRecorded = -Infinity;
+        remembered.viewport = null;
       },
       renameAchievement: (id, name) => {
         const { nodes, fileName, savedNames } = get();
-        const old = nodes.find((n) => n.id === id)?.data.values.achievementName;
-        if (typeof old !== "string" || old === name) return { old: typeof old === "string" ? old : undefined, updated: 0, existed: false };
+        const raw = nodes.find((n) => n.id === id)?.data.values.achievementName;
+        // An unset name (a new node, or a field whose Localized Text wire was removed) is "", so typing a first name works.
+        const old = typeof raw === "string" ? raw : undefined;
+        if ((old ?? "") === name) return { old, updated: 0, existed: false };
         let updated = 0;
         set({
           nodes: nodes.map((n) => {
@@ -210,14 +233,14 @@ export const useApp = create<State>()(
               return { ...n, data: { ...n.data, values: name ? { ...rest, achievementName: name } : rest } };
             }
             // References to the old name follow it, but never ones that point into another group.
-            if (name && n.data.kind === "AchievementUnlocked" && v.achievement === old && isInternalGroup(v.group, fileName)) {
+            if (name && old && n.data.kind === "AchievementUnlocked" && v.achievement === old && isInternalGroup(v.group, fileName)) {
               updated++;
               return { ...n, data: { ...n.data, values: { ...v, achievement: name } } };
             }
             return n;
           }),
         });
-        return { old, updated, existed: savedNames.includes(old) };
+        return { old, updated, existed: !!old && savedNames.includes(old) };
       },
       restore: (d, workspace) => {
         set({
@@ -239,10 +262,11 @@ export const useApp = create<State>()(
         void get().refreshIcons();
         useApp.temporal.getState().clear();
         lastRecorded = -Infinity;
+        remembered.viewport = null;
       },
       setTranslation: (locale, key, value) => {
         const f = get().loc[locale];
-        if (f) set({ loc: { ...get().loc, [locale]: setText(f, key, value) } });
+        if (f) edit(`t:${locale}:${key}`, value, get, () => set({ loc: { ...get().loc, [locale]: setText(f, key, value) } }));
       },
       addLanguage: (locale) => {
         const { loc, fileName } = get();
@@ -275,6 +299,7 @@ export const useApp = create<State>()(
       // of the last recorded one share its history entry, so one Delete is one undo step.
       handleSet: (handleSet) => {
         return (pastState, replace, ...rest) => {
+          if (coalesce) return;
           const t = performance.now();
           if (t - lastRecorded < 30) return;
           lastRecorded = t;
