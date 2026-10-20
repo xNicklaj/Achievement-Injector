@@ -1,14 +1,15 @@
 import { useStore } from "@xyflow/react";
 import { useDeferredValue, useState } from "react";
 import type { FieldInfo } from "../schema";
-import { findPlugin, lookup, searchRecords, usePlugins } from "../io/plugins";
+import { lookup, usePlugins, type Search } from "../io/plugins";
+import type { ReactNode } from "react";
 
 /** Field names are shown in PascalCase; the JSON keys stay camelCase. */
 export const pascal = (s: string) => s[0].toUpperCase() + s.slice(1);
 
 export const inputClass = "nodrag nowheel w-full min-w-0 rounded border border-[var(--border)] bg-[var(--bg-app)] px-2 py-[3px] text-[13px] text-[var(--text)] outline-none focus:border-zinc-400";
 
-type Props = { info: FieldInfo; value: unknown; onChange: (v: unknown) => void; /** Red border: this field has an error. */ invalid?: boolean; /** The plugin this field's FormID belongs to, to name the record when it is loaded. */ plugin?: string; /** Record type this field must point at, to narrow the search. */ want?: string };
+type Props = { info: FieldInfo; value: unknown; onChange: (v: unknown) => void; /** Red border: this field has an error. */ invalid?: boolean; /** The plugin this field's FormID belongs to, to name the record when it is loaded. */ plugin?: string; /** A search of the loaded plugins for this field; clicking the input opens it. */ search?: Search };
 
 /** What a loaded plugin says the FormID is: type, EditorID, name. */
 function FormHint({ plugin, value }: { plugin?: string; value: unknown }) {
@@ -20,35 +21,28 @@ function FormHint({ plugin, value }: { plugin?: string; value: unknown }) {
 }
 
 /**
- * A FormID input. Clicking it opens a search of the field's plugin, when that plugin is loaded: pick a record by
- * EditorID, name or ID and its ID is written to the input. Esc closes the search, and the input can then be typed in as usual.
+ * Wraps an input with a search of the loaded plugins: clicking the input opens it, picking an entry writes its value.
+ * Esc closes the search, and the input can then be typed in as usual.
  */
-function FormIdField({ info, value, onChange, plugin, want, style, placeholder }: Pick<Props, "info" | "value" | "onChange" | "plugin" | "want"> & { style?: React.CSSProperties; placeholder?: string }) {
+function Pickable({ search, onPick, children }: { search?: Search; onPick: (v: string | number) => void; children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
   const term = useDeferredValue(q);
-  const loaded = usePlugins((s) => findPlugin(s.plugins, plugin));
-  const rows = open && loaded ? searchRecords(loaded, term, info.formKind, want) : [];
+  const rows = open && search ? search.run(term) : [];
   const [shift, setShift] = useState({ x: 0, y: 0 });
   // The node is scaled by the canvas zoom, so a screen-pixel drag is divided by it to follow the pointer.
   const zoom = useStore((s) => s.transform[2]);
   const close = () => (setOpen(false), setQ(""), setShift({ x: 0, y: 0 }));
-  const pick = (id: string) => (onChange(id), close());
+  const pick = (v: string | number) => (onPick(v), close());
   return (
     <div
       className="relative min-w-0 flex-1"
+      onClick={(e) => search && (e.target as HTMLElement).tagName === "INPUT" && setOpen(true)}
       onBlur={(e) => !e.currentTarget.contains(e.relatedTarget as Node | null) && close()}
       onKeyDown={(e) => e.key === "Escape" && open && (close(), e.currentTarget.querySelector("input")?.focus())}
     >
-      <input style={style}
-        className={`${inputClass} font-mono`}
-        value={typeof value === "string" ? value : ""}
-        placeholder={placeholder}
-        onClick={() => loaded && setOpen(true)}
-        onChange={(e) => onChange(e.target.value === "" ? undefined : e.target.value)}
-      />
-      <FormHint plugin={plugin} value={value} />
-      {open && loaded && (
+      {children}
+      {open && search && (
         <div style={{ transform: `translate(${shift.x}px, ${shift.y}px)` }} className="nodrag nowheel absolute right-0 top-full z-50 mt-1 w-[28rem] rounded border border-[var(--border)] bg-[var(--bg-panel)] shadow-xl">
           <div
             title="Drag to move"
@@ -62,19 +56,19 @@ function FormIdField({ info, value, onChange, plugin, want, style, placeholder }
             autoFocus
             className={inputClass}
             value={q}
-            placeholder={`Search ${want ?? "records"} by EditorID or name`}
+            placeholder={search.label}
             onChange={(e) => setQ(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && rows[0] && pick(rows[0].id)}
+            onKeyDown={(e) => e.key === "Enter" && rows[0] && pick(rows[0].value)}
           />
           <ul className="max-h-48 overflow-auto text-[12px]">
             {rows.map((r) => (
-              <li key={r.id}>
-                <button className="block w-full truncate px-2 py-1 text-left hover:bg-white/10" onMouseDown={(e) => e.preventDefault()} onClick={() => pick(r.id)}>
-                  <span className="font-mono">{r.id}</span> <span className="text-[var(--text-dim)]">{r.record.type}</span> {r.record.editorId} {r.record.name}
+              <li key={`${r.value}${r.text ?? ""}`}>
+                <button className="block w-full truncate px-2 py-1 text-left hover:bg-white/10" onMouseDown={(e) => e.preventDefault()} onClick={() => pick(r.value)}>
+                  <span className="font-mono">{r.value}</span> <span className="text-[var(--text-dim)]">{r.tag}</span> {r.text}
                 </button>
               </li>
             ))}
-            {!rows.length && <li className="px-2 py-1 text-[var(--text-dim)]">No match in {loaded.file}</li>}
+            {!rows.length && <li className="whitespace-normal px-2 py-1 text-[var(--text-dim)]">{search.empty ?? "No match"}</li>}
           </ul>
         </div>
       )}
@@ -103,7 +97,7 @@ function Marquee({ text }: { text: string }) {
 }
 
 /** One widget per field type; empty input removes the key so unset is never serialized. */
-export function FieldWidget({ info, value, onChange, invalid, plugin, want }: Props) {
+export function FieldWidget({ info, value, onChange, invalid, plugin, search }: Props) {
   const bad = invalid ? { borderColor: "var(--status-error)" } : undefined;
   const placeholder = info.default !== undefined ? `default: ${String(info.default)}` : info.description;
   switch (info.widget) {
@@ -118,8 +112,8 @@ export function FieldWidget({ info, value, onChange, invalid, plugin, want }: Pr
         />
       );
     case "integer":
-    case "float":
-      return (
+    case "float": {
+      const input = (
         <input style={bad}
           type="number"
           step={info.widget === "integer" ? 1 : "any"}
@@ -131,6 +125,8 @@ export function FieldWidget({ info, value, onChange, invalid, plugin, want }: Pr
           onChange={(e) => onChange(e.target.value === "" ? undefined : Number(e.target.value))}
         />
       );
+      return search ? <Pickable search={search} onPick={(v) => onChange(Number(v))}>{input}</Pickable> : input;
+    }
     case "enum":
       return (
         <select style={bad}
@@ -156,16 +152,22 @@ export function FieldWidget({ info, value, onChange, invalid, plugin, want }: Pr
           }}
         />
       );
-    default:
-      return info.widget === "formId" ? (
-        <FormIdField {...{ info, value, onChange, plugin, want }} style={bad} placeholder={placeholder} />
-      ) : (
+    default: {
+      const formId = info.widget === "formId";
+      const input = (
         <input style={bad}
-          className={inputClass}
+          className={`${inputClass} ${formId ? "font-mono" : ""}`}
           value={typeof value === "string" ? value : ""}
           placeholder={placeholder}
           onChange={(e) => onChange(e.target.value === "" ? undefined : e.target.value)}
         />
       );
+      // A FormID always gets the wrapper, so its input is not remounted when a plugin is loaded.
+      return formId ? (
+        <Pickable search={search} onPick={(v) => onChange(String(v))}>{input}<FormHint plugin={plugin} value={value} /></Pickable>
+      ) : search ? (
+        <Pickable search={search} onPick={(v) => onChange(String(v))}>{input}</Pickable>
+      ) : input;
+    }
   }
 }

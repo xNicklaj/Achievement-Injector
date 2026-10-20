@@ -1,7 +1,7 @@
 import { Handle, Position, useStore, type NodeProps } from "@xyflow/react";
 import { AlertTriangle, CircleAlert } from "lucide-react";
 import { achievementNames, conditionsSummary, isInternalGroup, type AppNode } from "../graph";
-import { expectedType } from "../io/plugins";
+import { searchFor, usePlugins } from "../io/plugins";
 import { getText } from "../io/localization";
 import { isLocalizable, registry, UNKNOWN_CONDITION } from "../registry";
 import { BASELINE_VERSION, compareVersions } from "../schema";
@@ -116,6 +116,8 @@ export function GraphNode({ id, data, selected }: NodeProps<AppNode>) {
   const locked = useStore((s) => !(s.nodesDraggable || s.nodesConnectable || s.elementsSelectable));
   const groupPlugin = useApp((s) => s.group.plugin);
   const override = data.values.pluginOverride;
+  const plugin = (typeof override === "string" && override) || groupPlugin;
+  const plugins = usePlugins((s) => s.plugins);
   // Strings keep the selector stable, so the node only re-renders when its own summary changes.
   const summary = useApp((s) => {
     if (!def.condIn) return "";
@@ -162,7 +164,7 @@ export function GraphNode({ id, data, selected }: NodeProps<AppNode>) {
         ) : f.widget === "achievementRef" ? (
           <AchievementRefField id={id} value={data.values[f.name]} group={data.values.group} invalid={invalid.includes(f.name)} onChange={(v) => setValue(id, f.name, v)} />
         ) : (
-          <FieldWidget info={f} value={data.values[f.name]} plugin={(typeof override === "string" && override) || groupPlugin} want={expectedType(data.kind, f.name)} invalid={invalid.includes(f.name)} onChange={(v) => setValue(id, f.name, v)} />
+          <FieldWidget info={f} value={data.values[f.name]} plugin={plugin} search={searchFor(plugins, data.kind, f, data.values, plugin)} invalid={invalid.includes(f.name)} onChange={(v) => setValue(id, f.name, v)} />
         )}
       </div>
     );
