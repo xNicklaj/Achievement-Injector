@@ -96,6 +96,39 @@ function Marquee({ text }: { text: string }) {
   );
 }
 
+const HEX_ID = /^[0-9a-fA-F]{1,8}$/;
+
+/** A list of FormIDs, one row each: rows are added and removed, and each has its own plugin search and name hint. */
+function ListEditor({ value, onChange, invalid, plugin, search }: Props) {
+  const items = Array.isArray(value) ? value.map(String) : [];
+  const set = (next: string[]) => onChange(next.length ? next : undefined);
+  const edit = (i: number, v: string) => set(items.map((x, j) => (j === i ? v : x)));
+  return (
+    <div className="flex min-w-0 flex-1 flex-col gap-1">
+      {items.map((v, i) => (
+        <div key={i} className="flex items-start gap-1">
+          <Pickable search={search} onPick={(p) => edit(i, String(p))}>
+            <input
+              className={`${inputClass} font-mono`}
+              style={(v ? !HEX_ID.test(v) : invalid) ? { borderColor: "var(--status-error)" } : undefined}
+              value={v}
+              placeholder="FormID"
+              onChange={(e) => edit(i, e.target.value.trim())}
+            />
+            <FormHint plugin={plugin} value={v} />
+          </Pickable>
+          <button type="button" title="Remove" aria-label="Remove" className="nodrag shrink-0 rounded px-1.5 py-[3px] text-[var(--text-dim)] hover:bg-white/10" onClick={() => set(items.filter((_, j) => j !== i))}>
+            ×
+          </button>
+        </div>
+      ))}
+      <button type="button" className="nodrag self-start rounded border border-[var(--border)] px-2 py-0.5 text-[12px] text-[var(--text-dim)] hover:bg-white/10" onClick={() => onChange([...items, ""])}>
+        + Add
+      </button>
+    </div>
+  );
+}
+
 /** One widget per field type; empty input removes the key so unset is never serialized. */
 export function FieldWidget({ info, value, onChange, invalid, plugin, search }: Props) {
   const bad = invalid ? { borderColor: "var(--status-error)" } : undefined;
@@ -141,17 +174,7 @@ export function FieldWidget({ info, value, onChange, invalid, plugin, search }: 
         </select>
       );
     case "list":
-      return (
-        <input style={bad}
-          className={`${inputClass} font-mono`}
-          value={Array.isArray(value) ? value.join(", ") : ""}
-          placeholder="comma separated"
-          onChange={(e) => {
-            const items = e.target.value.split(",").map((s) => s.trim()).filter(Boolean);
-            onChange(items.length ? items : undefined);
-          }}
-        />
-      );
+      return <ListEditor info={info} value={value} onChange={onChange} invalid={invalid} plugin={plugin} search={search} />;
     default: {
       const formId = info.widget === "formId";
       const input = (

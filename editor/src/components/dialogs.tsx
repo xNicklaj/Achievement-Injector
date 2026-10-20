@@ -7,7 +7,9 @@ export const message = (title: string, text: string) =>
   openDialog<void>(
     (done) => (
       <Frame title={title} footer={<Button primary autoFocus onClick={() => done()}>OK</Button>}>
-        <p className="whitespace-pre-wrap">{text}</p>
+        <div className="flex flex-col gap-2">
+          {text.split("\n").map((line, i) => <p key={i} className="whitespace-pre-wrap">{line}</p>)}
+        </div>
       </Frame>
     ),
     undefined,

@@ -219,7 +219,7 @@ export function searchFor(plugins: Plugin[], kind: string, f: FieldInfo, values:
   const own = findPlugin(plugins, file);
   const formIdOf = () => (typeof values.formID === "string" ? lookup(plugins, file, values.formID)?.record : undefined);
 
-  if (f.widget === "formId") {
+  if (f.widget === "formId" || (f.widget === "list" && f.item === "formId")) {
     const want = EXPECTED[kind]?.[f.name];
     return own && { label: `Search ${want ?? "records"} by EditorID or name`, run: (t) => searchRecords(own, t, f.formKind, want, MAX_CHOICES).map((r) => ({ value: r.id, tag: r.record.type, text: [r.record.editorId, r.record.name].filter(Boolean).join(" · ") })) };
   }
