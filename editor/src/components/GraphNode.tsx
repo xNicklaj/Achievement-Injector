@@ -1,6 +1,7 @@
-import { Handle, Position, type NodeProps } from "@xyflow/react";
+import { Handle, Position, useStore, type NodeProps } from "@xyflow/react";
 import { AlertTriangle, CircleAlert } from "lucide-react";
 import { achievementNames, conditionsSummary, isInternalGroup, type AppNode } from "../graph";
+import { expectedType } from "../io/plugins";
 import { getText } from "../io/localization";
 import { isLocalizable, registry, UNKNOWN_CONDITION } from "../registry";
 import { BASELINE_VERSION, compareVersions } from "../schema";
@@ -111,6 +112,10 @@ export function TranslationRows({ keyName }: { keyName: string }) {
 export function GraphNode({ id, data, selected }: NodeProps<AppNode>) {
   const def = registry[data.kind];
   const setValue = useApp((s) => s.setValue);
+  // The Controls lock button turns all three off; the fields must stop taking input too.
+  const locked = useStore((s) => !(s.nodesDraggable || s.nodesConnectable || s.elementsSelectable));
+  const groupPlugin = useApp((s) => s.group.plugin);
+  const override = data.values.pluginOverride;
   // Strings keep the selector stable, so the node only re-renders when its own summary changes.
   const summary = useApp((s) => {
     if (!def.condIn) return "";
@@ -157,7 +162,7 @@ export function GraphNode({ id, data, selected }: NodeProps<AppNode>) {
         ) : f.widget === "achievementRef" ? (
           <AchievementRefField id={id} value={data.values[f.name]} group={data.values.group} invalid={invalid.includes(f.name)} onChange={(v) => setValue(id, f.name, v)} />
         ) : (
-          <FieldWidget info={f} value={data.values[f.name]} invalid={invalid.includes(f.name)} onChange={(v) => setValue(id, f.name, v)} />
+          <FieldWidget info={f} value={data.values[f.name]} plugin={(typeof override === "string" && override) || groupPlugin} want={expectedType(data.kind, f.name)} invalid={invalid.includes(f.name)} onChange={(v) => setValue(id, f.name, v)} />
         )}
       </div>
     );
@@ -184,7 +189,7 @@ export function GraphNode({ id, data, selected }: NodeProps<AppNode>) {
         {def.condOut && def.category !== "condition" && <Handle type="source" id="cond-out" position={Position.Right} style={dot("var(--pin-condition)")} />}
         {def.locOut && <Handle type="source" id="loc-out" position={Position.Right} style={dot("var(--pin-localized)")} />}
       </div>
-      <div className="py-2">
+      <div className="py-2" inert={locked}>
         {def.condIn && (
           <div className="relative py-1 pl-3.5 pr-3">
             <Handle type="target" id="cond-in" position={Position.Left} style={dot("var(--pin-condition)")} />

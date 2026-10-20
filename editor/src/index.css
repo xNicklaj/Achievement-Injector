@@ -83,3 +83,9 @@ input[type="number"]::-webkit-outer-spin-button {
   --syn-literal: #6aa6e8;
   --syn-punct: #8b8b95;
 }
+
+@keyframes marquee {
+  to {
+    transform: translateX(var(--shift));
+  }
+}
