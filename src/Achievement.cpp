@@ -62,7 +62,8 @@ Achievement::Achievement(json& jsonData, std::string plugin, std::string groupNa
     unlocked(false) {  // Initialize joinType and unlocked
 
     this->groupName = groupName;
-    this->plugin = plugin;
+    // Group plugin, optionally overridden here; conditions inherit this unless they override it too
+    this->plugin = jsonData.value("pluginOverride", plugin);
     if (jsonData.value("joinType", "OR") == "OR") this->joinType = ConditionsJoinType::OR;
     else this->joinType = ConditionsJoinType::AND;
     
