@@ -27,3 +27,7 @@ Releases: latest tag is **v1.4.0** (2026-10-17). Everything on `main` after it i
 **Localization file names (undocumented)**
 - The locale in `<Group>_<LOCALE>.txt` is the first two letters of the game's `sLanguage`, uppercased (`LocalizationManager.cpp`), not an ISO code. Skyrim's nine languages map to `EN FR GE IT SP PO RU JA CH` (ENGLISH, FRENCH, GERMAN, ITALIAN, SPANISH, POLISH, RUSSIAN, JAPANESE, CHINESE). `DE`, `ES`, `PL`, `ZH` and `CN` never match. Document the table, or consider mapping ISO codes in the DLL.
 - Lookup falls back to `EN`, then to the raw `$key`. Files are UTF-8 or ANSI; a BOM hides the first key. Only lines starting with `$` and containing a tab are read; repeated tabs after the key are skipped.
+
+**`AchievementUnlocked` and localized names (undocumented)**
+- `AchievementUnlockedCondition` compares `achievement` with the target's final name as plain text, and the condition itself is never localized (`Condition::Localize` does nothing for it). To reference an achievement whose `achievementName` is a `$key`, the condition must hold the localized text for the player's language, so it cannot work across languages. Saved progress is keyed by the same localized text. Worth documenting, or localizing the reference in the DLL.
+- The per-achievement `icon` value includes the extension (`"ACH_Awakening.dds"`) and is looked up in `Icons/<Group>/` where `<Group>` is the JSON file name.

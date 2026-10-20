@@ -30,5 +30,8 @@ Before finishing a change: `npm test` and `npm run typecheck` must pass.
 - **Colours live only in CSS variables** in `src/index.css`. Handle and edge colours are inline styles because Tailwind cannot scan runtime class strings. Inline fields have no type icons (decided); field names show in PascalCase (`pascal()`), JSON keys stay camelCase.
 - **Graph rules belong in `graph.ts`** (pure, tested), not in components. New "only one X per chain" rules reuse the `unique` flag on the node def.
 - **Undo history tracks the document only** (nodes, edges, group), not selection or measured size. Drags record one entry via `beginDrag`/`endDrag`.
+- **Icons** are `.dds`, BC3 (DXT5) or lower, 512×512; paths are `Icons/<group file name>/<icon>` and `Icons/<group>.dds`. `io/dds.ts` is the only place that reads the format.
+- **Validation has one source.** `exportGroup` returns issues pinned to nodes (`nodeId`, `field`); `validation.ts` runs it once, debounced, and nodes, minimap and the JSON view all read that. Do not recompute problems in components.
+- **Tests that touch IndexedDB** use `fake-indexeddb`. In a real-browser script never `deleteDatabase` while the page has the DB open: the request stays pending and wipes the data when the page closes. Delete records instead.
 - **Locale codes are not ISO.** They are the first two letters of `sLanguage` (`EN FR GE IT SP PO RU JA CH`, see `src/io/languages.ts`). Never offer `DE`, `ES`, `PL` or `ZH`: such files never load.
 - Editor UI is English only. Targets the latest DLL version; show it in the footer/menu bar.
