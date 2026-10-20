@@ -31,6 +31,9 @@ Before finishing a change: `npm test` and `npm run typecheck` must pass.
 - **Graph rules belong in `graph.ts`** (pure, tested), not in components. New "only one X per chain" rules reuse the `unique` flag on the node def.
 - **Undo history tracks the document only** (nodes, edges, group), not selection or measured size. Drags record one entry via `beginDrag`/`endDrag`.
 - **Icons** are `.dds`, BC3 (DXT5) or lower, 512×512; paths are `Icons/<group file name>/<icon>` and `Icons/<group>.dds`. `io/dds.ts` is the only place that reads the format.
+- **Version stamp.** Export writes `_editor.modVersion` = largest `since` among fields in use; import refuses files newer than `TARGET_VERSION`. New condition types or fields must carry `since`. Unknown condition types load as `UnknownCondition` (type kept in `extra.type`) and are never lost or rewritten.
+- **A condition's `onUnlock`** is a flow chain from the condition node, actions only (`graph.ts`); the achievement's own `onUnlock` is the chain after its Create node.
+- **History**: typing coalesces per word in `store.ts` (`edit`); new text-edit actions should go through it.
 - **Validation has one source.** `exportGroup` returns issues pinned to nodes (`nodeId`, `field`); `validation.ts` runs it once, debounced, and nodes, minimap and the JSON view all read that. Do not recompute problems in components.
 - **Tests that touch IndexedDB** use `fake-indexeddb`. In a real-browser script never `deleteDatabase` while the page has the DB open: the request stays pending and wipes the data when the page closes. Delete records instead.
 - **Locale codes are not ISO.** They are the first two letters of `sLanguage` (`EN FR GE IT SP PO RU JA CH`, see `src/io/languages.ts`). Never offer `DE`, `ES`, `PL` or `ZH`: such files never load.
