@@ -21,22 +21,24 @@ void HasPerkCondition::OnDataLoaded(void) {
 	CheckCondition();
 }
 
-bool HasPerkCondition::CheckCondition() {
-	if (this->isMet) return false;
-	
+bool HasPerkCondition::Evaluate() {
+	// Live conditions skip OnDataLoaded, so resolve lazily
 	if (!this->perk) {
 		this->perk = GetFormOfType<RE::BGSPerk>(this->formIDStr, this->plugin);
 	}
-	
-	if (!this->perk) return false;
-	
 	auto player = RE::PlayerCharacter::GetSingleton();
-	if (player && player->HasPerk(this->perk)) {
+	return this->perk && player && player->HasPerk(this->perk);
+}
+
+bool HasPerkCondition::CheckCondition() {
+	if (this->isMet) return false;
+
+	if (Evaluate()) {
 		this->UnlockNotify();
 		RE::UI::GetSingleton()->RemoveEventSink(this);
 		return true;
 	}
-	
+
 	return false;
 }
 

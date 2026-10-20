@@ -13,6 +13,8 @@ public:
 	void EnableListener(void) override;
 	void SetConditionParameters(std::string formid) override;
 	bool CheckCondition() override;
+	bool SupportsLive() override { return true; }
+	bool Evaluate() override;
 
 	std::string formid;
 	RE::FormID cachedFormID = 0;

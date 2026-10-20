@@ -27,9 +27,8 @@ void HasPerksCondition::OnDataLoaded(void) {
 	CheckCondition();
 }
 
-bool HasPerksCondition::CheckCondition() {
-	if (this->isMet) return false;
-	
+bool HasPerksCondition::Evaluate() {
+	// Live conditions skip OnDataLoaded, so resolve lazily
 	if (this->perks.empty()) {
 		for (const auto& formIDStr : this->formIDs) {
 			auto perk = GetFormOfType<RE::BGSPerk>(formIDStr, this->plugin);
@@ -38,20 +37,26 @@ bool HasPerksCondition::CheckCondition() {
 			}
 		}
 	}
-	
+
 	if (this->perks.empty()) return false;
-	
+
 	auto player = RE::PlayerCharacter::GetSingleton();
 	if (!player) return false;
-	
+
 	int count = 0;
 	for (auto perk : this->perks) {
 		if (player->HasPerk(perk)) {
 			count++;
 		}
 	}
-	
-	if (count >= this->threshold) {
+
+	return count >= this->threshold;
+}
+
+bool HasPerksCondition::CheckCondition() {
+	if (this->isMet) return false;
+
+	if (Evaluate()) {
 		this->UnlockNotify();
 		RE::UI::GetSingleton()->RemoveEventSink(this);
 		return true;

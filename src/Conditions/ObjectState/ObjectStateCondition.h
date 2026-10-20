@@ -10,6 +10,8 @@ public:
     void EnableListener() override;
     void SetConditionParameters(std::string formID, bool state) override;
     bool CheckCondition();
+    bool SupportsLive() override { return true; }
+    bool Evaluate() override;
 
 	RE::TESObjectREFR* cachedRef = nullptr;
 private:

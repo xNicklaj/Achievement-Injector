@@ -8,6 +8,8 @@ public:
 	void EnableListener(void) override;
 	void SetConditionParameters(std::string formid, int quantity) override;
 	bool CheckCondition() override;
+	bool SupportsLive() override { return true; }
+	bool Evaluate() override;
 
 	std::string formid;
 	int quantity = 1;

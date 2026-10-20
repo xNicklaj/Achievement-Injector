@@ -12,6 +12,8 @@ public:
 	void EnableListener(void) override;
 	void SetConditionParameters(std::vector<std::string> formIDs, int threshold) override;
 	bool CheckCondition() override;
+	bool SupportsLive() override { return true; }
+	bool Evaluate() override;
 
 	std::vector<std::string> formIDs;
 	std::vector<RE::BGSPerk*> perks;

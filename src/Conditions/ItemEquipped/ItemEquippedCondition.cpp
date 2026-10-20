@@ -18,18 +18,25 @@ void ItemEquippedCondition::EnableListener(void) {
 void ItemEquippedCondition::SetConditionParameters(std::string formid_a) {
 	this->formid = formid_a;
 };
-// Retro-check for an item that is already worn
-bool ItemEquippedCondition::CheckCondition() {
-	if (this->isMet || !this->cachedFormID) return false;
+bool ItemEquippedCondition::Evaluate() {
+	// Live conditions skip OnDataLoaded, so resolve lazily
+	if (!this->cachedFormID) this->cachedFormID = GetFormID(this->formid, this->plugin);
+	if (!this->cachedFormID) return false;
 	auto player = RE::PlayerCharacter::GetSingleton();
 	if (!player) return false;
 	for (auto& [item, data] : player->GetInventory()) {
-		if (item && item->GetFormID() == this->cachedFormID && data.second && data.second->IsWorn()) {
-			logger::info("Player met condition item equipped {}", this->formid);
-			this->UnlockNotify();
-			KeyedSink<RE::TESEquipEvent>::GetSingleton()->Unsubscribe(this);
-			return true;
-		}
+		if (item && item->GetFormID() == this->cachedFormID && data.second && data.second->IsWorn()) return true;
+	}
+	return false;
+}
+// Retro-check for an item that is already worn
+bool ItemEquippedCondition::CheckCondition() {
+	if (this->isMet || !this->cachedFormID) return false;
+	if (Evaluate()) {
+		logger::info("Player met condition item equipped {}", this->formid);
+		this->UnlockNotify();
+		KeyedSink<RE::TESEquipEvent>::GetSingleton()->Unsubscribe(this);
+		return true;
 	}
 	return false;
 };

@@ -7,8 +7,8 @@ void QuestStageDoneCondition::SetConditionParameters(std::string formID_a, std::
     this->formID = formID_a;
     this->OP = OP_a;
     this->stage = stage_a;
-    if (OP_a != ">=" && OP_a != "GT" && OP_a != "==" && OP_a != "EQ")
-        logger::error("QuestStageDone: unknown operation \"{}\" for quest {}, this condition can never be met. Use >= or ==.", OP_a, formID_a);
+    if (!IsValidOperation(OP_a))
+        logger::error("QuestStageDone: unknown operation \"{}\" for quest {}, this condition can never be met. Use >=, ==, <, <= or !=.", OP_a, formID_a);
 }
 void QuestStageDoneCondition::OnDataLoaded(void) {
     this->cachedQuest = GetFormOfType<RE::TESQuest>(this->formID, this->plugin);
@@ -26,15 +26,14 @@ RE::BSEventNotifyControl QuestStageDoneCondition::ProcessEvent(const RE::TESQues
 
     return RE::BSEventNotifyControl::kContinue;
 }
+bool QuestStageDoneCondition::Evaluate() {
+    // Live conditions skip OnDataLoaded, so resolve lazily
+    if (!this->cachedQuest) this->cachedQuest = GetFormOfType<RE::TESQuest>(this->formID, this->plugin);
+    return this->cachedQuest && CompareValues(this->OP, (float)this->cachedQuest->GetCurrentStageID(), (float)this->stage);
+}
 bool QuestStageDoneCondition::CheckCondition() {
     if (this->isMet) return true;
-    if ((this->OP == ">=" || this->OP == "GT") && (this->cachedQuest ? this->cachedQuest->GetCurrentStageID() : 0) >= stage) {
-        logger::info("Quest {} met condition stage {}", this->formID, this->stage);
-        this->UnlockNotify();
-        KeyedSink<RE::TESQuestStageEvent>::GetSingleton()->Unsubscribe(this);
-        return true;
-    }
-    else if ((this->OP == "==" || this->OP == "EQ") && (this->cachedQuest ? this->cachedQuest->GetCurrentStageID() : 0) == stage) {
+    if (Evaluate()) {
         logger::info("Quest {} met condition stage {}", this->formID, this->stage);
         this->UnlockNotify();
         KeyedSink<RE::TESQuestStageEvent>::GetSingleton()->Unsubscribe(this);

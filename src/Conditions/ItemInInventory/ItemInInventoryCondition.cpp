@@ -21,20 +21,24 @@ RE::BSEventNotifyControl ItemInInventoryCondition::ProcessEvent(const RE::TESCon
     }
     return RE::BSEventNotifyControl::kContinue;
 }
-bool ItemInInventoryCondition::CheckCondition() {
-    //RE::PlayerCharacter* player = RE::PlayerCharacter::GetSingleton();
+bool ItemInInventoryCondition::Evaluate() {
+    // Live conditions skip OnDataLoaded, so resolve lazily
+    if (!this->cachedForm) this->cachedForm = GetForm(this->formid, this->plugin);
+    auto player = RE::PlayerCharacter::GetSingleton();
+    if (!this->cachedForm || !player) return false;
     int quantity_l = 0;
 
-    const auto inventory = RE::PlayerCharacter::GetSingleton()->GetInventory();
-    RE::TESForm* target;
+    const auto inventory = player->GetInventory();
     for (auto& [item, data] : inventory) {
         // For fucking reasons data.first is the amount. Ok
-        target = this->cachedForm;
-        if (item != NULL && target != NULL && item->GetFormID() == target->formID) {
+        if (item != NULL && item->GetFormID() == this->cachedForm->formID) {
             quantity_l += data.first;
         }
     }
-    if (quantity_l >= this->quantity) {
+    return quantity_l >= this->quantity;
+}
+bool ItemInInventoryCondition::CheckCondition() {
+    if (Evaluate()) {
         logger::info("Player met condition item {} quantity {}", this->formid, this->quantity);
         this->UnlockNotify();
         KeyedSink<RE::TESContainerChangedEvent>::GetSingleton()->Unsubscribe(this);

@@ -20,12 +20,18 @@ void FactionRankCondition::OnDataLoaded(void) {
 	CheckCondition();
 }
 
+bool FactionRankCondition::Evaluate() {
+	// Live conditions skip OnDataLoaded, so resolve lazily
+	if (!this->faction) this->faction = GetFormOfType<RE::TESFaction>(this->formIDStr, this->plugin);
+	auto player = RE::PlayerCharacter::GetSingleton();
+	// -1 is "not in the faction", so rank 0 means any member
+	return this->faction && player && player->GetFactionRank(this->faction, true) >= std::max(this->rank, 0);
+}
+
 bool FactionRankCondition::CheckCondition() {
 	if (this->isMet || !this->faction) return false;
 
-	auto player = RE::PlayerCharacter::GetSingleton();
-	// -1 is "not in the faction", so rank 0 means any member
-	if (player && player->GetFactionRank(this->faction, true) >= std::max(this->rank, 0)) {
+	if (Evaluate()) {
 		this->UnlockNotify();
 		RE::UI::GetSingleton()->RemoveEventSink(this);
 		return true;

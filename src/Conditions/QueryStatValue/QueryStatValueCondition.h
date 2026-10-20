@@ -11,6 +11,8 @@ public:
     void SetConditionParameters(std::string stat, float value) override;
     void SetConditionParameters(std::string stat, std::string OP, float value) override;
     bool CheckCondition();
+    bool SupportsLive() override { return true; }
+    bool Evaluate() override;
 
 private:
     std::string stat = "";
