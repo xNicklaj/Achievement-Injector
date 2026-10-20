@@ -13,7 +13,7 @@
       "pattern": "\\.(esp|esm|esl)$",
       "widget": "plugin",
       "since": "1.4.0",
-      "description": "Base plugin for every condition without pluginOverride"
+      "description": "Base plugin for every achievement and condition without pluginOverride"
     },
     "showInMenu": {
       "widget": "bool",
@@ -56,6 +56,13 @@
             "since": "1.4.0",
             "default": true,
             "type": "boolean"
+          },
+          "pluginOverride": {
+            "widget": "plugin",
+            "since": "1.4.0",
+            "description": "Defaults to the group's base plugin; conditions inherit it unless they set their own",
+            "type": "string",
+            "pattern": "\\.(esp|esm|esl)$"
           },
           "icon": {
             "widget": "iconPath",
@@ -142,7 +149,7 @@
                     "pluginOverride": {
                       "widget": "plugin",
                       "since": "1.4.0",
-                      "description": "Defaults to the group's base plugin",
+                      "description": "Defaults to the achievement's plugin",
                       "type": "string",
                       "pattern": "\\.(esp|esm|esl)$"
                     },
@@ -328,7 +335,7 @@
                     "pluginOverride": {
                       "widget": "plugin",
                       "since": "1.4.0",
-                      "description": "Defaults to the group's base plugin",
+                      "description": "Defaults to the achievement's plugin",
                       "type": "string",
                       "pattern": "\\.(esp|esm|esl)$"
                     },
@@ -538,7 +545,7 @@
                     "pluginOverride": {
                       "widget": "plugin",
                       "since": "1.4.0",
-                      "description": "Defaults to the group's base plugin",
+                      "description": "Defaults to the achievement's plugin",
                       "type": "string",
                       "pattern": "\\.(esp|esm|esl)$"
                     },
@@ -701,7 +708,7 @@
                     "pluginOverride": {
                       "widget": "plugin",
                       "since": "1.4.0",
-                      "description": "Defaults to the group's base plugin",
+                      "description": "Defaults to the achievement's plugin",
                       "type": "string",
                       "pattern": "\\.(esp|esm|esl)$"
                     },
@@ -872,7 +879,7 @@
                     "pluginOverride": {
                       "widget": "plugin",
                       "since": "1.4.0",
-                      "description": "Defaults to the group's base plugin",
+                      "description": "Defaults to the achievement's plugin",
                       "type": "string",
                       "pattern": "\\.(esp|esm|esl)$"
                     },
@@ -1026,7 +1033,7 @@
                     "pluginOverride": {
                       "widget": "plugin",
                       "since": "1.4.0",
-                      "description": "Defaults to the group's base plugin",
+                      "description": "Defaults to the achievement's plugin",
                       "type": "string",
                       "pattern": "\\.(esp|esm|esl)$"
                     },
@@ -1189,7 +1196,7 @@
                     "pluginOverride": {
                       "widget": "plugin",
                       "since": "1.4.0",
-                      "description": "Defaults to the group's base plugin",
+                      "description": "Defaults to the achievement's plugin",
                       "type": "string",
                       "pattern": "\\.(esp|esm|esl)$"
                     },
@@ -1352,7 +1359,7 @@
                     "pluginOverride": {
                       "widget": "plugin",
                       "since": "1.4.0",
-                      "description": "Defaults to the group's base plugin",
+                      "description": "Defaults to the achievement's plugin",
                       "type": "string",
                       "pattern": "\\.(esp|esm|esl)$"
                     },
@@ -1515,7 +1522,7 @@
                     "pluginOverride": {
                       "widget": "plugin",
                       "since": "1.4.0",
-                      "description": "Defaults to the group's base plugin",
+                      "description": "Defaults to the achievement's plugin",
                       "type": "string",
                       "pattern": "\\.(esp|esm|esl)$"
                     },
@@ -1678,7 +1685,7 @@
                     "pluginOverride": {
                       "widget": "plugin",
                       "since": "1.4.0",
-                      "description": "Defaults to the group's base plugin",
+                      "description": "Defaults to the achievement's plugin",
                       "type": "string",
                       "pattern": "\\.(esp|esm|esl)$"
                     },
@@ -1833,7 +1840,7 @@
                     "pluginOverride": {
                       "widget": "plugin",
                       "since": "1.4.0",
-                      "description": "Defaults to the group's base plugin",
+                      "description": "Defaults to the achievement's plugin",
                       "type": "string",
                       "pattern": "\\.(esp|esm|esl)$"
                     },
@@ -1988,7 +1995,7 @@
                     "pluginOverride": {
                       "widget": "plugin",
                       "since": "1.4.0",
-                      "description": "Defaults to the group's base plugin",
+                      "description": "Defaults to the achievement's plugin",
                       "type": "string",
                       "pattern": "\\.(esp|esm|esl)$"
                     },
@@ -2151,7 +2158,7 @@
                     "pluginOverride": {
                       "widget": "plugin",
                       "since": "1.4.0",
-                      "description": "Defaults to the group's base plugin",
+                      "description": "Defaults to the achievement's plugin",
                       "type": "string",
                       "pattern": "\\.(esp|esm|esl)$"
                     },
@@ -2314,7 +2321,7 @@
                     "pluginOverride": {
                       "widget": "plugin",
                       "since": "1.4.0",
-                      "description": "Defaults to the group's base plugin",
+                      "description": "Defaults to the achievement's plugin",
                       "type": "string",
                       "pattern": "\\.(esp|esm|esl)$"
                     },
@@ -2468,7 +2475,7 @@
                     "pluginOverride": {
                       "widget": "plugin",
                       "since": "1.4.0",
-                      "description": "Defaults to the group's base plugin",
+                      "description": "Defaults to the achievement's plugin",
                       "type": "string",
                       "pattern": "\\.(esp|esm|esl)$"
                     },
@@ -2658,7 +2665,7 @@
                     "pluginOverride": {
                       "widget": "plugin",
                       "since": "1.4.0",
-                      "description": "Defaults to the group's base plugin",
+                      "description": "Defaults to the achievement's plugin",
                       "type": "string",
                       "pattern": "\\.(esp|esm|esl)$"
                     },
@@ -2818,7 +2825,7 @@
                     "pluginOverride": {
                       "widget": "plugin",
                       "since": "1.4.0",
-                      "description": "Defaults to the group's base plugin",
+                      "description": "Defaults to the achievement's plugin",
                       "type": "string",
                       "pattern": "\\.(esp|esm|esl)$"
                     },
@@ -3008,7 +3015,7 @@
                     "pluginOverride": {
                       "widget": "plugin",
                       "since": "1.4.0",
-                      "description": "Defaults to the group's base plugin",
+                      "description": "Defaults to the achievement's plugin",
                       "type": "string",
                       "pattern": "\\.(esp|esm|esl)$"
                     },
@@ -3181,7 +3188,7 @@
                     "pluginOverride": {
                       "widget": "plugin",
                       "since": "1.4.0",
-                      "description": "Defaults to the group's base plugin",
+                      "description": "Defaults to the achievement's plugin",
                       "type": "string",
                       "pattern": "\\.(esp|esm|esl)$"
                     },
@@ -3361,7 +3368,7 @@
                     "pluginOverride": {
                       "widget": "plugin",
                       "since": "1.4.0",
-                      "description": "Defaults to the group's base plugin",
+                      "description": "Defaults to the achievement's plugin",
                       "type": "string",
                       "pattern": "\\.(esp|esm|esl)$"
                     },
@@ -3515,7 +3522,7 @@
                     "pluginOverride": {
                       "widget": "plugin",
                       "since": "1.4.0",
-                      "description": "Defaults to the group's base plugin",
+                      "description": "Defaults to the achievement's plugin",
                       "type": "string",
                       "pattern": "\\.(esp|esm|esl)$"
                     },
@@ -3670,7 +3677,7 @@
                     "pluginOverride": {
                       "widget": "plugin",
                       "since": "1.4.0",
-                      "description": "Defaults to the group's base plugin",
+                      "description": "Defaults to the achievement's plugin",
                       "type": "string",
                       "pattern": "\\.(esp|esm|esl)$"
                     },
@@ -3832,7 +3839,7 @@
                     "pluginOverride": {
                       "widget": "plugin",
                       "since": "1.4.0",
-                      "description": "Defaults to the group's base plugin",
+                      "description": "Defaults to the achievement's plugin",
                       "type": "string",
                       "pattern": "\\.(esp|esm|esl)$"
                     },
@@ -3995,7 +4002,7 @@
                     "pluginOverride": {
                       "widget": "plugin",
                       "since": "1.4.0",
-                      "description": "Defaults to the group's base plugin",
+                      "description": "Defaults to the achievement's plugin",
                       "type": "string",
                       "pattern": "\\.(esp|esm|esl)$"
                     },
@@ -4156,7 +4163,7 @@
                     "pluginOverride": {
                       "widget": "plugin",
                       "since": "1.4.0",
-                      "description": "Defaults to the group's base plugin",
+                      "description": "Defaults to the achievement's plugin",
                       "type": "string",
                       "pattern": "\\.(esp|esm|esl)$"
                     },
@@ -4316,7 +4323,7 @@
                     "pluginOverride": {
                       "widget": "plugin",
                       "since": "1.4.0",
-                      "description": "Defaults to the group's base plugin",
+                      "description": "Defaults to the achievement's plugin",
                       "type": "string",
                       "pattern": "\\.(esp|esm|esl)$"
                     },
@@ -4465,7 +4472,7 @@
                     "pluginOverride": {
                       "widget": "plugin",
                       "since": "1.4.0",
-                      "description": "Defaults to the group's base plugin",
+                      "description": "Defaults to the achievement's plugin",
                       "type": "string",
                       "pattern": "\\.(esp|esm|esl)$"
                     },
@@ -4631,7 +4638,7 @@
                     "pluginOverride": {
                       "widget": "plugin",
                       "since": "1.4.0",
-                      "description": "Defaults to the group's base plugin",
+                      "description": "Defaults to the achievement's plugin",
                       "type": "string",
                       "pattern": "\\.(esp|esm|esl)$"
                     },
@@ -4793,7 +4800,7 @@
                     "pluginOverride": {
                       "widget": "plugin",
                       "since": "1.4.0",
-                      "description": "Defaults to the group's base plugin",
+                      "description": "Defaults to the achievement's plugin",
                       "type": "string",
                       "pattern": "\\.(esp|esm|esl)$"
                     },
@@ -4949,7 +4956,7 @@
                     "pluginOverride": {
                       "widget": "plugin",
                       "since": "1.4.0",
-                      "description": "Defaults to the group's base plugin",
+                      "description": "Defaults to the achievement's plugin",
                       "type": "string",
                       "pattern": "\\.(esp|esm|esl)$"
                     },
@@ -5116,7 +5123,7 @@
                     "pluginOverride": {
                       "widget": "plugin",
                       "since": "1.4.0",
-                      "description": "Defaults to the group's base plugin",
+                      "description": "Defaults to the achievement's plugin",
                       "type": "string",
                       "pattern": "\\.(esp|esm|esl)$"
                     },
@@ -5412,6 +5419,27 @@
           }
         },
         "icons": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "x": {
+                "type": "number"
+              },
+              "y": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "x",
+              "y"
+            ]
+          }
+        },
+        "plugins": {
           "type": "object",
           "propertyNames": {
             "type": "string"

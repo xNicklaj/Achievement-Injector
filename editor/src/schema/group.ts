@@ -14,6 +14,7 @@ export const AchievementSchema = z.looseObject({
   hideDescription: bool({ optional: true, default: false }),
   showInMenu: bool({ optional: true, default: true }),
   showPopup: bool({ optional: true, default: true }),
+  pluginOverride: pluginFile({ optional: true, hint: "Defaults to the group's base plugin; conditions inherit it unless they set their own" }),
   icon: iconPath({ optional: true, hint: "File name in Icons/<Group>/ (512x512 DDS, BC3 max)" }),
   notificationSound: str({ optional: true, hint: "Ignored when the MCM sound override is on" }),
   // The DLL treats any value other than "OR" as AND; absent means OR.
@@ -28,12 +29,12 @@ export type Achievement = z.infer<typeof AchievementSchema>;
 export const GroupSchema = z
   .looseObject({
     groupName: localized(),
-    plugin: pluginFile({ hint: "Base plugin for every condition without pluginOverride" }),
+    plugin: pluginFile({ hint: "Base plugin for every achievement and condition without pluginOverride" }),
     showInMenu: bool({ optional: true, default: true }),
     achievements: z.array(AchievementSchema),
-    // `keys` and `icons` hold the canvas position of each LocalizedText and Icon node, which have no JSON object of their own.
+    // `keys`, `icons` and `plugins` hold the canvas position of each LocalizedText, Icon and PluginOverride node, which have no JSON object of their own.
     // `modVersion` is the oldest mod version that reads everything in the file; an editor that targets an older one refuses to open it.
-    _editor: z.object({ schemaVersion: z.number().int(), modVersion: z.string().optional(), keys: z.record(z.string(), XY).optional(), icons: z.record(z.string(), XY).optional() }).optional(),
+    _editor: z.object({ schemaVersion: z.number().int(), modVersion: z.string().optional(), keys: z.record(z.string(), XY).optional(), icons: z.record(z.string(), XY).optional(), plugins: z.record(z.string(), XY).optional() }).optional(),
   })
   .superRefine((g, ctx) => {
     const seen = new Set<string>();

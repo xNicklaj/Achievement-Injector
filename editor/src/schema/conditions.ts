@@ -91,7 +91,7 @@ const cond = <T extends string, S extends z.ZodRawShape>(type: T, title: string,
     .looseObject({
       type: z.literal(type),
       ...shape,
-      pluginOverride: pluginFile({ optional: true, hint: "Defaults to the group's base plugin" }),
+      pluginOverride: pluginFile({ optional: true, hint: "Defaults to the achievement's plugin" }),
       live: bool({ optional: true, default: false, since: "1.4.1" }),
       negate: bool({ optional: true, default: false, since: "1.4.1" }),
       onUnlock: z.array(OnUnlockAction).optional(),
