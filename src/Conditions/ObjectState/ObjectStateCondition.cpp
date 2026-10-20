@@ -14,14 +14,17 @@ void ObjectStateCondition::SetConditionParameters(std::string formID_a, bool sta
     this->formID = formID_a;
     this->state = state_a;
 };
-bool ObjectStateCondition::CheckCondition() {
-    if (this->isMet)
-        return true;
+bool ObjectStateCondition::Evaluate() {
     RE::TESObjectREFR* target = GetFormOfType<RE::TESObjectREFR>(this->formID, this->plugin);
     if (!target)
         return false;
     logger::debug("Object {} is {}.", this->formID, !target->IsDisabled() ? "ENABLED" : "DISABLED");
-    if (target->IsDisabled() == !this->state) {
+    return target->IsDisabled() == !this->state;
+}
+bool ObjectStateCondition::CheckCondition() {
+    if (this->isMet)
+        return true;
+    if (Evaluate()) {
         this->UnlockNotify();
         RE::PlayerCharacter::GetSingleton()->AsPositionPlayerEventSource()->RemoveEventSink(this);
         return true;

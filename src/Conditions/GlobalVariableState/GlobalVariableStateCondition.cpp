@@ -20,13 +20,17 @@ void GlobalVariableStateCondition::SetConditionParameters(std::string formID_a, 
 	SetConditionParameters(formID_a, value_a);
 	this->OP = OP_a;
 	if (!IsValidOperation(OP_a))
-		logger::error("GlobalVariableState: unknown operation \"{}\" for global {}, this condition can never be met. Use >= or ==.", OP_a, formID_a);
+		logger::error("GlobalVariableState: unknown operation \"{}\" for global {}, this condition can never be met. Use >=, ==, <, <= or !=.", OP_a, formID_a);
 };
+bool GlobalVariableStateCondition::Evaluate() {
+	// Live conditions skip OnDataLoaded, so resolve lazily
+	if (!this->cachedGlobal) this->cachedGlobal = GetFormOfType<RE::TESGlobal>(this->formID, this->plugin);
+	return this->cachedGlobal && CompareValues(this->OP, this->cachedGlobal->value, this->value);
+}
 bool GlobalVariableStateCondition::CheckCondition() {
 	if(this->isMet) return true;
 	if (!this->cachedGlobal) return false;
-	float globValue = this->cachedGlobal->value;
-	if(CompareValues(this->OP, globValue, this->value)) {
+	if(Evaluate()) {
 		this->UnlockNotify();
 		RE::PlayerCharacter::GetSingleton()->AsPositionPlayerEventSource()->RemoveEventSink(this);
 		return true;

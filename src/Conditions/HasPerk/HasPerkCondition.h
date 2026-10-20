@@ -12,6 +12,8 @@ public:
 	void EnableListener(void) override;
 	void SetConditionParameters(std::string formID) override;
 	bool CheckCondition() override;
+	bool SupportsLive() override { return true; }
+	bool Evaluate() override;
 
 	std::string formIDStr;
 	RE::BGSPerk* perk = nullptr;

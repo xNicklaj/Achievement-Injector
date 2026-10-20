@@ -19,11 +19,15 @@ void Condition::SetConditionParameters(std::string, std::string, std::string) {}
 void Condition::SetConditionParameters(std::string, float) {}
 void Condition::SetConditionParameters(std::string, std::string, float) {}
 bool Condition::IsValidOperation(const std::string& op) {
-	return op == ">=" || op == "GT" || op == "==" || op == "EQ";
+	return op == ">=" || op == "GT" || op == "==" || op == "EQ" ||
+		op == "<" || op == "LT" || op == "<=" || op == "LE" || op == "!=" || op == "NE";
 }
 bool Condition::CompareValues(const std::string& op, float actual, float expected) {
 	if (op == ">=" || op == "GT") return actual >= expected;
 	if (op == "==" || op == "EQ") return actual == expected;
+	if (op == "<" || op == "LT") return actual < expected;
+	if (op == "<=" || op == "LE") return actual <= expected;
+	if (op == "!=" || op == "NE") return actual != expected;
 	return false;
 }
 void Condition::SetConditionParameters(std::string, bool) {}

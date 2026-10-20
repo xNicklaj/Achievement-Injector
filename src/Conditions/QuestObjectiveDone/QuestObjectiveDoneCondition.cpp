@@ -30,13 +30,12 @@ RE::BSEventNotifyControl QuestObjectiveDoneCondition::ProcessEvent(const RE::Pos
     if (!this->isMet) CheckCondition();
     return RE::BSEventNotifyControl::kContinue;
 }
-bool QuestObjectiveDoneCondition::CheckCondition() {
-    bool found = false;
-    if (this->isMet) return true;
+bool QuestObjectiveDoneCondition::Evaluate() {
+    // Live conditions skip OnDataLoaded, so resolve lazily
+    if (!this->quest) this->quest = GetFormOfType<RE::TESQuest>(this->formID, this->plugin);
     if (!quest) return false;
     for (auto& objective_l : quest->objectives) {
 		if (objective_l->index != this->objective) continue;
-        found = true;
         if(objective_l->state == RE::QUEST_OBJECTIVE_STATE::kFailed) {
             logger::debug("Objective {} for quest {} at stage {} has state kFailed", objective_l->index, this->formID, quest->currentStage);
         } else if (objective_l->state == RE::QUEST_OBJECTIVE_STATE::kCompleted) {
@@ -49,14 +48,20 @@ bool QuestObjectiveDoneCondition::CheckCondition() {
             logger::debug("Objective {} for quest {} at stage {} has state kDisplayed", objective_l->index, this->formID, quest->currentStage);
         }
 
-        if (objective_l->index == this->objective && (objective_l->state == RE::QUEST_OBJECTIVE_STATE::kDisplayed || objective_l->state == RE::QUEST_OBJECTIVE_STATE::kCompletedDisplayed )) {
-            logger::info("Player met condition quest {} objective {}", this->formID, this->objective);
-            this->UnlockNotify();
-            KeyedSink<RE::TESQuestStageEvent>::GetSingleton()->Unsubscribe(this);
-            RE::PlayerCharacter::GetSingleton()->AsPositionPlayerEventSource()->RemoveEventSink(this);
+        if (objective_l->state == RE::QUEST_OBJECTIVE_STATE::kDisplayed || objective_l->state == RE::QUEST_OBJECTIVE_STATE::kCompletedDisplayed)
             return true;
-        }
 	}
 	logger::debug("Objective {} for quest {} not found or not displayed.", this->objective, this->formID);
+    return false;
+}
+bool QuestObjectiveDoneCondition::CheckCondition() {
+    if (this->isMet) return true;
+    if (Evaluate()) {
+        logger::info("Player met condition quest {} objective {}", this->formID, this->objective);
+        this->UnlockNotify();
+        KeyedSink<RE::TESQuestStageEvent>::GetSingleton()->Unsubscribe(this);
+        RE::PlayerCharacter::GetSingleton()->AsPositionPlayerEventSource()->RemoveEventSink(this);
+        return true;
+    }
     return false;
 }

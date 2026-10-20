@@ -7,9 +7,13 @@ public:
 	void OnDataLoaded(void) override;
 	void EnableListener(void) override;
 	void SetConditionParameters(std::string skill, int level) override;
+	void SetConditionParameters(std::string skill, std::string op, int level) override;
 	bool CheckCondition() override;
+	bool SupportsLive() override { return true; }
+	bool Evaluate() override;
 
 	std::string skill;
+	std::string OP = ">=";
 	int level = 0;
 	RE::ActorValue cachedSkill = RE::ActorValue::kNone;
 

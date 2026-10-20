@@ -1,5 +1,6 @@
 #include "Achievement.h"
 
+#include <algorithm>
 #include <string>
 #include <memory>
 #include "ConditionsJoinType.h"
@@ -93,11 +94,11 @@ Achievement::Achievement(json& jsonData, std::string plugin, std::string groupNa
             }
             else if (type == "PlayerLevel") {
                 a_condition = new PlayerLevelCondition();
-                a_condition->SetConditionParameters(condition["level"].get<int>());
+                a_condition->SetConditionParameters(condition.value("operation", ">="), condition["level"].get<int>());
             }
             else if (type == "SkillLevel") {
                 a_condition = new PlayerSkillLevelCondition();
-                a_condition->SetConditionParameters(condition["skill"].get<std::string>(), condition["level"].get<int>());
+                a_condition->SetConditionParameters(condition["skill"].get<std::string>(), condition.value("operation", ">="), condition["level"].get<int>());
             }
             else if (type == "ItemInInventory") {
                 a_condition = new ItemInInventoryCondition();
@@ -246,6 +247,16 @@ Achievement::Achievement(json& jsonData, std::string plugin, std::string groupNa
             logger::error("Skipping condition in achievement {}.", this->achievementName);
             continue;
 		}
+        bool negate = condition.value("negate", false);
+        if (a_condition && (negate || condition.value("live", false))) {
+            if (a_condition->SupportsLive()) {
+                a_condition->live = true;
+                a_condition->negate = negate;
+            } else {
+                logger::warn("[{}.json] Condition type {} in {} does not support \"live\" or \"negate\". Skipping condition.", this->groupName, type, this->achievementName);
+                a_condition = nullptr;
+            }
+        }
         if (a_condition) {
             if (condition.value("pluginOverride", "") != "") a_condition->SetPlugin(condition["pluginOverride"].get<std::string>());
             else a_condition->SetPlugin(this->plugin);
@@ -255,6 +266,8 @@ Achievement::Achievement(json& jsonData, std::string plugin, std::string groupNa
         };
         if (a_condition) conditionMet.push_back(false);
     }
+    if (!conditions.empty() && std::all_of(conditions.begin(), conditions.end(), [](Condition* c) { return c->live; }))
+        logger::warn("Achievement {} has only live conditions and can never unlock.", this->achievementName);
 }
 
 void Achievement::ForceUnlock() {
@@ -286,6 +299,7 @@ void Achievement::EnableListener(void) {
 
     for (size_t i = 0; i < conditions.size(); i++) {
         Condition* condition = conditions[i];
+        if (condition->live) continue; // evaluated on demand in OnConditionMet, nothing to hook
         if (!CheckIfModIsLoaded(condition->plugin)) {
             logger::warn("Plugin {} not loaded. Skipping condition.", condition->plugin);
             continue;
@@ -312,7 +326,10 @@ void Achievement::OnConditionMet(void) {
     bool allConditionsMet = false;
     int i = 0;
     for (Condition* condition : conditions) {
-        if (condition->isMet == true) {
+        if (condition->live) {
+            // isMet is only true here via ForceUnlock
+            conditionMet[i] = condition->isMet || (condition->Evaluate() != condition->negate);
+        } else if (condition->isMet == true) {
             conditionMet[i] = true;
         }
         i++;

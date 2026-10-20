@@ -27,26 +27,28 @@ RE::BSEventNotifyControl SpellLearnedCondition::ProcessEvent(const RE::PositionP
     return RE::BSEventNotifyControl::kContinue;
 }
 
-bool SpellLearnedCondition::CheckCondition() {
-    if (this->isMet) return true;
-    bool found = false;
+bool SpellLearnedCondition::Evaluate() {
+    // Live conditions skip OnDataLoaded, so resolve lazily
+    if (!this->cachedSpell) this->cachedSpell = GetFormOfType<RE::SpellItem>(this->FormID, this->plugin);
     RE::SpellItem* target = this->cachedSpell;
     if (!target) return false;
     RE::TESNPC* player = RE::PlayerCharacter::GetSingleton()->GetActorBase();
-    
-    if (target && RE::PlayerCharacter::GetSingleton()->HasSpell(target))
-        found = true;
 
-    if (!found) {
-        for (unsigned i = 0; i < player->GetSpellList()->numSpells; i++) {
-            RE::SpellItem* spell = player->GetSpellList()->spells[i];
-            if (spell && spell->formID == target->formID) {
-                found = true;
-                break;
-            }
-        }
+    if (RE::PlayerCharacter::GetSingleton()->HasSpell(target))
+        return true;
+
+    for (unsigned i = 0; i < player->GetSpellList()->numSpells; i++) {
+        RE::SpellItem* spell = player->GetSpellList()->spells[i];
+        if (spell && spell->formID == target->formID) return true;
     }
-    
+    return false;
+}
+
+bool SpellLearnedCondition::CheckCondition() {
+    if (this->isMet) return true;
+    bool found = Evaluate();
+    RE::SpellItem* target = this->cachedSpell;
+
     if (found) {
         logger::info("Player met condition learned {}:{}", target->fullName.c_str(), FormIDToString(target->formID));
         this->UnlockNotify();

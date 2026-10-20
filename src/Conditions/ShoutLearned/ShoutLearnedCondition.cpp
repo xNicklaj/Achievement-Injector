@@ -18,33 +18,35 @@ void ShoutLearnedCondition::SetConditionParameters(std::string formID_a, int wor
 }
 RE::BSEventNotifyControl ShoutLearnedCondition::ProcessEvent(const RE::TESTrackedStatsEvent* a_event, RE::BSTEventSource<RE::TESTrackedStatsEvent>*) {
     if (a_event->stat == "Words Of Power Learned") CheckCondition();
-    
+
     return RE::BSEventNotifyControl::kContinue;
 }
 
-bool ShoutLearnedCondition::CheckCondition() {
-    bool found = false;
+bool ShoutLearnedCondition::Evaluate() {
+    // Live conditions skip OnDataLoaded, so resolve lazily
+    if (!this->cachedShout) this->cachedShout = GetFormOfType<RE::TESShout>(this->FormID, this->plugin);
     RE::TESShout* target = this->cachedShout;
     RE::TESNPC* player = RE::PlayerCharacter::GetSingleton()->GetActorBase();
     if(!target) return false;
 
-    int wordCount = 0;
-    if (!found) {
-        for (unsigned i = 0; i < player->GetSpellList()->numShouts; i++) {
-            RE::TESShout* shout = player->GetSpellList()->shouts[i];
-            if (shout && shout->formID == target->formID) {
-                found = true;
-                for(const auto& variation : shout->variations){
-                    if(variation.word->GetKnown()) 
-                        wordCount++;
-				}
-                logger::debug("Shouts {} has learned {}/3 words. ({} required)", shout->fullName.c_str(), wordCount, this->wordNumber);
-                break;
+    for (unsigned i = 0; i < player->GetSpellList()->numShouts; i++) {
+        RE::TESShout* shout = player->GetSpellList()->shouts[i];
+        if (shout && shout->formID == target->formID) {
+            int wordCount = 0;
+            for(const auto& variation : shout->variations){
+                if(variation.word->GetKnown())
+                    wordCount++;
             }
+            logger::debug("Shouts {} has learned {}/3 words. ({} required)", shout->fullName.c_str(), wordCount, this->wordNumber);
+            return wordCount >= this->wordNumber;
         }
     }
-    
-    if (found && wordCount >= this->wordNumber) {
+    return false;
+}
+
+bool ShoutLearnedCondition::CheckCondition() {
+    if (Evaluate()) {
+        RE::TESShout* target = this->cachedShout;
         logger::info("Player met condition learned shout {}:{}", target->fullName.c_str(), FormIDToString(target->formID));
         this->UnlockNotify();
         KeyedSink<RE::TESTrackedStatsEvent>::GetSingleton()->Unsubscribe(this);

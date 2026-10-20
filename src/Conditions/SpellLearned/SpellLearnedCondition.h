@@ -8,6 +8,8 @@ public:
 	void EnableListener(void) override;
 	void SetConditionParameters(std::string skill) override;
 	bool CheckCondition() override;
+	bool SupportsLive() override { return true; }
+	bool Evaluate() override;
 
 	std::string FormID;
 	RE::SpellItem* cachedSpell = nullptr;

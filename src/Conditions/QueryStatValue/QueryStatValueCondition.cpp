@@ -19,11 +19,13 @@ void QueryStatValueCondition::SetConditionParameters(std::string stat_a, std::st
 	SetConditionParameters(stat_a, value_a);
 	this->OP = OP_a;
 	if (!IsValidOperation(OP_a))
-		logger::error("QueryStatValue: unknown operation \"{}\" for stat {}, this condition can never be met. Use >= or ==.", OP_a, stat_a);
+		logger::error("QueryStatValue: unknown operation \"{}\" for stat {}, this condition can never be met. Use >=, ==, <, <= or !=.", OP_a, stat_a);
 };
+bool QueryStatValueCondition::Evaluate() {
+	return CompareValues(this->OP, (float)RE::QueryStat(this->stat.c_str()), this->value);
+}
 bool QueryStatValueCondition::CheckCondition() {
-	int32_t globValue = RE::QueryStat(this->stat.c_str());
-	if (CompareValues(this->OP, (float)globValue, this->value)) {
+	if (Evaluate()) {
 		this->UnlockNotify();
 		return true;
 	}
