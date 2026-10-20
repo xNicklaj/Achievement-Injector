@@ -4,6 +4,13 @@ import { z } from "zod";
 export const TARGET_VERSION = "1.4.1";
 export const BASELINE_VERSION = "1.4.0";
 
+/** Negative when `a` is older than `b`, as dotted numbers ("1.4.1" > "1.4.0"). */
+export const compareVersions = (a: string, b: string) => {
+  const [x, y] = [a, b].map((v) => v.split(".").map(Number));
+  for (let i = 0; i < Math.max(x.length, y.length); i++) if ((x[i] ?? 0) !== (y[i] ?? 0)) return (x[i] ?? 0) - (y[i] ?? 0);
+  return 0;
+};
+
 export type Widget =
   | "bool"
   | "integer"

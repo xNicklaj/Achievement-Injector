@@ -2,7 +2,8 @@ import { Handle, Position, type NodeProps } from "@xyflow/react";
 import { AlertTriangle, CircleAlert } from "lucide-react";
 import { achievementNames, conditionsSummary, isInternalGroup, type AppNode } from "../graph";
 import { getText } from "../io/localization";
-import { isLocalizable, registry } from "../registry";
+import { isLocalizable, registry, UNKNOWN_CONDITION } from "../registry";
+import { BASELINE_VERSION, compareVersions } from "../schema";
 import { useState } from "react";
 import { confirmDialog } from "./dialogs";
 import { useApp } from "../store";
@@ -80,7 +81,7 @@ function AchievementRefField({ id, value, group, onChange, invalid }: { id: stri
 }
 
 /** One row per language found in the group's Localizations files (HANDOVER 3.13). */
-function TranslationRows({ keyName }: { keyName: string }) {
+export function TranslationRows({ keyName }: { keyName: string }) {
   const loc = useApp((s) => s.loc);
   const setTranslation = useApp((s) => s.setTranslation);
   const locales = Object.keys(loc).sort();
@@ -141,7 +142,12 @@ export function GraphNode({ id, data, selected }: NodeProps<AppNode>) {
     return (
       <div key={f.name} className="relative flex items-center gap-1.5 py-0.5 pl-3 pr-2">
         {isLoc && <Handle type="target" id={`loc:${f.name}`} position={Position.Left} style={dot("var(--pin-localized)")} />}
-        <span className="w-28 shrink-0 truncate text-[var(--text-dim)]" title={f.description ? `${f.name}: ${f.description}` : f.name}>{pascal(f.name)}</span>
+        <span className="flex w-28 shrink-0 items-center gap-1 text-[var(--text-dim)]" title={f.description ? `${f.name}: ${f.description}` : f.name}>
+          <span className="truncate">{pascal(f.name)}</span>
+          {f.since && compareVersions(f.since, BASELINE_VERSION) > 0 && (
+            <span className="shrink-0 rounded bg-white/10 px-1 text-[9px] leading-tight" title={`Needs Achievement Injector ${f.since} or newer`}>{f.since}</span>
+          )}
+        </span>
         {connected ? (
           <span className="text-[11px] italic text-[var(--pin-localized)]">localized</span>
         ) : def.kind === "CreateAchievement" && f.name === "achievementName" ? (
@@ -168,14 +174,14 @@ export function GraphNode({ id, data, selected }: NodeProps<AppNode>) {
     >
       <div className="relative flex items-center gap-1.5 rounded-t-sm px-3 py-1 font-semibold text-white" style={{ background: `var(--cat-${def.category})` }}>
         {def.flowIn && <Handle type="target" id="flow-in" position={Position.Left} className={flowHandle} />}
-        <span className="flex-1 truncate">{def.title}</span>
+        <span className="flex-1 truncate">{data.kind === UNKNOWN_CONDITION ? `Unknown: ${String(data.extra?.type)}` : def.title}</span>
         {status && (
           <span title={problems} aria-label={problems} tabIndex={0} className="cursor-help">
             {status === "error" ? <CircleAlert size={14} /> : <AlertTriangle size={14} />}
           </span>
         )}
-        {def.flowOut && <Handle type="source" id="flow-out" position={Position.Right} className={flowHandle} />}
-        {def.condOut && <Handle type="source" id="cond-out" position={Position.Right} style={dot("var(--pin-condition)")} />}
+        {def.flowOut && <Handle type="source" id="flow-out" position={Position.Right} className={flowHandle} title={def.category === "condition" ? "On Unlock: commands and Papyrus calls to run when this condition is met" : undefined} />}
+        {def.condOut && def.category !== "condition" && <Handle type="source" id="cond-out" position={Position.Right} style={dot("var(--pin-condition)")} />}
         {def.locOut && <Handle type="source" id="loc-out" position={Position.Right} style={dot("var(--pin-localized)")} />}
       </div>
       <div className="py-1">
@@ -187,6 +193,7 @@ export function GraphNode({ id, data, selected }: NodeProps<AppNode>) {
             </span>
           </div>
         )}
+        {data.kind === UNKNOWN_CONDITION && <div className="px-3 py-0.5 text-[11px] text-[var(--text-dim)]">Not a type this editor knows. It is kept as it is.</div>}
         {(flat ? def.fields : required).map(row)}
         {data.kind === "LocalizedText" && <TranslationRows keyName={typeof data.values.key === "string" ? data.values.key : ""} />}
         {!flat && optional.length > 0 && (
@@ -196,6 +203,13 @@ export function GraphNode({ id, data, selected }: NodeProps<AppNode>) {
             </summary>
             {optional.map(row)}
           </details>
+        )}
+        {def.category === "condition" && (
+          // The flow pin sits in the header like every other node's; the condition output moves to its own row.
+          <div className="relative py-0.5 pl-3 pr-4 text-right text-[11px] text-[var(--text-dim)]" title="Connect to Add Conditions">
+            Condition
+            <Handle type="source" id="cond-out" position={Position.Right} style={dot("var(--pin-condition)")} />
+          </div>
         )}
       </div>
     </div>

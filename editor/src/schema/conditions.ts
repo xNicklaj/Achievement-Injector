@@ -20,6 +20,9 @@ import {
 // Optional = `condition.value("x", default)`; the default goes in `default` meta, never in parsing.
 
 export const EditorNode = z.object({ id: z.string().min(1), x: z.number(), y: z.number() });
+const XY = z.object({ x: z.number(), y: z.number() });
+/** Positions of the action nodes after the node, in chain order (achievements and conditions both carry an `onUnlock` chain). */
+export const ChainEditor = EditorNode.extend({ chain: z.array(XY).optional() });
 
 /** `onUnlock` entries (Runnable.cpp). Papyrus targets a Global function: DispatchStaticCall, no form to bind. */
 export const OnUnlockAction = z.discriminatedUnion("type", [
@@ -50,7 +53,7 @@ const cond = <T extends string, S extends z.ZodRawShape>(type: T, title: string,
       ...shape,
       pluginOverride: pluginFile({ optional: true, hint: "Defaults to the group's base plugin" }),
       onUnlock: z.array(OnUnlockAction).optional(),
-      _editor: EditorNode.optional(),
+      _editor: ChainEditor.optional(),
     })
     .meta({ title, ...(description && { description }) });
 

@@ -31,6 +31,8 @@ export type NodeDef = {
   /** At most one per flow chain. */
   unique: boolean;
   fields: FieldInfo[];
+  /** Exists only to carry data (an unknown condition type): never offered for creation. */
+  hidden?: boolean;
 };
 
 const field = (f: Pick<FieldInfo, "name" | "widget"> & Partial<FieldInfo>): FieldInfo => ({ optional: false, ...f });
@@ -71,11 +73,20 @@ const conditionNodes: NodeDef[] = Object.values(conditionRegistry).map((c) => ({
   description: c.description,
   keywords: [c.type],
   condOut: true,
+  // A condition's `onUnlock` actions hang off its flow pin.
+  flowOut: true,
   fields: [...c.fields, field({ name: "pluginOverride", widget: "plugin", optional: true, description: "Defaults to the group's base plugin" })],
 }));
 
-export const registry: Record<string, NodeDef> = Object.fromEntries([...flowNodes, ...conditionNodes].map((d) => [d.kind, d]));
-export const nodeDefs = Object.values(registry);
+/** A condition type this editor does not know: kept as it is (the real type is in `extra.type`) and flagged, so nothing is lost. */
+export const UNKNOWN_CONDITION = "UnknownCondition";
+const unknownCondition: NodeDef = { ...base, kind: UNKNOWN_CONDITION, category: "condition", title: "Unknown Condition", condOut: true, flowOut: true, hidden: true, fields: [] };
+
+export const registry: Record<string, NodeDef> = Object.fromEntries([...flowNodes, ...conditionNodes, unknownCondition].map((d) => [d.kind, d]));
+export const nodeDefs = Object.values(registry).filter((d) => !d.hidden);
+
+export const isCondition = (kind: string) => registry[kind]?.category === "condition";
+export const isAction = (kind: string) => kind === "RunCommand" || kind === "CallPapyrus";
 
 export const isLocalizable = (f: FieldInfo) => f.widget === "localizedString";
 

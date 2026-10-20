@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { exportGroup, withoutEditor } from "./exportGroup";
 import { ImportError, importGroup, type Json } from "./importGroup";
+import { newLocFile, setText } from "./localization";
 
 const dir = join(__dirname, "../../../Skyrim/Data/SKSE/Plugins/AchievementsData");
 const files = readdirSync(dir).filter((f) => f.endsWith(".json"));
@@ -64,7 +65,7 @@ describe("import", () => {
   it("refuses files it cannot represent without data loss", () => {
     expect(() => importGroup([])).toThrow(ImportError);
     expect(() => importGroup({ ...base })).toThrow(/achievements/);
-    expect(() => importGroup(ach({ conditions: [{ type: "Nope" }] }))).toThrow(/Nope/);
+    expect(() => importGroup(ach({ conditions: [{ level: 1 }] }))).toThrow(/no "type"/);
     expect(() => importGroup(ach({ onUnlock: [{ type: "weird" }] }))).toThrow(/weird/);
   });
 });
@@ -115,5 +116,69 @@ describe("auto-layout with optional fields set", () => {
     const [first, second] = importGroup(raw).nodes.filter((n) => n.data.kind === "CreateAchievement");
     // 7 fields (name, description and the five optional ones) under a header, all showing.
     expect(second.position.y - first.position.y).toBeGreaterThanOrEqual(28 + 7 * 24);
+  });
+});
+
+const ach = (a: Json) => ({ groupName: "G", plugin: "A.esp", achievements: [{ achievementName: "A", description: "d", ...a }] });
+
+describe("condition onUnlock", () => {
+  const raw = ach({
+    conditions: [
+      { type: "PlayerLevel", level: 5, onUnlock: [{ type: "command", command: "player.additem f 1" }, { type: "papyrus", script: "S", function: "F" }] },
+      { type: "PlayerLevel", level: 6, onUnlock: [] },
+      { type: "PlayerLevel", level: 7 },
+    ],
+  });
+  it("becomes a chain of action nodes on the condition's flow pin, and round-trips", () => {
+    const snap = importGroup(raw);
+    const cond = snap.nodes.find((n) => n.data.values.level === 5)!;
+    const first = snap.edges.find((e) => e.source === cond.id && e.sourceHandle === "flow-out")!;
+    expect(snap.nodes.find((n) => n.id === first.target)!.data.kind).toBe("RunCommand");
+    expect(snap.edges.filter((e) => e.sourceHandle === "flow-out" && e.target !== first.target && snap.nodes.find((n) => n.id === e.source)!.data.kind === "RunCommand")).toHaveLength(1);
+    expect(stripEditor(exportGroup(snap).json)).toEqual(raw);
+    expect(exportGroup(snap).issues).toEqual([]);
+  });
+  it("keeps positions of the action nodes", () => {
+    const once = exportGroup(importGroup(raw)).json;
+    expect(exportGroup(importGroup(once)).json).toEqual(once);
+  });
+});
+
+describe("unknown condition types", () => {
+  const raw = ach({ conditions: [{ type: "FutureThing", amount: 3, onUnlock: [{ type: "command", command: "x" }] }] });
+  it("load as a flagged generic node and are written back unchanged", () => {
+    const snap = importGroup(raw);
+    const n = snap.nodes.find((x) => x.data.kind === "UnknownCondition")!;
+    expect(n.data.extra).toEqual({ type: "FutureThing", amount: 3 });
+    const { json, issues } = exportGroup(snap);
+    expect(stripEditor(json)).toEqual(raw);
+    expect(issues).toHaveLength(1);
+    expect(issues[0]).toMatchObject({ level: "error", nodeId: n.id });
+    expect(issues[0].message).toMatch(/FutureThing/);
+  });
+});
+
+describe("version stamp", () => {
+  it("is the oldest mod version that reads the file", () => {
+    const stamp = (a: Json) => (exportGroup(importGroup(ach(a))).json._editor as { modVersion: string }).modVersion;
+    expect(stamp({ conditions: [{ type: "PlayerLevel", level: 1 }] })).toBe("1.4.0");
+    expect(stamp({ conditions: [{ type: "PlayerActivation", formID: "1", quantity: 2 }] })).toBe("1.4.1");
+  });
+  it("refuses a file made for a newer mod or editor, and accepts older ones", () => {
+    const withStamp = (e: object) => ({ ...ach({}), _editor: e });
+    expect(() => importGroup(withStamp({ schemaVersion: 1, modVersion: "9.0.0" }))).toThrow(/9\.0\.0 or newer/);
+    expect(() => importGroup(withStamp({ schemaVersion: 99 }))).toThrow(/newer version of the editor/);
+    expect(() => importGroup(withStamp({ schemaVersion: 1, modVersion: "1.4.0" }))).not.toThrow();
+  });
+});
+
+describe("group name key", () => {
+  it("warns when the key has no translation in a language, and not when it has", () => {
+    const snap = { ...importGroup({ groupName: "$gn", plugin: "A.esp", achievements: [] }) };
+    const en = newLocFile("G_EN.txt");
+    const miss = exportGroup({ ...snap, loc: { EN: en } }).issues.map((i) => i.message);
+    expect(miss.some((m) => /\$gn has no translation for EN/.test(m))).toBe(true);
+    const has = exportGroup({ ...snap, loc: { EN: setText(en, "gn", "Name") } }).issues;
+    expect(has).toEqual([]);
   });
 });

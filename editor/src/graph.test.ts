@@ -47,3 +47,20 @@ describe("AddConditions summary", () => {
     expect(conditionsSummary([node("q", "PlayerLevel", { level: 5 }), ...nodes.filter((n) => n.id !== "q")], [e], "a1").level).toBe("ok");
   });
 });
+
+describe("a condition's On Unlock chain", () => {
+  it("takes actions from the condition's flow pin, and nothing else", () => {
+    expect(refuseReason(nodes, [], link("q", "r", "flow-out", "flow-in"))).toBeNull();
+    expect(refuseReason(nodes, [], link("q", "a1", "flow-out", "flow-in"))).toMatch(/On Unlock/);
+    expect(refuseReason(nodes, [], link("q", "j", "flow-out", "flow-in"))).toMatch(/On Unlock/);
+    // An action already in a condition's chain cannot lead on to a Join Type.
+    expect(refuseReason(nodes, [flow("q", "r")], link("r", "j", "flow-out", "flow-in"))).toMatch(/On Unlock/);
+  });
+  it("does not stop the achievement's own chain from running actions", () => {
+    expect(refuseReason(nodes, [flow("c", "a1")], link("a1", "r", "flow-out", "flow-in"))).toBeNull();
+  });
+  it("is not offered a creatable unknown-condition node", () => {
+    expect(nodeDefs.some((d) => d.kind === "UnknownCondition")).toBe(false);
+    expect(registry.UnknownCondition.flowOut).toBe(true);
+  });
+});

@@ -1,7 +1,7 @@
 import type { Edge } from "@xyflow/react";
 import { achievementNames, isInternalGroup, type AppNode } from "../graph";
-import { isLocalizable, registry } from "../registry";
-import { GroupSchema, SCHEMA_VERSION } from "../schema";
+import { isAction, isLocalizable, registry, UNKNOWN_CONDITION } from "../registry";
+import { BASELINE_VERSION, compareVersions, GroupSchema, SCHEMA_VERSION } from "../schema";
 import type { GroupValues } from "../store";
 import type { Json } from "./importGroup";
 import { getText, type LocFile } from "./localization";
@@ -32,7 +32,7 @@ const round = (n: number) => Math.round(n);
 const xy = (n: AppNode) => ({ x: round(n.position.x), y: round(n.position.y) });
 
 /** Where each part of an exported achievement came from, so schema errors can be pinned on nodes. */
-type Refs = { create: string; add?: string; join?: string; conds: string[]; actions: string[] };
+type Refs = { create: string; add?: string; join?: string; conds: string[]; actions: string[]; condActions: string[][] };
 
 /**
  * Graph -> JSON. Unset fields are omitted, unknown keys come back from `extra`, so a file imported and
@@ -71,6 +71,14 @@ export function exportGroup(s: ExportState): { json: Json; issues: Issue[] } {
     if (missing.length) add("warning", `Localized Text "${keyOf(n)}" has no translation for ${missing.join(", ")}.`, n.id, { detail: `No translation for ${missing.join(", ")}.` });
   }
 
+  // The group name is a field like any other: a `$key` there needs translations too.
+  const groupName = typeof s.group.groupName === "string" ? s.group.groupName : "";
+  if (groupName.length > 1 && groupName.startsWith("$")) {
+    const missing = langs.filter((l) => !getText(loc[l], groupName.slice(1)));
+    if (!langs.length) add("warning", `The group name ${groupName} is a key, but no languages are set up, so it shows as raw text in game.`);
+    else if (missing.length) add("warning", `The group name ${groupName} has no translation for ${missing.join(", ")}.`);
+  }
+
   // `AchievementUnlocked` inside this group must name an achievement that exists; one in another group cannot be checked (HANDOVER 3.1).
   const names = new Set(achievementNames(s.nodes, s.edges, loc));
   for (const n of s.nodes) {
@@ -104,18 +112,25 @@ export function exportGroup(s: ExportState): { json: Json; issues: Issue[] } {
     return out;
   };
 
+  /** Nodes reached by following flow wires from `id`, each claimed once. */
   const used = new Set<string>();
+  const chainFrom = (id: string) => {
+    const out: AppNode[] = [];
+    for (let next = flowNext(id); next && !used.has(next); next = flowNext(next)) {
+      const n = byId.get(next);
+      if (!n) break;
+      used.add(next);
+      out.push(n);
+    }
+    return out;
+  };
+  const actionJson = (n: AppNode) => ({ type: n.data.kind === "RunCommand" ? "command" : "papyrus", ...fields(n), ...n.data.extra });
+  const unknownConds = new Set<string>();
   const achievements: Json[] = [];
   const refs: Refs[] = [];
   for (const create of s.nodes.filter((n) => n.data.kind === "CreateAchievement")) {
     used.add(create.id);
-    const chain: AppNode[] = [];
-    for (let id = flowNext(create.id); id && !used.has(id); id = flowNext(id)) {
-      const n = byId.get(id);
-      if (!n) break;
-      used.add(id);
-      chain.push(n);
-    }
+    const chain = chainFrom(create.id);
 
     const out: Json = fields(create);
     const adds = chain.filter((n) => n.data.kind === "AddConditions");
@@ -128,6 +143,7 @@ export function exportGroup(s: ExportState): { json: Json; issues: Issue[] } {
     if (joinType !== undefined) out.joinType = joinType;
 
     const condIds: string[] = [];
+    const condActions: string[][] = [];
     if (adds[0]) {
       out.conditions = s.edges
         .filter((e) => e.target === adds[0].id && e.targetHandle === "cond-in")
@@ -135,19 +151,30 @@ export function exportGroup(s: ExportState): { json: Json; issues: Issue[] } {
           const c = byId.get(e.source)!;
           used.add(c.id);
           condIds.push(c.id);
-          return { type: c.data.kind, ...fields(c), ...c.data.extra, _editor: { id: c.id, ...xy(c) } };
+          if (c.data.kind === UNKNOWN_CONDITION) {
+            unknownConds.add(c.id);
+            const type = String(c.data.extra?.type);
+            add("error", `Achievement "${name}": "${type}" is not a condition type this editor knows.`, c.id, { detail: `Unknown condition "${type}": it is kept as it is, but may be from a newer mod version or a typo` });
+          }
+          // The condition's own actions: the chain hanging off its flow pin.
+          const acts = chainFrom(c.id).filter((n) => isAction(n.data.kind));
+          condActions.push(acts.map((n) => n.id));
+          const o: Json = { type: c.data.kind, ...fields(c), ...c.data.extra };
+          if (acts.length) o.onUnlock = acts.map(actionJson);
+          o._editor = { id: c.id, ...xy(c), ...(acts.length ? { chain: acts.map(xy) } : {}) };
+          return o;
         });
     }
 
-    const actionNodes = chain.filter((n) => n.data.kind === "RunCommand" || n.data.kind === "CallPapyrus");
-    const actions = actionNodes.map((n) => ({ type: n.data.kind === "RunCommand" ? "command" : "papyrus", ...fields(n), ...n.data.extra }));
+    const actionNodes = chain.filter((n) => isAction(n.data.kind));
+    const actions = actionNodes.map(actionJson);
     if (actions.length) out.onUnlock = actions;
 
     // Unknown keys last; an actions list from the chain wins over a placeholder `onUnlock: []` kept in extra.
     for (const [k, v] of Object.entries(create.data.extra ?? {})) if (!(k in out)) out[k] = v;
     out._editor = { id: create.id, ...xy(create), chain: chain.map(xy) };
     achievements.push(out);
-    refs.push({ create: create.id, add: adds[0]?.id, join: joins[0]?.id, conds: condIds, actions: actionNodes.map((n) => n.id) });
+    refs.push({ create: create.id, add: adds[0]?.id, join: joins[0]?.id, conds: condIds, actions: actionNodes.map((n) => n.id), condActions });
   }
 
   // Anything not reached from an achievement would vanish on save: say so.
@@ -163,22 +190,32 @@ export function exportGroup(s: ExportState): { json: Json; issues: Issue[] } {
   const keys: Record<string, { x: number; y: number }> = {};
   for (const n of keyNodes) if (keyOf(n)) keys[keyOf(n)] = xy(n);
 
-  const json: Json = { ...s.group, ...s.groupExtra, achievements, _editor: { schemaVersion: SCHEMA_VERSION, ...(keyNodes.length ? { keys } : {}) } };
+  // The oldest mod version that reads every field in the file; an older editor refuses to open anything newer than itself.
+  let modVersion = BASELINE_VERSION;
+  for (const id of used) {
+    const n = byId.get(id)!;
+    for (const f of registry[n.data.kind].fields) if (n.data.values[f.name] !== undefined && f.since && compareVersions(f.since, modVersion) > 0) modVersion = f.since;
+  }
+
+  const json: Json = { ...s.group, ...s.groupExtra, achievements, _editor: { schemaVersion: SCHEMA_VERSION, modVersion, ...(keyNodes.length ? { keys } : {}) } };
 
   const parsed = GroupSchema.safeParse(json);
   if (!parsed.success)
     for (const i of parsed.error.issues) {
-      const [root, idx, a, b, c] = i.path;
+      const [root, idx, a, b, c, d, e] = i.path;
       const r = root === "achievements" && typeof idx === "number" ? refs[idx] : undefined;
       let nodeId: string | undefined;
       let field: string | undefined;
       if (r) {
-        if (a === "conditions" && typeof b === "number") (nodeId = r.conds[b]), (field = typeof c === "string" ? c : undefined);
+        if (a === "conditions" && typeof b === "number" && c === "onUnlock" && typeof d === "number") (nodeId = r.condActions[b]?.[d]), (field = typeof e === "string" ? e : undefined);
+        else if (a === "conditions" && typeof b === "number") (nodeId = r.conds[b]), (field = typeof c === "string" ? c : undefined);
         else if (a === "conditions") nodeId = r.add ?? r.create;
         else if (a === "onUnlock" && typeof b === "number") (nodeId = r.actions[b]), (field = typeof c === "string" ? c : undefined);
         else if (a === "joinType") (nodeId = r.join ?? r.create), (field = "joinType");
         else (nodeId = r.create), (field = typeof a === "string" ? a : undefined);
       }
+      // An unknown condition type already has its own message; the schema's "invalid input" adds nothing.
+      if (nodeId && unknownConds.has(nodeId)) continue;
       const name = field ?? String(r ? (a ?? "") : (root ?? ""));
       const missing = i.code === "invalid_type" && /received undefined/.test(i.message);
       const text = missing ? `${name} is required` : i.message;

@@ -1,6 +1,6 @@
 import type { Edge, Node } from "@xyflow/react";
 import { fallbackText, type LocFile } from "./io/localization";
-import { missingRequired, registry, wiredFields } from "./registry";
+import { isAction, isCondition, missingRequired, registry, wiredFields } from "./registry";
 
 /** `values`: fields the editor has a widget for (unset = absent). `extra`: unknown keys, kept so import/export is lossless. */
 export type NodeData = { kind: string; values: Record<string, unknown>; extra?: Record<string, unknown> };
@@ -51,6 +51,9 @@ export function refuseReason(nodes: AppNode[], edges: Edge[], c: Link): string |
       if (def?.unique) count.set(def.kind, (count.get(def.kind) ?? 0) + 1);
     }
     for (const [k, n] of count) if (n > 1) return `A chain can have only one ${registry[k].title}`;
+    // A chain that starts at a condition is that condition's `onUnlock`: it can hold actions only.
+    const kinds = [...before, ...after].map((id) => nodes.find((n) => n.id === id)?.data.kind ?? "");
+    if (kinds.some(isCondition) && !kinds.every((k) => isCondition(k) || isAction(k))) return "A condition's On Unlock can only run commands and Papyrus calls";
   }
   // A condition node feeds one AddConditions only (HANDOVER 3.2); a localizable field takes one text node.
   if (kind === "cond" && used(c.sourceHandle, "source", c.source)) return "Condition already used";
