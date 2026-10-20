@@ -19,7 +19,7 @@ import { groupId, type Workspace } from "./io/workspace";
 import { registry } from "./registry";
 import { remembered } from "./viewport";
 
-export type View = "graph" | "group" | "localization" | "json";
+export type View = "graph" | "group" | "localization" | "plugins" | "json";
 
 /** Group-level fields (HANDOVER 3.4). Unset = not serialized. */
 export type GroupValues = { groupName?: string; plugin?: string; showInMenu?: boolean };

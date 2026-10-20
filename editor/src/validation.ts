@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { exportGroup, type ExportState, type Issue } from "./io/exportGroup";
 import type { Json } from "./io/importGroup";
+import { usePlugins } from "./io/plugins";
 import { useApp } from "./store";
 
 export type Validation = {
@@ -29,15 +30,18 @@ export function computeValidation(s: ExportState): Validation {
   return { json, issues, byNode, fieldsByNode };
 }
 
-export const useValidation = create<Validation>(() => computeValidation(useApp.getState() as ExportState));
+const current = () => ({ ...useApp.getState(), plugins: usePlugins.getState().plugins }) as ExportState;
+
+export const useValidation = create<Validation>(() => computeValidation(current()));
 
 /** Recompute shortly after the document stops changing, so dragging a node stays smooth. */
 export function startValidation(wait = 150) {
   let t: ReturnType<typeof setTimeout>;
-  const run = () => useValidation.setState(computeValidation(useApp.getState() as ExportState), true);
-  const off = useApp.subscribe(() => (clearTimeout(t), (t = setTimeout(run, wait))));
+  const run = () => useValidation.setState(computeValidation(current()), true);
+  const later = () => (clearTimeout(t), (t = setTimeout(run, wait)));
+  const offs = [useApp.subscribe(later), usePlugins.subscribe(later)];
   run();
-  return () => (off(), clearTimeout(t));
+  return () => (offs.forEach((f) => f()), clearTimeout(t));
 }
 
 /** Split a `byNode` entry into its level and messages. */

@@ -5,6 +5,7 @@ import { BASELINE_VERSION, compareVersions, GroupSchema, SCHEMA_VERSION } from "
 import type { GroupValues } from "../store";
 import type { Json } from "./importGroup";
 import { getText, type LocFile } from "./localization";
+import { formIssues, type Plugin } from "./plugins";
 
 /**
  * A problem found while building the file. `nodeId` and `field` say where it shows on the canvas;
@@ -22,6 +23,8 @@ export type ExportState = {
   /** File names found in `Icons/<group>/`; null when they cannot be listed, so nothing is checked. */
   iconFiles?: string[] | null;
   pendingIcons?: Record<string, unknown>;
+  /** Plugins loaded for FormID checks; fields of plugins that are not loaded are not checked. */
+  plugins?: Plugin[];
 };
 
 /** The JSON without editor metadata, for reading. `_editor` is still written to the file. */
@@ -87,6 +90,8 @@ export function exportGroup(s: ExportState): { json: Json; issues: Issue[] } {
     if (isInternalGroup(v.group, s.fileName) && !names.has(v.achievement))
       add("warning", `AchievementUnlocked refers to "${v.achievement}", which is not an achievement in this group.`, n.id, { field: "achievement", detail: `achievement: no achievement named "${v.achievement}" in this group` });
   }
+
+  if (s.plugins?.length) issues.push(...formIssues(s.nodes, typeof s.group.plugin === "string" ? s.group.plugin : undefined, s.plugins));
 
   // An icon that is not in Icons/<group>/ is skipped by the DLL with a log warning. Only checkable when the folder can be listed.
   if (s.iconFiles && s.fileName) {

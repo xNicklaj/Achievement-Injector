@@ -6,6 +6,7 @@ import { GroupProperties } from "./components/GroupProperties";
 import { JsonView } from "./components/JsonView";
 import { LocalizationTable } from "./components/LocalizationTable";
 import { MenuBar } from "./components/MenuBar";
+import { PluginsView } from "./components/PluginsView";
 import { NodePanel } from "./components/NodePanel";
 import { Sidebar } from "./components/Sidebar";
 import { copySelection, duplicateSelection, hasClipboard, paste } from "./clipboard";
@@ -55,6 +56,8 @@ export function App() {
             <GroupProperties />
           ) : view === "localization" ? (
             <LocalizationTable />
+          ) : view === "plugins" ? (
+            <PluginsView />
           ) : view === "json" ? (
             <JsonView />
           ) : (
