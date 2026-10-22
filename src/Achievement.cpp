@@ -79,9 +79,11 @@ void Achievement::EnableListener(void) {
     // Runs again on a character switch: drop the previous character's in-memory progress
     this->unlocked = false;
     conditionMet.assign(conditionMet.size(), false);
+    static const std::vector<int> noState;
     for (Condition* condition : conditions) {
         condition->Deserialize(0);
         condition->isMet = false;
+        condition->LoadChildren(noState, 0); // clears sub-conditions
     }
     SerializedAchievement sa = Serializer::GetSingleton()->DeserializeAchievementData(this->groupName, this->achievementName);
     if (sa.unlocked) {
@@ -91,6 +93,9 @@ void Achievement::EnableListener(void) {
         for (Condition* condition : conditions) condition->isMet = true;
         return;
     }
+
+    size_t childOffset = conditions.size();
+    for (Condition* condition : conditions) childOffset = condition->LoadChildren(sa.conditionsState, childOffset);
 
     for (size_t i = 0; i < conditions.size(); i++) {
         Condition* condition = conditions[i];
@@ -183,6 +188,8 @@ std::vector<int> Achievement::GetConditionsState(void) {
     for (Condition* condition : this->conditions) {
         v.push_back(condition->Serialize());
     }
+    // Sub-conditions of composite conditions follow the top-level entries
+    for (Condition* condition : this->conditions) condition->SerializeChildren(v);
     return v;
 }
 

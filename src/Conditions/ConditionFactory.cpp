@@ -1,4 +1,5 @@
 #include "ConditionFactory.h"
+#include "ConditionsMet/ConditionsMetCondition.h"
 
 #include "Conditions/DragonSoulAbsorbed/DragonSoulsAbsorbedCondition.h"
 #include "Conditions/ItemInInventory/ItemInInventoryCondition.h"
@@ -66,6 +67,14 @@ Condition* CreateCondition(json& condition, const std::string& plugin, const std
         else if (type == "PlayerActivation") {
             a_condition = new PlayerActivationCondition();
             a_condition->SetConditionParameters(condition["formID"].get<std::string>(), condition.value("quantity", 1));
+        }
+        else if (type == "ConditionsMet") {
+            auto cm = new ConditionsMetCondition();
+            a_condition = cm;
+            // "quantity" is accepted as a number or a numeric string
+            const json& q = condition["quantity"];
+            cm->SetParameters(q.is_string() ? std::stoi(q.get<std::string>()) : q.get<int>(), condition["conditions"],
+                              condition.value("pluginOverride", plugin), groupName, achievementName);
         }
         else if (type == "SpellCast") {
             a_condition = new SpellCastCondition();
