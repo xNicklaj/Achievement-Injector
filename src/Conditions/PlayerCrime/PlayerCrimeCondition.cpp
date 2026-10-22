@@ -41,7 +41,7 @@ bool PlayerCrimeCondition::CheckCondition() {
 	if (allMet && this->cachedFactions.size() > 0) {
 		logger::info("Player met condition: Faction bounties reached threshold.");
 		this->UnlockNotify();
-		KeyedSink<RE::TESTrackedStatsEvent>::GetSingleton()->Unsubscribe(this);
+		StopListening();
 		return true;
 	}
 
@@ -55,4 +55,7 @@ RE::BSEventNotifyControl PlayerCrimeCondition::ProcessEvent(const RE::TESTracked
 		CheckCondition();
 	}
 	return RE::BSEventNotifyControl::kContinue;
+}
+void PlayerCrimeCondition::StopListening(void) {
+	KeyedSink<RE::TESTrackedStatsEvent>::GetSingleton()->Unsubscribe(this);
 }

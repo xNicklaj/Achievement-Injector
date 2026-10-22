@@ -41,6 +41,11 @@ public:
 	virtual void Localize(std::string);
 	virtual int Serialize(void);
 	virtual bool Deserialize(int); // Returns true if condition is met
+	// Stop receiving game events. Conditions unsubscribe themselves once met; this is for a parent that is met first.
+	virtual void StopListening() {}
+	// Conditions that own sub-conditions save theirs after all top-level entries (see Achievement::GetConditionsState)
+	virtual void SerializeChildren(std::vector<int>&) {}
+	virtual size_t LoadChildren(const std::vector<int>&, size_t offset) { return offset; } // Returns the offset after this condition's entries
 	
 	void SetEventManager(eventpp::EventDispatcher<std::string, void()>* eventManager);
 	void SetPlugin(std::string plugin);

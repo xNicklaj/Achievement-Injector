@@ -8,6 +8,7 @@ public:
     ObjectStateCondition();
     void OnDataLoaded() override;
     void EnableListener() override;
+    void StopListening(void) override;
     void SetConditionParameters(std::string formID, bool state) override;
     bool CheckCondition();
     bool SupportsLive() override { return true; }

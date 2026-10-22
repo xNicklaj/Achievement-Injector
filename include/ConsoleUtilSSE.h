@@ -102,7 +102,7 @@ namespace Papyrus
 
         static inline void CompileAndRunImpl(RE::Script* script, RE::ScriptCompiler* compiler, RE::COMPILER_NAME name, RE::TESObjectREFR* targetRef) {
 			using func_t = decltype(CompileAndRunImpl);
-			REL::Relocation<func_t> func{ RELOCATION_ID(21416, REL::Module::get().version().patch() < 1130 ? 21890 : 441582) };
+			REL::Relocation<func_t> func{ RELOCATION_ID(21416, REL::Module::get().version() < REL::Version(1, 6, 1130, 0) ? 21890 : 441582) };
 			return func(script, compiler, name, targetRef);
         }
 
@@ -112,7 +112,7 @@ namespace Papyrus
         }
 
         static inline RE::ObjectRefHandle GetSelectedRefHandle() {
-			REL::Relocation<RE::ObjectRefHandle*> selectedRef{ RELOCATION_ID(519394, REL::Module::get().version().patch() < 1130 ? 405935 : 504099) };
+			REL::Relocation<RE::ObjectRefHandle*> selectedRef{ RELOCATION_ID(519394, REL::Module::get().version() < REL::Version(1, 6, 1130, 0) ? 405935 : 504099) };
 			return *selectedRef;
         }
     };

@@ -21,12 +21,16 @@ void QueryStatValueCondition::SetConditionParameters(std::string stat_a, std::st
 	if (!IsValidOperation(OP_a))
 		logger::error("QueryStatValue: unknown operation \"{}\" for stat {}, this condition can never be met. Use >=, ==, <, <= or !=.", OP_a, stat_a);
 };
+void QueryStatValueCondition::StopListening(void) {
+	KeyedSink<RE::TESTrackedStatsEvent>::GetSingleton()->Unsubscribe(this);
+}
 bool QueryStatValueCondition::Evaluate() {
 	return CompareValues(this->OP, (float)RE::QueryStat(this->stat.c_str()), this->value);
 }
 bool QueryStatValueCondition::CheckCondition() {
 	if (Evaluate()) {
 		this->UnlockNotify();
+		StopListening();
 		return true;
 	}
 	return false;

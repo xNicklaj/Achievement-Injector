@@ -8,6 +8,7 @@ public:
     QueryStatValueCondition();
     void OnDataLoaded() override;
     void EnableListener() override;
+    void StopListening(void) override;
     void SetConditionParameters(std::string stat, float value) override;
     void SetConditionParameters(std::string stat, std::string OP, float value) override;
     bool CheckCondition();

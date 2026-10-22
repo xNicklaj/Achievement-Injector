@@ -5,6 +5,7 @@ public:
 	DragonSoulAbsorbedCondition();
 	void OnDataLoaded(void) override;
 	void EnableListener(void) override;
+	void StopListening(void) override;
 	void SetConditionParameters(int quantity) override;
 	bool CheckCondition() override;
 

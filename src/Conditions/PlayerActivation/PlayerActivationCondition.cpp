@@ -32,8 +32,11 @@ RE::BSEventNotifyControl PlayerActivationCondition::ProcessEvent(const RE::TESAc
 		if (++this->currQuantity >= this->quantity) {
 			logger::info("Player met condition activation {}", this->formid);
 			this->UnlockNotify();
-			KeyedSink<RE::TESActivateEvent>::GetSingleton()->Unsubscribe(this);
+			StopListening();
 		} else this->eventManager->dispatch("SerializationRequested");
 	}
 	return RE::BSEventNotifyControl::kContinue;
 };
+void PlayerActivationCondition::StopListening(void) {
+	KeyedSink<RE::TESActivateEvent>::GetSingleton()->Unsubscribe(this);
+}

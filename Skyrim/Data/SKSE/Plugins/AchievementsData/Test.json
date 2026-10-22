@@ -172,6 +172,51 @@
                 { "type": "ItemEquipped", "formID": "012E46" },
                 { "type": "ItemEquipped", "formID": "012E4B" }
             ]
+        },
+        {
+            "achievementName": "Test ConditionsMet",
+            "description": "Equip any 2 of 4 Iron pieces (save/reload between pieces to test persistence). Console: player.additem 12e49 1, 12e4d 1, 12e46 1, 12e4b 1",
+            "conditions": [
+                {
+                    "type": "ConditionsMet",
+                    "quantity": 2,
+                    "conditions": [
+                        { "type": "ItemEquipped", "formID": "012E49" },
+                        { "type": "ItemEquipped", "formID": "012E4D" },
+                        { "type": "ItemEquipped", "formID": "012E46" },
+                        { "type": "ItemEquipped", "formID": "012E4B" }
+                    ]
+                }
+            ]
+        },
+        {
+            "achievementName": "Test ConditionsMet Nested",
+            "description": "2 of 3: (Iron armor + helmet), (Iron gauntlets or boots), Iron Dagger. Console: player.additem 12e49 1, 12e4d 1, 12e46 1, 12e4b 1, 1397e 1. Try armor+helmet, restart, then dagger",
+            "conditions": [
+                {
+                    "type": "ConditionsMet",
+                    "quantity": 2,
+                    "conditions": [
+                        {
+                            "type": "ConditionsMet",
+                            "quantity": 2,
+                            "conditions": [
+                                { "type": "ItemEquipped", "formID": "012E49" },
+                                { "type": "ItemEquipped", "formID": "012E4D" }
+                            ]
+                        },
+                        {
+                            "type": "ConditionsMet",
+                            "quantity": 1,
+                            "conditions": [
+                                { "type": "ItemEquipped", "formID": "012E46" },
+                                { "type": "ItemEquipped", "formID": "012E4B" }
+                            ]
+                        },
+                        { "type": "ItemEquipped", "formID": "01397E" }
+                    ]
+                }
+            ]
         }
     ]
 }

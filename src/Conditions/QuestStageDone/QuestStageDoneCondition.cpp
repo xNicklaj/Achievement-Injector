@@ -36,8 +36,11 @@ bool QuestStageDoneCondition::CheckCondition() {
     if (Evaluate()) {
         logger::info("Quest {} met condition stage {}", this->formID, this->stage);
         this->UnlockNotify();
-        KeyedSink<RE::TESQuestStageEvent>::GetSingleton()->Unsubscribe(this);
+        StopListening();
         return true;
     }
     return false;
+}
+void QuestStageDoneCondition::StopListening(void) {
+    KeyedSink<RE::TESQuestStageEvent>::GetSingleton()->Unsubscribe(this);
 }

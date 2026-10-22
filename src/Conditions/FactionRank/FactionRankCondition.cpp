@@ -33,7 +33,7 @@ bool FactionRankCondition::CheckCondition() {
 
 	if (Evaluate()) {
 		this->UnlockNotify();
-		RE::UI::GetSingleton()->RemoveEventSink(this);
+		StopListening();
 		return true;
 	}
 	return false;
@@ -44,4 +44,7 @@ RE::BSEventNotifyControl FactionRankCondition::ProcessEvent(const RE::MenuOpenCl
 		CheckCondition();
 	}
 	return RE::BSEventNotifyControl::kContinue;
+}
+void FactionRankCondition::StopListening(void) {
+	RE::UI::GetSingleton()->RemoveEventSink(this);
 }

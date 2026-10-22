@@ -12,6 +12,7 @@ public:
 
 	void OnDataLoaded(void) override;
 	void EnableListener(void) override;
+	void StopListening(void) override;
 	bool CheckCondition() override;
 	void SetParameters(std::string formID, std::string script, std::string variable, int value);
 

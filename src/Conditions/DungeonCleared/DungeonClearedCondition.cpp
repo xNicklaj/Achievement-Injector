@@ -22,7 +22,7 @@ bool DungeonClearedCondition::CheckCondition() {
     if (target->IsCleared()) {
         logger::info("Player met condition location {} cleared.", this->formid);
         UnlockNotify();
-        KeyedSink<RE::TESTrackedStatsEvent>::GetSingleton()->Unsubscribe(this);
+        StopListening();
         return true;
     }
     return false;
@@ -32,4 +32,7 @@ RE::BSEventNotifyControl DungeonClearedCondition::ProcessEvent(const RE::TESTrac
         CheckCondition();
     }
     return RE::BSEventNotifyControl::kContinue;
+}
+void DungeonClearedCondition::StopListening(void) {
+    KeyedSink<RE::TESTrackedStatsEvent>::GetSingleton()->Unsubscribe(this);
 }

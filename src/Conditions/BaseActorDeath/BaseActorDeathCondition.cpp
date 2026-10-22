@@ -30,7 +30,7 @@ bool BaseActorDeathCondition::CheckCondition() {
 	if (this->currQuantity >= this->quantity) {
 		logger::info("Player met condition actor {} dead.", this->identifier);
 		this->UnlockNotify();
-		KeyedSink<RE::TESDeathEvent>::GetSingleton()->Unsubscribe(this);
+		StopListening();
 	}
 	return false;
 };
@@ -88,4 +88,7 @@ int BaseActorDeathCondition::Serialize() {
 void BaseActorDeathCondition::Localize(std::string path) {
 	if (!this->isFormID && this->identifier[0] == '$')
 		this->identifier = LocalizationManager::GetSingleton()->GetLocalizedText(path, LocalizationManager::GetSingleton()->CurrentLocale(), this->identifier);
+}
+void BaseActorDeathCondition::StopListening(void) {
+	KeyedSink<RE::TESDeathEvent>::GetSingleton()->Unsubscribe(this);
 }

@@ -17,6 +17,11 @@ namespace logger = SKSE::log;
 
 using json = nlohmann::json;
 
+// Thrown by the constructor when the achievement must not be loaded; not a malformed file
+struct AchievementSkipped : std::runtime_error {
+    using std::runtime_error::runtime_error;
+};
+
 class Achievement : Runnable {
 public:
     // Constructor that initializes the Achievement from a JSON object

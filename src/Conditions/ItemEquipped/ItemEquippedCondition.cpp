@@ -35,7 +35,7 @@ bool ItemEquippedCondition::CheckCondition() {
 	if (Evaluate()) {
 		logger::info("Player met condition item equipped {}", this->formid);
 		this->UnlockNotify();
-		KeyedSink<RE::TESEquipEvent>::GetSingleton()->Unsubscribe(this);
+		StopListening();
 		return true;
 	}
 	return false;
@@ -44,7 +44,10 @@ RE::BSEventNotifyControl ItemEquippedCondition::ProcessEvent(const RE::TESEquipE
 	if (a_event && a_event->equipped && this->cachedFormID && a_event->baseObject == this->cachedFormID && a_event->actor && a_event->actor->IsPlayerRef()) {
 		logger::info("Player met condition item equipped {}", this->formid);
 		this->UnlockNotify();
-		KeyedSink<RE::TESEquipEvent>::GetSingleton()->Unsubscribe(this);
+		StopListening();
 	}
 	return RE::BSEventNotifyControl::kContinue;
 };
+void ItemEquippedCondition::StopListening(void) {
+	KeyedSink<RE::TESEquipEvent>::GetSingleton()->Unsubscribe(this);
+}

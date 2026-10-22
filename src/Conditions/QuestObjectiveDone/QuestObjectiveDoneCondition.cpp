@@ -59,9 +59,12 @@ bool QuestObjectiveDoneCondition::CheckCondition() {
     if (Evaluate()) {
         logger::info("Player met condition quest {} objective {}", this->formID, this->objective);
         this->UnlockNotify();
-        KeyedSink<RE::TESQuestStageEvent>::GetSingleton()->Unsubscribe(this);
-        RE::PlayerCharacter::GetSingleton()->AsPositionPlayerEventSource()->RemoveEventSink(this);
+        StopListening();
         return true;
     }
     return false;
+}
+void QuestObjectiveDoneCondition::StopListening(void) {
+    KeyedSink<RE::TESQuestStageEvent>::GetSingleton()->Unsubscribe(this);
+    RE::PlayerCharacter::GetSingleton()->AsPositionPlayerEventSource()->RemoveEventSink(this);
 }

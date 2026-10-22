@@ -77,6 +77,12 @@ void CustomSkillLevelCondition::EnableListener() {
     RE::UI::GetSingleton()->AddEventSink<RE::MenuOpenCloseEvent>(this);
 }
 
+void CustomSkillLevelCondition::StopListening() {
+    GlobalVariableStateCondition::StopListening();
+    if (csfDispatcher) csfDispatcher->RemoveEventSink(this);
+    RE::UI::GetSingleton()->RemoveEventSink<RE::MenuOpenCloseEvent>(this);
+}
+
 RE::BSEventNotifyControl CustomSkillLevelCondition::ProcessEvent(const RE::MenuOpenCloseEvent* a_event, RE::BSTEventSource<RE::MenuOpenCloseEvent>*) {
     if (this->isMet) {
         RE::UI::GetSingleton()->RemoveEventSink<RE::MenuOpenCloseEvent>(this);

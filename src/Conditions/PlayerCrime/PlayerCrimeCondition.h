@@ -8,6 +8,7 @@ class PlayerCrimeCondition : public Condition, public RE::BSTEventSink<RE::TESTr
 public:
 	PlayerCrimeCondition(void);
 	void EnableListener(void) override;
+	void StopListening(void) override;
 	void OnDataLoaded(void) override;
 	void SetConditionParameters(std::vector<std::string> factionIDs_a, int bountyThreshold_a) override;
 	bool CheckCondition(void) override;

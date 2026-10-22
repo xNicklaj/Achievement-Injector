@@ -8,6 +8,7 @@ public:
     GlobalVariableStateCondition();
     void OnDataLoaded() override;
     void EnableListener() override;
+    void StopListening(void) override;
     void SetConditionParameters(std::string formID, float value) override;
     void SetConditionParameters(std::string formID, std::string OP, float value) override;
     bool CheckCondition();

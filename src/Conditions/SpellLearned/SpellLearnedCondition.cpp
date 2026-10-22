@@ -52,8 +52,11 @@ bool SpellLearnedCondition::CheckCondition() {
     if (found) {
         logger::info("Player met condition learned {}:{}", target->fullName.c_str(), FormIDToString(target->formID));
         this->UnlockNotify();
-        RE::SpellsLearned::GetEventSource()->RemoveEventSink(this);
-        RE::PlayerCharacter::GetSingleton()->AsPositionPlayerEventSource()->RemoveEventSink(this);
+        StopListening();
     }
     return found;
+}
+void SpellLearnedCondition::StopListening(void) {
+    RE::SpellsLearned::GetEventSource()->RemoveEventSink(this);
+    RE::PlayerCharacter::GetSingleton()->AsPositionPlayerEventSource()->RemoveEventSink(this);
 }

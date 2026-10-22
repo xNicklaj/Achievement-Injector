@@ -33,8 +33,11 @@ RE::BSEventNotifyControl MagicEffectAppliedCondition::ProcessEvent(const RE::TES
 		if (++this->currQuantity >= this->quantity) {
 			logger::info("Player met condition magic effect applied {}", this->formid);
 			this->UnlockNotify();
-			KeyedSink<RE::TESMagicEffectApplyEvent>::GetSingleton()->Unsubscribe(this);
+			StopListening();
 		} else this->eventManager->dispatch("SerializationRequested");
 	}
 	return RE::BSEventNotifyControl::kContinue;
 };
+void MagicEffectAppliedCondition::StopListening(void) {
+	KeyedSink<RE::TESMagicEffectApplyEvent>::GetSingleton()->Unsubscribe(this);
+}

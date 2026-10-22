@@ -36,8 +36,11 @@ bool PlayerSkillLevelCondition::CheckCondition() {
     if (!this->isMet && Evaluate()) {
         logger::info("Skill {} met condition level {}", this->skill, this->level);
         this->UnlockNotify();
-        RE::SkillIncrease::GetEventSource()->RemoveEventSink(this);
+        StopListening();
         return true;
     }
     return false;
+}
+void PlayerSkillLevelCondition::StopListening(void) {
+    RE::SkillIncrease::GetEventSource()->RemoveEventSink(this);
 }

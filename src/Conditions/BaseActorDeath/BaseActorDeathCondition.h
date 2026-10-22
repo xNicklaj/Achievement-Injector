@@ -5,6 +5,7 @@ public:
 	BaseActorDeathCondition();
 	void OnDataLoaded(void) override;
 	void EnableListener(void) override;
+	void StopListening(void) override;
 	void SetConditionParameters(std::string, int) override;
     void SetEditorID(bool);
 	bool CheckCondition();

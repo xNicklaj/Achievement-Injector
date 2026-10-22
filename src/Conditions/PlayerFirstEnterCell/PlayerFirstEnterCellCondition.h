@@ -5,6 +5,7 @@ public:
 	PlayerFirstEnterCellCondition();
 	void OnDataLoaded(void) override;
 	void EnableListener(void) override;
+	void StopListening(void) override;
 	void SetConditionParameters(std::string cellID) override;
 	bool CheckCondition();
 	std::string cellID;

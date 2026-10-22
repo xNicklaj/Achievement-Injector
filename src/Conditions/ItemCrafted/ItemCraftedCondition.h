@@ -5,6 +5,7 @@ public:
 	ItemCraftedCondition();
 	void OnDataLoaded(void) override;
 	void EnableListener(void) override;
+	void StopListening(void) override;
 	void SetConditionParameters(std::string itemID) override;
 	void SetConditionParameters(std::string itemID, int quantity) override;
 	int Serialize() override;

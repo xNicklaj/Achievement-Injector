@@ -25,16 +25,6 @@ std::string AchievementGroup::ToString() {
     return ret + locked;
 }
 
-void AchievementGroup::ForceUnlock(std::string achievementName) {
-    for (const auto& achievement: this->achievements) {
-        // Papyrus strings are case-insensitively interned, so the caller's casing may not survive
-        if (_stricmp(achievement->achievementName.c_str(), achievementName.c_str()) == 0) {
-            achievement->ForceUnlock();
-            return;
-        }
-    }
-}
-
 std::string AchievementManager::ToString() {
     std::string ret = "";
     int num_displayed = 0;
@@ -70,20 +60,30 @@ const std::string& AchievementManager::GetCache() {
     return cache;
 }
 
-void AchievementManager::ForceUnlock(std::string achievementName, std::string group_a) {
-    LocalizationManager* lm = LocalizationManager::GetSingleton();
+Achievement* AchievementManager::Find(std::string achievementName, const std::string& group_a) {
     if (achievementName.starts_with("$")) {
-        std::string prev = achievementName;
+        LocalizationManager* lm = LocalizationManager::GetSingleton();
         achievementName = lm->GetLocalizedText(group_a, lm->CurrentLocale(), achievementName);
-        logger::debug("Achievement {} was localized to {} to be unlocked.", prev, achievementName);
     }
-    logger::debug("Forcing unlock of achievement {} in group {}.", achievementName, group_a);
     for (auto& group: this->achievementGroups) {
-        if (_stricmp(group.groupid.c_str(), group_a.c_str()) == 0) {
-            group.ForceUnlock(achievementName);
-            return;
+        if (_stricmp(group.groupid.c_str(), group_a.c_str()) != 0) continue;
+        for (auto* achievement: group.achievements) {
+            // Papyrus strings are case-insensitively interned, so the caller's casing may not survive
+            if (_stricmp(achievement->achievementName.c_str(), achievementName.c_str()) == 0) return achievement;
         }
+        return nullptr;
     }
+    return nullptr;
+}
+
+void AchievementManager::ForceUnlock(std::string achievementName, std::string group_a) {
+    logger::debug("Forcing unlock of achievement {} in group {}.", achievementName, group_a);
+    if (auto* achievement = Find(achievementName, group_a)) achievement->ForceUnlock();
+}
+
+bool AchievementManager::IsUnlocked(const std::string& achievementName, const std::string& group_a) {
+    auto* achievement = Find(achievementName, group_a);
+    return achievement && achievement->unlocked;
 }
 
 void AchievementManager::AddEventSink(std::function<void(AchievementUnlockedEvent*)> callback) {

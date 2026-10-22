@@ -9,6 +9,7 @@ public:
 	WorldspaceDiscoveryCondition();
 	void OnDataLoaded(void) override;
 	void EnableListener(void) override;
+	void StopListening(void) override;
 	void SetConditionParameters(std::string worldspaceID_a, int requiredCount_a);
 	bool CheckCondition(void) override;
 

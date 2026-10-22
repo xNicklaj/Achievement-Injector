@@ -31,7 +31,7 @@ bool ItemCraftedCondition::CheckCondition(RE::FormID itemID_a) {
 		if (++this->currQuantity >= this->quantity) {
 			logger::info("Player met condition crafted {}.", this->itemID);
 			this->UnlockNotify();
-			RE::ItemCrafted::GetEventSource()->RemoveEventSink(this);
+			StopListening();
 			return true;
 		}
 		this->eventManager->dispatch("SerializationRequested");
@@ -42,4 +42,7 @@ RE::BSEventNotifyControl ItemCraftedCondition::ProcessEvent(const RE::ItemCrafte
 	if (!a_event || !IsValidEventPtr(a_event->item, "ItemCrafted item")) return RE::BSEventNotifyControl::kContinue;
 	CheckCondition(a_event->item->formID);
 	return RE::BSEventNotifyControl::kContinue;
+}
+void ItemCraftedCondition::StopListening(void) {
+	RE::ItemCrafted::GetEventSource()->RemoveEventSink(this);
 }

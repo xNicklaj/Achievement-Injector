@@ -49,7 +49,10 @@ bool ShoutLearnedCondition::CheckCondition() {
         RE::TESShout* target = this->cachedShout;
         logger::info("Player met condition learned shout {}:{}", target->fullName.c_str(), FormIDToString(target->formID));
         this->UnlockNotify();
-        KeyedSink<RE::TESTrackedStatsEvent>::GetSingleton()->Unsubscribe(this);
+        StopListening();
     }
     return false;
+}
+void ShoutLearnedCondition::StopListening(void) {
+    KeyedSink<RE::TESTrackedStatsEvent>::GetSingleton()->Unsubscribe(this);
 }

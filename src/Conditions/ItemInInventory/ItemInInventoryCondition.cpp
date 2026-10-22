@@ -41,8 +41,11 @@ bool ItemInInventoryCondition::CheckCondition() {
     if (Evaluate()) {
         logger::info("Player met condition item {} quantity {}", this->formid, this->quantity);
         this->UnlockNotify();
-        KeyedSink<RE::TESContainerChangedEvent>::GetSingleton()->Unsubscribe(this);
+        StopListening();
         return true;
     }
     return false;
+}
+void ItemInInventoryCondition::StopListening(void) {
+    KeyedSink<RE::TESContainerChangedEvent>::GetSingleton()->Unsubscribe(this);
 }

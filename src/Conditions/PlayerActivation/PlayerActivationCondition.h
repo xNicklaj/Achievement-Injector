@@ -5,6 +5,7 @@ public:
 	PlayerActivationCondition();
 	void OnDataLoaded(void) override;
 	void EnableListener(void) override;
+	void StopListening(void) override;
 	void SetConditionParameters(std::string formid) override;
 	void SetConditionParameters(std::string formid, int quantity) override;
 	bool CheckCondition() override;

@@ -26,7 +26,7 @@ bool ObjectStateCondition::CheckCondition() {
         return true;
     if (Evaluate()) {
         this->UnlockNotify();
-        RE::PlayerCharacter::GetSingleton()->AsPositionPlayerEventSource()->RemoveEventSink(this);
+        StopListening();
         return true;
     }
     return false;
@@ -36,4 +36,7 @@ RE::BSEventNotifyControl ObjectStateCondition::ProcessEvent(const RE::PositionPl
     if (!this->isMet)
         CheckCondition();
     return RE::BSEventNotifyControl::kContinue;
+}
+void ObjectStateCondition::StopListening(void) {
+    RE::PlayerCharacter::GetSingleton()->AsPositionPlayerEventSource()->RemoveEventSink(this);
 }

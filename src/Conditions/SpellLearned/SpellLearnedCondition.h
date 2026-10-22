@@ -6,6 +6,7 @@ public:
 	SpellLearnedCondition();
 	void OnDataLoaded(void) override;
 	void EnableListener(void) override;
+	void StopListening(void) override;
 	void SetConditionParameters(std::string skill) override;
 	bool CheckCondition() override;
 	bool SupportsLive() override { return true; }

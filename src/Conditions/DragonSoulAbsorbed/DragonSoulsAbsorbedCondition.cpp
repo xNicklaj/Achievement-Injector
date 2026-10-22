@@ -23,7 +23,7 @@ bool DragonSoulAbsorbedCondition::CheckCondition() {
     if (totalAbsorbed >= quantity) {
         logger::info("Player met condition absorbed souls {}", this->quantity);
         this->UnlockNotify();
-        RE::DragonSoulsGained::GetEventSource()->RemoveEventSink(this);
+        StopListening();
         return true;
     }
     return false;
@@ -32,4 +32,7 @@ RE::BSEventNotifyControl DragonSoulAbsorbedCondition::ProcessEvent(const RE::Dra
     // TODO tutto ma triggera
     CheckCondition();
     return RE::BSEventNotifyControl::kContinue;
+}
+void DragonSoulAbsorbedCondition::StopListening(void) {
+    RE::DragonSoulsGained::GetEventSource()->RemoveEventSink(this);
 }
