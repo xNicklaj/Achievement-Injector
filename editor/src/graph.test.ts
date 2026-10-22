@@ -11,8 +11,8 @@ const link = (source: string, target: string, sourceHandle: string, targetHandle
 
 describe("registry", () => {
   it("has every condition type plus ten non-condition nodes", () => {
-    expect(nodeDefs.filter((d) => d.category === "condition")).toHaveLength(31);
-    expect(nodeDefs).toHaveLength(41);
+    expect(nodeDefs.filter((d) => d.category === "condition")).toHaveLength(32);
+    expect(nodeDefs).toHaveLength(42);
   });
   it("localizable fields come from the schema", () => {
     expect(registry.CreateAchievement.fields.filter((f) => f.widget === "localizedString").map((f) => f.name)).toEqual(["achievementName", "description"]);
@@ -76,5 +76,33 @@ describe("Live and Negate nodes", () => {
     expect(refuseReason(nodes, [], link("drag", "live", "cond-out", "cond-in"))).toMatch(/does not support/);
     expect(refuseReason(nodes, [cond("q", "live")], link("drag", "live", "cond-out", "cond-in"))).toMatch(/already has/i);
     expect(refuseReason(nodes, [cond("live", "neg")], link("neg", "live", "cond-out", "cond-in"))).toMatch(/loop/);
+  });
+});
+
+describe("Conditions Met", () => {
+  const cm = [node("m1", "ConditionsMet", { quantity: 1 }), node("m2", "ConditionsMet", { quantity: 1 }), node("p", "PlayerLevel", { level: 1 }), node("hp", "HasPerk", { formID: "1" }), node("lv", "Live"), node("ng", "Negate"), node("add", "AddConditions"), node("cr", "CreateAchievement")];
+  const wire = (source: string, target: string): Edge => ({ id: `${source}-${target}`, source, target, sourceHandle: "cond-out", targetHandle: "cond-in" });
+
+  it("takes conditions, and feeds Add Conditions or another Conditions Met", () => {
+    expect(refuseReason(cm, [], link("p", "m1", "cond-out", "cond-in"))).toBeNull();
+    expect(refuseReason(cm, [wire("p", "m1")], link("hp", "m1", "cond-out", "cond-in"))).toBeNull(); // several in
+    expect(refuseReason(cm, [], link("m1", "add", "cond-out", "cond-in"))).toBeNull();
+    expect(refuseReason(cm, [], link("m2", "m1", "cond-out", "cond-in"))).toBeNull();
+  });
+  it("refuses a Conditions Met that holds itself, directly or through others", () => {
+    expect(refuseReason(cm, [wire("m2", "m1")], link("m1", "m2", "cond-out", "cond-in"))).toMatch(/loop/);
+    expect(refuseReason(cm, [], link("m1", "m1", "cond-out", "cond-in"))).not.toBeNull();
+  });
+  it("refuses Live and Negate inside it, from either end, and on itself", () => {
+    expect(refuseReason(cm, [], link("lv", "m1", "cond-out", "cond-in"))).toMatch(/not supported inside/);
+    expect(refuseReason(cm, [wire("lv", "m1")], link("hp", "lv", "cond-out", "cond-in"))).toMatch(/not supported inside/);
+    expect(refuseReason(cm, [], link("m1", "lv", "cond-out", "cond-in"))).toMatch(/does not support Live/);
+  });
+  it("summarises what it holds against its quantity", () => {
+    const two = [wire("p", "m1"), wire("hp", "m1")];
+    expect(conditionsSummary(cm, [], "m1")).toEqual({ text: "No conditions", level: "error" });
+    expect(conditionsSummary(cm, two, "m1")).toEqual({ text: "1 of 2 conditions", level: "ok" });
+    const three = cm.map((n) => (n.id === "m1" ? node("m1", "ConditionsMet", { quantity: 3 }) : n));
+    expect(conditionsSummary(three, two, "m1")).toEqual({ text: "Needs 3, but has 2 conditions", level: "error" });
   });
 });

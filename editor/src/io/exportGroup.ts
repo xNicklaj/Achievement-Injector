@@ -1,5 +1,5 @@
 import type { Edge } from "@xyflow/react";
-import { achievementNames, behind, isInternalGroup, linkedText, type AppNode } from "../graph";
+import { achievementNames, behind, isGroupCondition, isInternalGroup, linkedText, type AppNode } from "../graph";
 import { isAction, linkKind, registry, UNKNOWN_CONDITION } from "../registry";
 import { BASELINE_VERSION, compareVersions, GroupSchema, LIVE_TYPES, SCHEMA_VERSION } from "../schema";
 import type { GroupValues } from "../store";
@@ -34,8 +34,27 @@ export const withoutEditor = (v: unknown): unknown =>
 const round = (n: number) => Math.round(n);
 const xy = (n: AppNode) => ({ x: round(n.position.x), y: round(n.position.y) });
 
+/** A condition as exported: its node, the nodes of the conditions inside it (Conditions Met) and of its On Unlock actions. */
+type CondRef = { id: string; children: CondRef[]; actions: string[] };
+const flat = (refs: CondRef[]): string[] => refs.flatMap((r) => [r.id, ...flat(r.children)]);
+
 /** Where each part of an exported achievement came from, so schema errors can be pinned on nodes. */
-type Refs = { create: string; add?: string; join?: string; conds: string[]; actions: string[]; condActions: string[][] };
+type Refs = { create: string; add?: string; join?: string; conds: CondRef[]; actions: string[] };
+
+/** The node and field a schema error at `path` (the part after `conditions`) belongs to. */
+function pinCondition(r: Refs, path: PropertyKey[]): { nodeId?: string; field?: string } {
+  let ref: CondRef | undefined;
+  let p = path;
+  while (p[0] === "conditions" && typeof p[1] === "number") {
+    ref = (ref ? ref.children : r.conds)[p[1]];
+    if (!ref) return {};
+    p = p.slice(2);
+  }
+  if (!ref) return { nodeId: r.add ?? r.create };
+  const [k0, k1, k2] = p;
+  if (k0 === "onUnlock" && typeof k1 === "number") return { nodeId: ref.actions[k1], field: typeof k2 === "string" ? k2 : undefined };
+  return { nodeId: ref.id, field: typeof k0 === "string" ? k0 : undefined };
+}
 
 /**
  * Graph -> JSON. Unset fields are omitted, unknown keys come back from `extra`, so a file imported and
@@ -160,42 +179,56 @@ export function exportGroup(s: ExportState): { json: Json; issues: Issue[] } {
     const joinType = joins[0]?.data.values.joinType;
     if (joinType !== undefined) out.joinType = joinType;
 
-    const condIds: string[] = [];
-    const condActions: string[][] = [];
+    let tree: CondRef[] = [];
+    /** The conditions wired into `into` (Add Conditions, or the Conditions Met `inside`), in wire order. */
+    const condList = (into: AppNode, inside?: AppNode): { json: Json[]; refs: CondRef[] } => {
+      const json: Json[] = [];
+      const refs: CondRef[] = [];
+      for (const e of s.edges.filter((x) => x.target === into.id && x.targetHandle === "cond-in")) {
+        const { root: c, mods } = behind(s.nodes, s.edges, e.source);
+        for (const m of mods) used.add(m.id);
+        if (!c) {
+          for (const m of mods) add("warning", `${registry[m.data.kind].title} has no condition, so it will not be saved.`, m.id, { detail: "No condition connected: it will not be saved" });
+          continue;
+        }
+        used.add(c.id);
+        if (c.data.kind === UNKNOWN_CONDITION) {
+          unknownConds.add(c.id);
+          const type = String(c.data.extra?.type);
+          add("error", `Achievement "${name}": "${type}" is not a condition type this editor knows.`, c.id, { detail: `Unknown condition "${type}": it is kept as it is, but may be from a newer mod version or a typo` });
+        }
+        if (mods.length && !LIVE_TYPES.has(c.data.kind))
+          add("error", `${registry[c.data.kind].title} does not support ${mods[0].data.kind}.`, mods[0].id, { detail: `${registry[c.data.kind].title} does not support Live or Negate: the mod skips it` });
+        // The mod skips the whole achievement when a Conditions Met holds a live or negated condition.
+        else if (mods.length && inside)
+          add("error", `Achievement "${name}": ${mods[0].data.kind} is not supported inside Conditions Met.`, mods[0].id, { detail: "Live and Negate are not supported inside Conditions Met: the mod skips the achievement" });
+        // The mod accepts Negate alone, but this editor requires an explicit Live before it.
+        const negate = mods.findIndex((m) => m.data.kind === "Negate");
+        if (negate >= 0 && !mods.slice(0, negate).some((m) => m.data.kind === "Live"))
+          add("error", `Achievement "${name}": a Negate node needs a Live node between its condition and it.`, mods[negate].id, { detail: "Needs a Live node between the condition and this node" });
+        // The condition's own actions: the chain hanging off its flow pin.
+        const acts = chainFrom(c.id).filter((n) => isAction(n.data.kind));
+        const o: Json = { type: c.data.kind, ...fields(c), ...c.data.extra };
+        let children: CondRef[] = [];
+        if (isGroupCondition(c.data.kind)) {
+          const inner = condList(c, c);
+          o.conditions = inner.json;
+          children = inner.refs;
+        }
+        for (const m of mods) o[m.data.kind.toLowerCase()] = true;
+        if (acts.length) o.onUnlock = acts.map(actionJson);
+        o._editor = { id: c.id, ...xy(c), ...(acts.length ? { chain: acts.map(xy) } : {}), ...(mods.length ? { mods: mods.map((m) => ({ kind: m.data.kind, id: m.id, ...xy(m) })) } : {}) };
+        json.push(o);
+        refs.push({ id: c.id, children, actions: acts.map((n) => n.id) });
+      }
+      return { json, refs };
+    };
     if (adds[0]) {
-      out.conditions = s.edges
-        .filter((e) => e.target === adds[0].id && e.targetHandle === "cond-in")
-        .flatMap((e) => {
-          const { root: c, mods } = behind(s.nodes, s.edges, e.source);
-          for (const m of mods) used.add(m.id);
-          if (!c) {
-            for (const m of mods) add("warning", `${registry[m.data.kind].title} has no condition, so it will not be saved.`, m.id, { detail: "No condition connected: it will not be saved" });
-            return [];
-          }
-          used.add(c.id);
-          condIds.push(c.id);
-          if (c.data.kind === UNKNOWN_CONDITION) {
-            unknownConds.add(c.id);
-            const type = String(c.data.extra?.type);
-            add("error", `Achievement "${name}": "${type}" is not a condition type this editor knows.`, c.id, { detail: `Unknown condition "${type}": it is kept as it is, but may be from a newer mod version or a typo` });
-          }
-          if (mods.length && !LIVE_TYPES.has(c.data.kind))
-            add("error", `${registry[c.data.kind].title} does not support ${mods[0].data.kind}.`, mods[0].id, { detail: `${registry[c.data.kind].title} does not support Live or Negate: the mod skips it` });
-          // The mod accepts Negate alone, but this editor requires an explicit Live before it.
-          const negate = mods.findIndex((m) => m.data.kind === "Negate");
-          if (negate >= 0 && !mods.slice(0, negate).some((m) => m.data.kind === "Live"))
-            add("error", `Achievement "${name}": a Negate node needs a Live node between its condition and it.`, mods[negate].id, { detail: "Needs a Live node between the condition and this node" });
-          // The condition's own actions: the chain hanging off its flow pin.
-          const acts = chainFrom(c.id).filter((n) => isAction(n.data.kind));
-          condActions.push(acts.map((n) => n.id));
-          const o: Json = { type: c.data.kind, ...fields(c), ...c.data.extra };
-          for (const m of mods) o[m.data.kind.toLowerCase()] = true;
-          if (acts.length) o.onUnlock = acts.map(actionJson);
-          o._editor = { id: c.id, ...xy(c), ...(acts.length ? { chain: acts.map(xy) } : {}), ...(mods.length ? { mods: mods.map((m) => ({ kind: m.data.kind, id: m.id, ...xy(m) })) } : {}) };
-          return [o];
-        });
+      const list = condList(adds[0]);
+      out.conditions = list.json;
+      tree = list.refs;
       // The mod only evaluates live conditions when another condition fires, so an all-live achievement never unlocks.
-      if ((out.conditions as Json[]).length && (out.conditions as Json[]).every((o) => o.live || o.negate))
+      if (list.json.length && list.json.every((o) => o.live || o.negate))
         add("warning", `Achievement "${name}" has only live conditions, so it can never unlock.`, adds[0].id, { detail: "Only live conditions: it can never unlock. Add a condition that is not live" });
     }
 
@@ -207,7 +240,7 @@ export function exportGroup(s: ExportState): { json: Json; issues: Issue[] } {
     for (const [k, v] of Object.entries(create.data.extra ?? {})) if (!(k in out)) out[k] = v;
     out._editor = { id: create.id, ...xy(create), chain: chain.map(xy) };
     achievements.push(out);
-    refs.push({ create: create.id, add: adds[0]?.id, join: joins[0]?.id, conds: condIds, actions: actionNodes.map((n) => n.id), condActions });
+    refs.push({ create: create.id, add: adds[0]?.id, join: joins[0]?.id, conds: tree, actions: actionNodes.map((n) => n.id) });
   }
 
   // Achievements that wait for each other, directly or through others, can never unlock.
@@ -215,7 +248,7 @@ export function exportGroup(s: ExportState): { json: Json; issues: Issue[] } {
   const byName = new Map([...creates.values()].map((n) => [linkedText(s.nodes, s.edges, loc, n, "ach") ?? "", n.id]));
   const waits = new Map<string, Set<string>>();
   refs.forEach((r) => {
-    for (const id of r.conds) {
+    for (const id of flat(r.conds)) {
       const c = byId.get(id)!;
       if (c.data.kind !== "AchievementUnlocked") continue;
       const wire = s.edges.find((e) => e.target === id && e.targetHandle === "ach:achievement");
@@ -264,14 +297,12 @@ export function exportGroup(s: ExportState): { json: Json; issues: Issue[] } {
   const parsed = GroupSchema.safeParse(json);
   if (!parsed.success)
     for (const i of parsed.error.issues) {
-      const [root, idx, a, b, c, d, e] = i.path;
+      const [root, idx, a, b, c] = i.path;
       const r = root === "achievements" && typeof idx === "number" ? refs[idx] : undefined;
       let nodeId: string | undefined;
       let field: string | undefined;
       if (r) {
-        if (a === "conditions" && typeof b === "number" && c === "onUnlock" && typeof d === "number") (nodeId = r.condActions[b]?.[d]), (field = typeof e === "string" ? e : undefined);
-        else if (a === "conditions" && typeof b === "number") (nodeId = r.conds[b]), (field = typeof c === "string" ? c : undefined);
-        else if (a === "conditions") nodeId = r.add ?? r.create;
+        if (a === "conditions") ({ nodeId, field } = pinCondition(r, i.path.slice(2)));
         else if (a === "onUnlock" && typeof b === "number") (nodeId = r.actions[b]), (field = typeof c === "string" ? c : undefined);
         else if (a === "joinType") (nodeId = r.join ?? r.create), (field = "joinType");
         else (nodeId = r.create), (field = typeof a === "string" ? a : undefined);

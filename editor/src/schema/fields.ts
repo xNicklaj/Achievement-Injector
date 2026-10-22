@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 /** DLL version the schema targets (HANDOVER 3.7). Fields newer than BASELINE carry an explicit `since`. */
-export const TARGET_VERSION = "1.4.1";
+export const TARGET_VERSION = "1.4.2";
 export const BASELINE_VERSION = "1.4.0";
 
 /** Negative when `a` is older than `b`, as dotted numbers ("1.4.1" > "1.4.0"). */

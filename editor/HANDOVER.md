@@ -6,7 +6,7 @@ _Last updated: 2026-10-20_
 
 Built in `editor/` (Vite 8, React 19, `@xyflow/react`, Tailwind 4, Zustand + zundo, Lucide); run with `npm run dev`, `npm test`, `npm run build`:
 - **Schema** (`src/schema/`): done, see 3.12.
-- **Node registry** (`src/registry.ts`): derived from the schema, 37 node types (31 conditions + `CreateAchievement`, `AddConditions`, `JoinType`, `RunCommand`, `CallPapyrus`, `LocalizedText`).
+- **Node registry** (`src/registry.ts`): derived from the schema, 38 node types (32 conditions + `CreateAchievement`, `AddConditions`, `JoinType`, `RunCommand`, `CallPapyrus`, `LocalizedText`).
 - **Graph rules** (`src/graph.ts`, tested): pin-type matching, one flow in/out per node, no loops, one `AddConditions`/`JoinType` per chain (generic helper), a condition node feeds one `AddConditions`, live `AddConditions` summary.
 - **App shell** (3.15): menu bar, foldable menu, canvas, resizable node panel with category tabs, search and drag-to-canvas, Group Properties pane. Undo/redo works (one entry per drag).
 - **Import/export** (`src/io/`): JSON <-> graph, in both browsers via file pick and download (see File menu below). `src/io/io.test.ts` checks that all 8 shipped configs survive JSON -> graph -> JSON unchanged (ignoring `_editor` and key order) and that graph -> JSON -> graph is stable. Behaviour:
@@ -35,6 +35,7 @@ Built in `editor/` (Vite 8, React 19, `@xyflow/react`, Tailwind 4, Zustand + zun
 - **Spawn menu** (`spawn.ts`, `components/SpawnMenu.tsx`, 3.5): dropping a wire on empty canvas lists only the node types that can take it, each tried against the same connection rules as a hand-drawn wire (so a second `AddConditions` in a chain, or a used pin, is not offered); right-click lists every type. A text output offers one choice per localizable field. Arrow keys, Enter and Escape work; the node and its wire are created in one undo step, placed so the pin meets the cursor. Own small menu instead of cmdk (no new dependency).
 - **Icons** (`io/dds.ts`, `components/icons.tsx`, `IconField.tsx`, `io/iconActions.ts`, 3.1/3.4): a `.dds` reader (BC1 to BC3 and 32-bit decode; BC4/BC5/BC6H/BC7 are flagged as unsupported, "BC3 max"; size must be 512×512). Folder and picked-folder workspaces list and read `Icons/<Group>/` and `Icons/<Group>.dds`, case-insensitively; a few picked files cannot see icons. The `icon` field is a thumbnail, a free-text name and a picker with previews; the Group Properties page shows the group icon with its format check. Add icon / Choose icon check the file (refuse unsupported, confirm a wrong size or an overwrite) and queue it; queued icons count as unsaved changes, survive a draft restore, and Save writes them (`Icons/<group>/<file>` or `Icons/<group>.dds`) in place or as downloads. Export warns when `icon` names a file that is not in the group's folder (only when the folder can be listed).
 - **Renaming an achievement** (3.1): the name field commits on blur or Enter (Escape reverts). `AchievementUnlocked` references to the old name in this group (none or this group's file name) follow it, references into other groups are left alone, all in one undo step. Renaming a name that is already on disk (opened or last saved) asks to keep it or undo, noting that progress, the Papyrus API and the console command use the name and other groups are not updated. `AchievementUnlocked.achievement` suggests this group's achievement names; with another group in `group` it is free text tagged "external", and a name that does not exist in this group is a warning. A localized name counts as its fallback text, because the DLL compares plain text.
+- **Conditions Met** (1.4.2, `ConditionsMet.cpp`): a condition node that is also a collector. It has its own Condition input pin (like Add Conditions) and its output feeds Add Conditions or another Conditions Met, so nesting is wires, to any depth. `quantity` is a field; the nested `conditions` array is never a field, it is the wires into the node (import splits it out, export rebuilds it in wire order). The mod rejects, and so skips the whole achievement for, a `quantity` outside 1..N, an invalid or unknown sub-condition, and a live or negated one: the editor refuses wiring Live / Negate into it (`refuseReason`), refuses a loop, and export reports all of them pinned on the node (errors pinned by `pinCondition` through the nested path). It has no `pluginOverride` field because the mod passes sub-conditions the achievement's plugin, not the override of the node that holds them. Layout (import and Tidy up): what it holds sits to its left, stacked, and it sits past those columns. Progress is saved by position in the mod, so reordering or inserting sub-conditions on a live achievement shifts it onto the wrong ones. The node carries `since: "1.4.2"`, so a file using it is stamped 1.4.2.
 - **Condition `onUnlock`** (3.2): every condition node has an "On Unlock" row with a flow pin. A chain of Run Command / Call Papyrus nodes hanging off it exports as that condition's `onUnlock`; a chain that starts at a condition can hold actions only (`refuseReason`). Positions of those nodes are saved in the condition's `_editor.chain`, like an achievement's.
 - **Unknown condition types:** a file with a condition type this editor does not know opens, with that condition as a generic "Unknown: <type>" node that keeps every key and writes back unchanged, flagged as an error. A file that needs a newer mod is refused instead: export stamps `_editor.modVersion` (the largest `since` of any field in use, at least the baseline) and `_editor.schemaVersion`; import refuses a file whose stamp is newer than `TARGET_VERSION` / `SCHEMA_VERSION`. Unknown `onUnlock` action types are still refused. A future condition type must tag its fields with `since`, or the stamp cannot tell it is new.
 - **Version badges:** a field newer than the baseline shows its `since` ("1.4.1") beside its name on the node.
@@ -59,10 +60,10 @@ A browser-based, **local-only** editor for Achievement Injector configuration fi
 
 ## 2. Background: Achievement Injector
 
-- SKSE plugin (CommonLibSSE-NG), Nexus mod [126220](https://www.nexusmods.com/skyrimspecialedition/mods/126220), current version **1.4.0** (1.4.1 upcoming).
+- SKSE plugin (CommonLibSSE-NG), Nexus mod [126220](https://www.nexusmods.com/skyrimspecialedition/mods/126220), current version **1.4.2**.
 - One JSON file = one achievement **group** = one plugin. Root fields: `groupName`, `plugin`, `achievements[]` (plus group-level `showInMenu`).
 - Achievement fields: `achievementName`, `description`, `conditions[]`, `joinType` (AND/OR), `hideDescription`, `showInMenu`, `icon`, `notificationSound`, `onUnlock[]`.
-- 31 condition types (incl. the `PapyrusBinding` pseudo-condition). Each has its own required/optional fields. Common modifiers: `pluginOverride`, `quantity`, `operation`.
+- 32 condition types (incl. the `PapyrusBinding` pseudo-condition and the nesting `ConditionsMet`). Each has its own required/optional fields. Common modifiers: `pluginOverride`, `quantity`, `operation`.
 - `onUnlock` actions: `command`, `papyrus`. Can sit on an achievement or on a condition.
 - Localization: `Localizations/<Group>_<LANG>.txt`, tab-separated `$key<TAB>value` lines.
 - Icons: 512×512 `.dds`, **BC3 max** (BC5/BC7 unsupported). Group icon `Icons/<Group>.dds`, per-achievement icons `Icons/<Group>/<file>.dds`.
@@ -102,7 +103,7 @@ Canonical chain: `CreateAchievement → AddConditions → JoinType → RunComman
   - "3 conditions · 1 incomplete" — warning colour
   - "No conditions" — error state
   - Show the implied join when there's no `JoinType` node, e.g. "3 conditions · OR (default)".
-- **A condition node feeds one `AddConditions` only** (v1). `isValidConnection` refuses a second outgoing wire, so condition nodes are never shared between achievements and import never has to merge copies. Reuse can return later (see 3.3).
+- **A condition node feeds one `AddConditions` or `ConditionsMet` only** (v1). `isValidConnection` refuses a second outgoing wire, so condition nodes are never shared between achievements and import never has to merge copies. Reuse can return later (see 3.3).
 
 ### 3.3 Round-trip (JSON is the source of truth)
 
@@ -144,7 +145,7 @@ Condition nodes show the inherited base plugin as a greyed-out placeholder in `p
 ### 3.7 Version targeting
 
 - The editor **always targets the latest DLL version**; when the API changes significantly, the editor's validation is updated to match.
-- The UI shows the targeted version (e.g. footer "Targets Achievement Injector 1.4.1"), so authors know what minimum version to list on their mod page.
+- The UI shows the targeted version (e.g. footer "Targets Achievement Injector 1.4.2"), so authors know what minimum version to list on their mod page.
 
 ### 3.8 Saving
 

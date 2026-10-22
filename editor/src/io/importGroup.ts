@@ -44,6 +44,14 @@ const modifiersOf = (c: Json) =>
 
 const FLOW_KIND = { command: "RunCommand", papyrus: "CallPapyrus" } as const;
 
+/** The conditions inside a Conditions Met; they become nodes wired into it, to its left. */
+const kidsOf = (c: Json): Json[] => (c.type === "ConditionsMet" && Array.isArray(c.conditions) ? (c.conditions as Json[]) : []);
+const defOf = (c: Json): NodeDef => (registry[c.type as string]?.category === "condition" ? registry[c.type as string] : registry[UNKNOWN_CONDITION]);
+/** Column of a condition: a plain one is in the first, a Conditions Met sits past the columns of what it holds (and their Live / Negate nodes). */
+const columnX = (c: Json): number => Math.max(COL, ...kidsOf(c).map((k) => columnX(k) + COL * (1 + modifiersOf(k).length)));
+/** Vertical room a condition takes: itself, or the stack of what it holds when that is taller. */
+const rowHeight = (c: Json): number => Math.max(estimateHeight(defOf(c), c) + 20, kidsOf(c).reduce((h, k) => h + rowHeight(k), 0));
+
 const actionSpec = (list: Json[]) =>
   list.map((r) => {
     const kind = FLOW_KIND[r.type as keyof typeof FLOW_KIND];
@@ -161,13 +169,20 @@ export function importGroup(raw: unknown): Snapshot {
     if (!isObj(a)) throw new ImportError(`Achievement #${i + 1} is not an object.`);
     if ("conditions" in a && !Array.isArray(a.conditions)) throw new ImportError(`Achievement #${i + 1}: "conditions" must be an array.`);
     if ("onUnlock" in a && !Array.isArray(a.onUnlock)) throw new ImportError(`Achievement #${i + 1}: "onUnlock" must be an array.`);
-    for (const c of (a.conditions as unknown[]) ?? []) {
-      if (!isObj(c)) throw new ImportError(`Achievement #${i + 1}: a condition is not an object.`);
-      // An unknown condition type is kept as a flagged node; it only has to be an object with a type.
-      if (typeof c.type !== "string") throw new ImportError(`Achievement #${i + 1}: a condition has no "type".`);
-      if ("onUnlock" in c && !Array.isArray(c.onUnlock)) throw new ImportError(`Achievement #${i + 1}: a condition's "onUnlock" must be an array.`);
-      for (const r of (c.onUnlock as unknown[]) ?? []) badAction(r, `${c.type} in achievement #${i + 1}`);
-    }
+    const check = (list: unknown[]) => {
+      for (const c of list) {
+        if (!isObj(c)) throw new ImportError(`Achievement #${i + 1}: a condition is not an object.`);
+        // An unknown condition type is kept as a flagged node; it only has to be an object with a type.
+        if (typeof c.type !== "string") throw new ImportError(`Achievement #${i + 1}: a condition has no "type".`);
+        if ("onUnlock" in c && !Array.isArray(c.onUnlock)) throw new ImportError(`Achievement #${i + 1}: a condition's "onUnlock" must be an array.`);
+        for (const r of (c.onUnlock as unknown[]) ?? []) badAction(r, `${c.type} in achievement #${i + 1}`);
+        if (c.type === "ConditionsMet" && "conditions" in c) {
+          if (!Array.isArray(c.conditions)) throw new ImportError(`Achievement #${i + 1}: a ConditionsMet's "conditions" must be an array.`);
+          check(c.conditions);
+        }
+      }
+    };
+    check((a.conditions as unknown[]) ?? []);
     for (const r of (a.onUnlock as unknown[]) ?? []) badAction(r, `achievement #${i + 1}`);
   });
   if (unknown.length) throw new ImportError(`Unsupported entries: ${unknown.join(", ")}.`);
@@ -192,11 +207,10 @@ export function importGroup(raw: unknown): Snapshot {
 
     // Positions: saved `_editor` when present, otherwise a row layout per achievement band.
     const saved = Array.isArray(ed.chain) && ed.chain.length === chainSpec.length && ed.chain.every((p) => isObj(p) && num(p.x) && num(p.y)) ? (ed.chain as { x: number; y: number }[]) : null;
-    const condHeights = conds.map((c) => estimateHeight(registry[c.type as string]?.category === "condition" ? registry[c.type as string] : registry[UNKNOWN_CONDITION], c) + 20);
-    const bandH = Math.max(estimateHeight(registry.CreateAchievement, a), condHeights.reduce((s, h) => s + h, 0));
+    const bandH = Math.max(estimateHeight(registry.CreateAchievement, a), conds.reduce((h, c) => h + rowHeight(c), 0));
     // Live / Negate nodes sit in columns between the conditions and Add Conditions.
-    const modCols = Math.max(0, ...conds.map((c) => modifiersOf(c).length));
-    const chainX = (i: number) => (hasConds ? COL * (2 + modCols) : COL) + i * COL;
+    const condEnd = Math.max(2 * COL, ...conds.map((c) => columnX(c) + COL * (1 + modifiersOf(c).length)));
+    const chainX = (i: number) => (hasConds ? condEnd : COL) + i * COL;
 
     const create = add("CreateAchievement", created.values, created.extra, hasPos ? { x: ed.x as number, y: ed.y as number } : { x: 0, y: bandY }, ed.id);
     const chain = chainSpec.map((s, i) => add(s.kind, s.values, s.extra, saved ? saved[i] : { x: chainX(i), y: bandY }));
@@ -208,15 +222,14 @@ export function importGroup(raw: unknown): Snapshot {
       prev = n;
     }
 
-    let y = bandY;
-    conds.forEach((c, j) => {
+    /** One condition and, for a Conditions Met, the conditions inside it, wired into `into`. Returns the vertical room used. */
+    const addCond = (c: Json, into: AppNode, y: number): number => {
       const known = registry[c.type as string]?.category === "condition";
-      const def = known ? registry[c.type as string] : registry[UNKNOWN_CONDITION];
+      const def = defOf(c);
       // An unknown type keeps every key (its `type` included) in `extra`, so it is written back unchanged.
-      const cs = split(c, def, known ? ["type", "_editor", "onUnlock"] : ["_editor", "onUnlock"]);
+      const cs = split(c, def, known ? ["type", "_editor", "onUnlock", ...(c.type === "ConditionsMet" ? ["conditions"] : [])] : ["_editor", "onUnlock"]);
       const cEd = isObj(c._editor) ? c._editor : {};
-      const pos = num(cEd.x) && num(cEd.y) ? { x: cEd.x, y: cEd.y } : { x: COL, y };
-      y += condHeights[j];
+      const pos = num(cEd.x) && num(cEd.y) ? { x: cEd.x, y: cEd.y } : { x: columnX(c), y };
       const flags = modifiersOf(c);
       for (const k of flags) delete cs.extra[k];
       const cn = add(def.kind, cs.values, cs.extra, pos, cEd.id);
@@ -229,7 +242,7 @@ export function importGroup(raw: unknown): Snapshot {
         edges.push(mkEdge(last.id, "cond-out", mn.id, "cond-in"));
         last = mn;
       });
-      edges.push(mkEdge(last.id, "cond-out", addNode!.id, "cond-in"));
+      edges.push(mkEdge(last.id, "cond-out", into.id, "cond-in"));
       localize(cn);
       linkPlugin(cn);
 
@@ -244,7 +257,13 @@ export function importGroup(raw: unknown): Snapshot {
         edges.push(mkEdge(from.id, "flow-out", an.id, "flow-in"));
         from = an;
       });
-    });
+
+      let ky = y;
+      for (const k of kidsOf(c)) ky += addCond(k, cn, ky);
+      return rowHeight(c);
+    };
+    let y = bandY;
+    for (const c of conds) y += addCond(c, addNode!, y);
     localize(create);
     linkIcon(create);
     linkPlugin(create);

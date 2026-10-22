@@ -32,10 +32,10 @@ describe("spawn menu options", () => {
     expect(into).toEqual([]);
   });
 
-  it("from a condition output: AddConditions, Live and Negate (it joins a chain later, so the chain rule does not apply yet)", () => {
+  it("from a condition output: AddConditions, Conditions Met, Live and Negate (it joins a chain later, so the chain rule does not apply yet)", () => {
     const snap = load({});
     snap.nodes.push({ id: "c", type: "ae", position: { x: 0, y: 0 }, data: { kind: "PlayerLevel", values: { level: 1 } } });
-    expect(kinds(spawnOptions(snap.nodes, snap.edges, from("c", "cond-out", "source")))).toEqual(["AddConditions", "Live", "Negate"]);
+    expect(kinds(spawnOptions(snap.nodes, snap.edges, from("c", "cond-out", "source")))).toEqual(["AddConditions", "ConditionsMet", "Live", "Negate"]);
   });
 
   it("offers nothing from a condition output that already feeds an AddConditions", () => {
@@ -47,7 +47,7 @@ describe("spawn menu options", () => {
     const snap = load({ conditions: [] });
     const opts = spawnOptions(snap.nodes, snap.edges, from(node(snap, "AddConditions").id, "cond-in", "target"));
     // every condition type, plus Live and Negate
-    expect(opts).toHaveLength(33);
+    expect(opts).toHaveLength(34);
     expect(opts.every((o) => o.pin === "cond-out")).toBe(true);
   });
 

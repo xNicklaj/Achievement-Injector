@@ -15,7 +15,7 @@ Before finishing a change: `npm test` and `npm run typecheck` must pass.
 
 ## Layout
 
-- `src/schema/` Zod 4 schema, the single source of truth. `fields.ts` (field factories + metadata), `conditions.ts` (31 condition types), `group.ts` (achievement + group).
+- `src/schema/` Zod 4 schema, the single source of truth. `fields.ts` (field factories + metadata), `conditions.ts` (32 condition types), `group.ts` (achievement + group).
 - `src/registry.ts` node registry, derived from the schema. Drives the node list, widgets and pins.
 - `src/graph.ts` pure connection rules and the `AddConditions` summary. `src/store.ts` Zustand + zundo.
 - `src/components/` UI. Layout is in HANDOVER 3.15.

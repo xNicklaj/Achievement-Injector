@@ -13,6 +13,9 @@ export const pinKind = (handle: string | null | undefined): PinKind | null =>
   handle?.startsWith("flow") ? "flow" : handle?.startsWith("cond") ? "cond" : LINK_KINDS.find((k) => handle?.startsWith(k)) ?? null;
 
 export const isModifier = (kind: string) => !!registry[kind]?.modifier;
+/** A condition that collects other conditions through its own `cond-in` pin. */
+export const isGroupCondition = (kind: string) => kind === "ConditionsMet";
+const NO_LIVE_INSIDE = "Live and Negate are not supported inside Conditions Met";
 
 /** The condition behind a wire from `id`, looking back through Live / Negate nodes. `mods` run from the condition towards `id`; `seen` holds the modifiers passed. */
 export function behind(nodes: AppNode[], edges: Edge[], id: string) {
@@ -76,11 +79,24 @@ export function refuseReason(nodes: AppNode[], edges: Edge[], c: Link): string |
   // A condition node feeds one AddConditions only (HANDOVER 3.2); a localizable field takes one text node.
   if (kind === "cond" && used(c.sourceHandle, "source", c.source)) return "Condition already used";
   const into = nodes.find((n) => n.id === c.target);
+  // Conditions Met takes its sub-conditions as they are: the mod rejects a live or negated one, and a loop would never end.
+  if (kind === "cond" && into && isGroupCondition(into.data.kind)) {
+    if (nodes.find((n) => n.id === c.source && isModifier(n.data.kind))) return NO_LIVE_INSIDE;
+    const seen = new Set<string>();
+    for (const stack = [c.source]; stack.length; ) {
+      const id = stack.pop()!;
+      if (id === c.target) return "Would create a loop";
+      if (!seen.has(id)) (seen.add(id), stack.push(...edges.filter((e) => e.target === id && e.targetHandle === "cond-in").map((e) => e.source)));
+    }
+  }
   if (kind === "cond" && into && isModifier(into.data.kind)) {
     if (used(c.targetHandle, "target", c.target)) return "Already has a condition";
     const { root, seen } = behind(nodes, edges, c.source);
     if (seen.has(c.target)) return "Would create a loop";
     if (root && !LIVE_TYPES.has(root.data.kind)) return `${registry[root.data.kind].title} does not support Live or Negate`;
+    // The modifier already feeds a Conditions Met.
+    const out = edges.find((e) => e.source === c.target && e.sourceHandle === "cond-out")?.target;
+    if (isGroupCondition(nodes.find((n) => n.id === out)?.data.kind ?? "")) return NO_LIVE_INSIDE;
   }
   if (kind !== "flow" && kind !== "cond" && used(c.targetHandle, "target", c.target)) return kind === "loc" ? "Field already localized" : "Field already linked";
   // An achievement cannot wait for itself: the condition's own achievement is the one whose chain holds it.
@@ -90,12 +106,13 @@ export function refuseReason(nodes: AppNode[], edges: Edge[], c: Link): string |
 
 /** The achievement a condition node belongs to: the Create Achievement at the head of the chain its Add Conditions is in. */
 export function ownerOf(nodes: AppNode[], edges: Edge[], condition: string): string | undefined {
-  // Follow the wire through any Live / Negate nodes to the Add Conditions.
+  // Follow the wire through any Live / Negate nodes and enclosing Conditions Met nodes to the Add Conditions.
   let add: string | undefined = condition;
   for (const seen = new Set<string>(); add && !seen.has(add); ) {
     seen.add(add);
     add = edges.find((e) => e.source === add && e.sourceHandle === "cond-out")?.target;
-    if (!add || !isModifier(nodes.find((n) => n.id === add)?.data.kind ?? "")) break;
+    const kind = nodes.find((n) => n.id === add)?.data.kind ?? "";
+    if (!add || !(isModifier(kind) || isGroupCondition(kind))) break;
   }
   if (!add) return undefined;
   return [...upstream(edges, add)].find((id) => nodes.find((n) => n.id === id)?.data.kind === "CreateAchievement");
@@ -159,12 +176,20 @@ export function restoreInline(nodes: AppNode[], gone: Edge[], loc: Record<string
   return nodes.map((n) => (patches.has(n.id) ? { ...n, data: { ...n.data, values: { ...n.data.values, ...patches.get(n.id) } } } : n));
 }
 
-/** Human summary of an AddConditions node, derived from edges (HANDOVER 3.2), never stored. */
+/** Human summary of an AddConditions or ConditionsMet node, derived from edges (HANDOVER 3.2), never stored. */
 export function conditionsSummary(nodes: AppNode[], edges: Edge[], id: string) {
   const incomplete = (n: AppNode) => missingRequired(registry[n.data.kind], n.data.values, wiredFields(edges, n.id));
   const fed = edges.filter((e) => e.target === id && e.targetHandle === "cond-in").flatMap((e) => behind(nodes, edges, e.source).root ?? []);
   if (!fed.length) return { text: "No conditions", level: "error" as const };
   const bad = fed.filter(incomplete).length;
+  const self = nodes.find((n) => n.id === id);
+  if (self && isGroupCondition(self.data.kind)) {
+    const q = self.data.values.quantity;
+    const need = typeof q === "number" ? q : undefined;
+    const total = `${fed.length} condition${fed.length > 1 ? "s" : ""}`;
+    if (need !== undefined && need > fed.length) return { text: `Needs ${need}, but has ${total}`, level: "error" as const };
+    return { text: `${need !== undefined ? `${need} of ` : ""}${total}${bad ? ` · ${bad} incomplete` : ""}`, level: bad ? ("warning" as const) : ("ok" as const) };
+  }
   const join = [...upstream(edges, id), ...downstream(edges, id)].map((n) => nodes.find((x) => x.id === n)).find((n) => n?.data.kind === "JoinType");
   const joinText = join ? "" : " · OR (default)";
   return {

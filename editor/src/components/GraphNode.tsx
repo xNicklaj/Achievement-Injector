@@ -266,7 +266,7 @@ export function GraphNode({ id, data, selected }: NodeProps<AppNode>) {
         )}
         {def.category === "condition" && (
           // The flow pin sits in the header like every other node's; the condition output moves to its own row.
-          <div className="relative py-1 pl-3.5 pr-4 text-right text-[12px] text-[var(--text-dim)]" title="Connect to Add Conditions">
+          <div className="relative py-1 pl-3.5 pr-4 text-right text-[12px] text-[var(--text-dim)]" title="Connect to Add Conditions, or to a Conditions Met node">
             Condition
             <Handle type="source" id="cond-out" position={Position.Right} style={dot("var(--pin-condition)")} />
           </div>

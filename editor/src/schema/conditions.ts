@@ -84,9 +84,10 @@ const DESCRIPTIONS: Record<string, string> = {
   WorldspaceDiscovery: "Met when the player has discovered this many locations in the worldspace.",
   HasPerk: "Met when the player has the perk. Checked when a menu closes.",
   HasPerks: "Met when the player has at least this many of the listed perks. Checked when a menu closes.",
+  ConditionsMet: "Met when this many of the conditions wired into it are met. They can be of any type, including another Conditions Met. Live and Negate are not allowed inside it. Progress is saved by position.",
 };
 
-const cond = <T extends string, S extends z.ZodRawShape>(type: T, title: string, shape: S, description?: string) =>
+const cond = <T extends string, S extends z.ZodRawShape>(type: T, title: string, shape: S, description?: string, since?: string) =>
   z
     .looseObject({
       type: z.literal(type),
@@ -97,7 +98,7 @@ const cond = <T extends string, S extends z.ZodRawShape>(type: T, title: string,
       onUnlock: z.array(OnUnlockAction).optional(),
       _editor: ChainEditor.optional(),
     })
-    .meta({ title, ...((description ?? DESCRIPTIONS[type]) && { description: description ?? DESCRIPTIONS[type] }) });
+    .meta({ title, ...((description ?? DESCRIPTIONS[type]) && { description: description ?? DESCRIPTIONS[type] }), ...(since && { since }) });
 
 const needOneOf = (keys: string[]) => (c: Record<string, unknown>) =>
   keys.some((k) => typeof c[k] === "string" && c[k] !== "");
@@ -195,12 +196,30 @@ export const conditionSchemas = [
   cond("WorldspaceDiscovery", "Worldspace discovery", { worldspaceID: editorId(), requiredCount: int() }),
   cond("HasPerk", "Has perk", { formID: formId("base") }),
   cond("HasPerks", "Has perks", { perks: formIdList("base"), threshold: int() }),
+  // ConditionsMet.cpp: sub-conditions are ordinary conditions (nesting allowed); the DLL rejects a quantity outside 1..count and
+  // any sub-condition that is invalid, live or negated, so the whole achievement is skipped. Written as nodes wired into this one.
+  cond(
+    "ConditionsMet",
+    "Conditions met",
+    {
+      quantity: int(),
+      conditions: z.array(z.lazy((): z.ZodType => ConditionSchema)).min(1, "Needs at least one condition"),
+    },
+    undefined,
+    "1.4.2",
+  )
+    .refine((c) => typeof c.quantity !== "number" || c.quantity >= 1, { message: "Must be at least 1", path: ["quantity"] })
+    .refine((c) => typeof c.quantity !== "number" || !Array.isArray(c.conditions) || c.quantity <= c.conditions.length, {
+      message: "Cannot be more than the number of conditions",
+      path: ["quantity"],
+    }),
 ] as const;
 
 export const ConditionSchema = z.discriminatedUnion("type", conditionSchemas);
 export type Condition = z.infer<typeof ConditionSchema>;
 
-export const COMMON_CONDITION_KEYS: ReadonlySet<string> = new Set(["type", "pluginOverride", "live", "negate", "onUnlock", "_editor"]);
+// `conditions` (ConditionsMet) is not a widget: its entries are nodes wired into the condition.
+export const COMMON_CONDITION_KEYS: ReadonlySet<string> = new Set(["type", "pluginOverride", "live", "negate", "onUnlock", "_editor", "conditions"]);
 
 /** Node registry rows (HANDOVER 4.4): one per condition type, fields derived from the schema. */
 export const conditionRegistry = Object.fromEntries(
@@ -210,6 +229,7 @@ export const conditionRegistry = Object.fromEntries(
       type: s.shape.type.value as string,
       title: s.meta()?.title ?? s.shape.type.value,
       description: s.meta()?.description,
+      since: s.meta()?.since,
       fields: describeFields(s, COMMON_CONDITION_KEYS),
     },
   ]),

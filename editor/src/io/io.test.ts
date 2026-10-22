@@ -212,3 +212,63 @@ describe("live conditions", () => {
     expect(issues.some((i) => /only live/.test(i.message))).toBe(false);
   });
 });
+
+describe("conditions met", () => {
+  const lvl = (level: number) => ({ type: "PlayerLevel", level });
+  const raw = (conditions: Json[]) => ({ groupName: "G", plugin: "A.esp", achievements: [{ achievementName: "A", description: "d", conditions }] });
+  const nested = raw([{ type: "ConditionsMet", quantity: 2, conditions: [{ type: "ConditionsMet", quantity: 1, conditions: [lvl(1), lvl(2)], onUnlock: [{ type: "command", command: "x" }] }, lvl(3)] }]);
+
+  it("imports the conditions inside as nodes wired into it, nested ones too", () => {
+    const snap = importGroup(nested);
+    const metNodes = snap.nodes.filter((n) => n.data.kind === "ConditionsMet");
+    expect(metNodes).toHaveLength(2);
+    const into = (id: string) => snap.edges.filter((e) => e.target === id && e.targetHandle === "cond-in").map((e) => snap.nodes.find((n) => n.id === e.source)!.data.kind);
+    const outer = metNodes.find((n) => n.data.values.quantity === 2)!;
+    const inner = metNodes.find((n) => n.data.values.quantity === 1)!;
+    expect(into(outer.id).sort()).toEqual(["ConditionsMet", "PlayerLevel"]);
+    expect(into(inner.id)).toEqual(["PlayerLevel", "PlayerLevel"]);
+    expect(into(snap.nodes.find((n) => n.data.kind === "AddConditions")!.id)).toEqual(["ConditionsMet"]);
+    expect(outer.data.extra).toBeUndefined(); // `conditions` is wiring, not a leftover key
+  });
+
+  it("round-trips nested conditions, their order and a sub-condition's On Unlock", () => {
+    const { json, issues } = roundTrip(nested);
+    expect(stripEditor(json)).toEqual(nested);
+    expect(issues).toEqual([]);
+  });
+
+  it("is a 1.4.2 condition in the version stamp", () => {
+    expect((roundTrip(raw([{ type: "ConditionsMet", quantity: 1, conditions: [lvl(1)] }])).json._editor as { modVersion: string }).modVersion).toBe("1.4.2");
+  });
+
+  it("refuses a Conditions Met whose conditions are not a list", () => {
+    expect(() => importGroup(raw([{ type: "ConditionsMet", quantity: 1, conditions: {} }]))).toThrow(/ConditionsMet/);
+  });
+
+  it("pins problems on the node inside, however deep", () => {
+    const snap = importGroup(nested);
+    const leaf = snap.nodes.find((n) => n.data.kind === "PlayerLevel" && n.data.values.level === 2)!;
+    delete leaf.data.values.level;
+    expect(exportGroup(snap).issues.find((i) => i.field === "level")).toMatchObject({ level: "warning", nodeId: leaf.id });
+  });
+
+  it("pins a quantity the node cannot reach on the node itself", () => {
+    const snap = importGroup(raw([{ type: "ConditionsMet", quantity: 1, conditions: [lvl(1)] }]));
+    const met = snap.nodes.find((n) => n.data.kind === "ConditionsMet")!;
+    met.data.values.quantity = 4;
+    expect(exportGroup(snap).issues.find((i) => i.field === "quantity")).toMatchObject({ level: "error", nodeId: met.id });
+  });
+
+  it("flags an empty Conditions Met", () => {
+    const snap = importGroup(raw([{ type: "ConditionsMet", quantity: 1, conditions: [lvl(1)] }]));
+    snap.edges = snap.edges.filter((e) => e.targetHandle !== "cond-in" || snap.nodes.find((n) => n.id === e.target)!.data.kind === "AddConditions");
+    const met = snap.nodes.find((n) => n.data.kind === "ConditionsMet")!;
+    expect(exportGroup(snap).issues.find((i) => i.nodeId === met.id && i.level === "error")).toBeTruthy();
+  });
+
+  it("reports Live and Negate inside it, which the mod rejects", () => {
+    const snap = importGroup(raw([{ type: "ConditionsMet", quantity: 1, conditions: [{ type: "HasPerk", formID: "1", live: true }] }]));
+    const live = snap.nodes.find((n) => n.data.kind === "Live")!;
+    expect(exportGroup(snap).issues.find((i) => i.nodeId === live.id)).toMatchObject({ level: "error" });
+  });
+});

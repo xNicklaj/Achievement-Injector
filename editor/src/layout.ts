@@ -1,5 +1,5 @@
 import type { Edge } from "@xyflow/react";
-import { behind, type AppNode } from "./graph";
+import { behind, isGroupCondition, type AppNode } from "./graph";
 import { COL, estimateHeight } from "./io/importGroup";
 import { registry } from "./registry";
 import { useApp } from "./store";
@@ -41,21 +41,33 @@ export function tidyPositions(nodes: AppNode[], edges: Edge[]): Map<string, Pos>
     text(create);
     const main = chain(create.id);
     const add = main.find((n) => n.data.kind === "AddConditions");
+    type Fed = ReturnType<typeof behind>;
+    /** The conditions wired into `id`, each with its Live / Negate nodes. */
+    const fedBy = (id: string): Fed[] => edges.filter((x) => x.target === id && x.targetHandle === "cond-in").map((e) => behind(nodes, edges, e.source));
+    /** A Conditions Met sits past the columns of what it holds, which are to its left. */
+    const columnX = (f: Fed): number => Math.max(COL, ...(f.root && isGroupCondition(f.root.data.kind) ? fedBy(f.root.id) : []).map((k) => columnX(k) + COL * (1 + k.mods.length)));
     // Live / Negate nodes sit in columns between the conditions and Add Conditions.
-    const fed = add ? edges.filter((x) => x.target === add.id && x.targetHandle === "cond-in").map((e) => behind(nodes, edges, e.source)) : [];
-    const chainX = (i: number) => (add ? COL * (2 + Math.max(0, ...fed.map((f) => f.mods.length))) : COL) + i * COL;
+    const fed = add ? fedBy(add.id) : [];
+    const condEnd = Math.max(2 * COL, ...fed.map((f) => columnX(f) + COL * (1 + f.mods.length)));
+    const chainX = (i: number) => (add ? condEnd : COL) + i * COL;
     main.forEach((n, i) => put(n, chainX(i), bandY));
 
-    let cy = bandY;
-    for (const { root: c, mods } of fed) {
-      if (!c || placed.has(c.id)) continue;
-      put(c, COL, cy);
-      mods.forEach((m, k) => put(m, COL * (2 + k), cy));
+    /** Places one condition, then the conditions inside it. Returns the vertical room used. */
+    const place = (f: Fed, cy: number): number => {
+      const c = f.root;
+      if (!c || placed.has(c.id)) return 0;
+      const x = columnX(f);
+      put(c, x, cy);
+      f.mods.forEach((m, k) => put(m, x + COL * (1 + k), cy));
       text(c);
       const actions = chain(c.id);
       actions.forEach((a, k) => put(a, chainX(main.length) + k * COL, cy));
-      cy += Math.max(height(c), ...actions.map(height)) + 20;
-    }
+      let inner = 0;
+      if (isGroupCondition(c.data.kind)) for (const k of fedBy(c.id)) inner += place(k, cy + inner);
+      return Math.max(Math.max(height(c), ...actions.map(height)) + 20, inner);
+    };
+    let cy = bandY;
+    for (const f of fed) cy += place(f, cy);
     y += Math.max(height(create), cy - bandY, loc - bandY) + 80;
   }
 

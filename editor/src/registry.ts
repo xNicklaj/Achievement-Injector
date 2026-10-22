@@ -88,9 +88,13 @@ const conditionNodes: NodeDef[] = Object.values(conditionRegistry).map((c) => ({
   description: c.description,
   keywords: [c.type],
   condOut: true,
+  // Conditions Met collects its own conditions, like Add Conditions does for the achievement.
+  condIn: c.type === "ConditionsMet",
+  ...(c.since && { since: c.since }),
   // A condition's `onUnlock` actions hang off its flow pin.
   flowOut: true,
-  fields: [...c.fields, field({ name: "pluginOverride", widget: "plugin", optional: true, description: "Inherited from the achievement, then the group" })],
+  // Conditions Met passes nothing down: its sub-conditions inherit the achievement's plugin, not the override of the node that holds them.
+  fields: c.type === "ConditionsMet" ? c.fields : [...c.fields, field({ name: "pluginOverride", widget: "plugin", optional: true, description: "Inherited from the achievement, then the group" })],
 }));
 
 /** A condition type this editor does not know: kept as it is (the real type is in `extra.type`) and flagged, so nothing is lost. */

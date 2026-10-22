@@ -17,9 +17,9 @@ describe("shipped configs", () => {
 });
 
 describe("schema", () => {
-  it("covers all 31 condition types, each once", () => {
-    expect(conditionSchemas.length).toBe(31);
-    expect(new Set(Object.keys(conditionRegistry)).size).toBe(31);
+  it("covers all 32 condition types, each once", () => {
+    expect(conditionSchemas.length).toBe(32);
+    expect(new Set(Object.keys(conditionRegistry)).size).toBe(32);
   });
 
   const base = { groupName: "G", plugin: "A.esp" };
@@ -69,5 +69,30 @@ describe("schema", () => {
   it("emits a JSON Schema", () => {
     const js = z.toJSONSchema(GroupSchema, { io: "input" });
     expect(JSON.stringify(js)).toContain("QuestStageDone");
+  });
+});
+
+describe("ConditionsMet", () => {
+  const ach = (conditions: unknown[]) => ({ groupName: "G", plugin: "A.esp", achievements: [{ achievementName: "A", description: "d", conditions }] });
+  const lvl = (level: number) => ({ type: "PlayerLevel", level });
+  const ok = (c: unknown) => GroupSchema.safeParse(ach([c])).success;
+
+  it("accepts nested conditions, however deep", () => {
+    expect(ok({ type: "ConditionsMet", quantity: 1, conditions: [lvl(1)] })).toBe(true);
+    expect(ok({ type: "ConditionsMet", quantity: 2, conditions: [{ type: "ConditionsMet", quantity: 1, conditions: [lvl(1), lvl(2)] }, lvl(3)] })).toBe(true);
+  });
+  it.each([
+    [{ type: "ConditionsMet", quantity: 1, conditions: [] }], // nothing to meet
+    [{ type: "ConditionsMet", quantity: 0, conditions: [lvl(1)] }],
+    [{ type: "ConditionsMet", quantity: 2, conditions: [lvl(1)] }], // more than it holds
+    [{ type: "ConditionsMet", conditions: [lvl(1)] }],
+    [{ type: "ConditionsMet", quantity: 1, conditions: [{ type: "PlayerLevel" }] }], // an invalid sub-condition
+    [{ type: "ConditionsMet", quantity: 1, conditions: [{ type: "ConditionsMet", quantity: 3, conditions: [lvl(1)] }] }], // ...even a nested one
+  ])("rejects %j", (c) => {
+    expect(ok(c)).toBe(false);
+  });
+  it("is a 1.4.2 condition", () => {
+    expect(conditionRegistry.ConditionsMet).toMatchObject({ since: "1.4.2" });
+    expect(conditionRegistry.ConditionsMet.fields.map((f) => f.name)).toEqual(["quantity"]);
   });
 });
