@@ -16,7 +16,7 @@ import { mkEdge, type Snapshot } from "./io/importGroup";
 import type { SpawnFrom } from "./spawn";
 import { newLocFile, renameKey, serializeLoc, setText, type LocFile } from "./io/localization";
 import { groupId, type Workspace } from "./io/workspace";
-import { registry } from "./registry";
+import { linkKind, registry, UNKNOWN_CONDITION } from "./registry";
 import { remembered } from "./viewport";
 
 export type View = "graph" | "group" | "localization" | "plugins" | "json";
@@ -55,6 +55,13 @@ type State = {
   addNode: (kind: string, position: XYPosition) => void;
   /** Create a node and, when it was made from a dragged wire, connect that wire to `wire.pin`: one update, one undo step. */
   addNodeConnected: (kind: string, position: XYPosition, wire?: { from: SpawnFrom; pin: string }) => void;
+  /**
+   * Change conditions into another type, in place: same position, one undo step for all of them. Values that are fields of the new
+   * type carry over and the rest of a known condition's values go; an unknown condition's keys are never dropped (the ones that
+   * fit become values, the others stay as unknown keys). Wires the new type cannot hold (what a Conditions Met collects, links to
+   * fields it does not have) are removed. Anything in `ids` that is not a condition, or already has that type, is left alone.
+   */
+  replaceConditions: (ids: string[], kind: string) => void;
   /** `undefined` removes the key: unset is not serialized. */
   setValue: (id: string, name: string, value: unknown) => void;
   setGroup: (patch: Partial<GroupValues>) => void;
@@ -193,6 +200,39 @@ export const useApp = create<State>()(
             }),
           }),
         );
+      },
+      replaceConditions: (ids, kind) => {
+        const def = registry[kind];
+        if (def?.category !== "condition" || def.hidden) return;
+        const { nodes, edges } = get();
+        const swap = new Set(nodes.filter((n) => ids.includes(n.id) && registry[n.data.kind]?.category === "condition" && n.data.kind !== kind).map((n) => n.id));
+        if (!swap.size) return;
+        const fields = new Set(def.fields.map((f) => f.name));
+        const holds = (handle: string | null | undefined, side: "source" | "target") => {
+          if (side === "source") return handle === "flow-out" || handle === "cond-out";
+          if (handle === "cond-in") return def.condIn;
+          const at = handle?.indexOf(":") ?? -1;
+          return at > 0 && def.fields.some((f) => f.name === handle!.slice(at + 1) && linkKind(def, f) === handle!.slice(0, at));
+        };
+        // Untouched when no wire goes, so what is indexed by the wire list stays valid.
+        const kept = edges.filter((e) => !(swap.has(e.target) && !holds(e.targetHandle, "target")) && !(swap.has(e.source) && !holds(e.sourceHandle, "source")));
+        set({
+          edges: kept.length === edges.length ? edges : kept,
+          nodes: nodes.map((old) => {
+            if (!swap.has(old.id)) return old;
+            const values: Record<string, unknown> = {};
+            let extra = old.data.extra;
+            if (old.data.kind === UNKNOWN_CONDITION) {
+              const { type: _type, ...rest } = old.data.extra ?? {};
+              const other: Record<string, unknown> = {};
+              for (const [k, v] of Object.entries(rest)) (fields.has(k) ? values : other)[k] = v;
+              extra = Object.keys(other).length ? other : undefined;
+            } else for (const [k, v] of Object.entries(old.data.values)) if (fields.has(k)) values[k] = v;
+            // Without `measured` the node is measured again, so its pins are found where the new type puts them.
+            const { measured: _measured, ...node } = old;
+            return { ...node, data: { kind, values, ...(extra && { extra }) } };
+          }),
+        });
       },
       setGroup: (patch) => {
         const next = { ...get().group, ...patch };

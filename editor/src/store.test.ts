@@ -293,3 +293,108 @@ describe("history keeps measured sizes", () => {
     expect(s().nodes.every((n) => n.measured?.width === 288)).toBe(true);
   });
 });
+
+describe("replacing an unknown condition", () => {
+  const future = { type: "FutureThing", formID: "1A2B", amount: 3, onUnlock: [{ type: "command", command: "x" }] };
+  const openFuture = () =>
+    useApp.getState().load(importGroup({ groupName: "G", plugin: "A.esp", achievements: [{ achievementName: "A", description: "d", conditions: [future, { type: "PlayerLevel", level: 5 }] }] }), "G.json", {}, null);
+  const unknown = () => useApp.getState().nodes.find((n) => n.data.kind === "UnknownCondition")!;
+
+  it("keeps the node, its place and its wires, and moves matching keys into fields", () => {
+    openFuture();
+    const before = unknown();
+    const wires = useApp.getState().edges;
+    useApp.getState().replaceConditions([before.id], "HasPerk");
+    const after = useApp.getState().nodes.find((n) => n.id === before.id)!;
+    expect(after.data).toEqual({ kind: "HasPerk", values: { formID: "1A2B" }, extra: { amount: 3 } });
+    expect(after.position).toEqual(before.position);
+    expect(useApp.getState().edges).toBe(wires);
+    expect(after.measured).toBeUndefined();
+  });
+
+  it("writes the new type, still carrying what the file had and the condition's own actions", () => {
+    openFuture();
+    useApp.getState().replaceConditions([unknown().id], "HasPerk");
+    const { json, issues } = exportGroup(useApp.getState() as never);
+    const c = (json.achievements as { conditions: Record<string, unknown>[] }[])[0].conditions[0];
+    expect(c).toMatchObject({ type: "HasPerk", formID: "1A2B", amount: 3, onUnlock: [{ type: "command", command: "x" }] });
+    expect(issues.some((i) => /not a condition type/.test(i.message))).toBe(false);
+  });
+
+  it("is one undo step", () => {
+    openFuture();
+    const id = unknown().id;
+    useApp.getState().replaceConditions([id], "HasPerk");
+    useApp.temporal.getState().undo();
+    expect(useApp.getState().nodes.find((n) => n.id === id)!.data.kind).toBe("UnknownCondition");
+  });
+
+  it("replaces several at once, each keeping its own keys, in one undo step", () => {
+    useApp.getState().load(
+      importGroup({
+        groupName: "G",
+        plugin: "A.esp",
+        achievements: [{ achievementName: "A", description: "d", conditions: [{ type: "FutureThing", formID: "1" }, { type: "OtherThing", formID: "2", amount: 4 }, { type: "PlayerLevel", level: 5 }] }],
+      }),
+      "G.json",
+      {},
+      null,
+    );
+    const unknowns = () => useApp.getState().nodes.filter((n) => n.data.kind === "UnknownCondition");
+    // A known condition in the selection is replaced with the rest; the Add Conditions node is not a condition and stays.
+    const ids = [...useApp.getState().nodes.filter((n) => ["UnknownCondition", "PlayerLevel", "AddConditions"].includes(n.data.kind)).map((n) => n.id)];
+    useApp.getState().replaceConditions(ids, "HasPerk");
+    const nodes = useApp.getState().nodes;
+    expect(unknowns()).toHaveLength(0);
+    expect(nodes.filter((n) => n.data.kind === "HasPerk").map((n) => [n.data.values, n.data.extra])).toEqual([[{ formID: "1" }, undefined], [{ formID: "2" }, { amount: 4 }], [{}, undefined]]);
+    expect(nodes.filter((n) => n.data.kind === "AddConditions")).toHaveLength(1);
+    useApp.temporal.getState().undo();
+    expect(unknowns()).toHaveLength(2);
+    expect(useApp.getState().nodes.filter((n) => n.data.kind === "PlayerLevel")).toHaveLength(1);
+  });
+
+  it("only replaces conditions, and only with a real condition type", () => {
+    openFuture();
+    const run = useApp.getState().nodes.find((n) => n.data.kind === "RunCommand") ?? { id: "none" };
+    useApp.getState().replaceConditions([run.id, unknown().id], "RunCommand");
+    useApp.getState().replaceConditions([unknown().id], "UnknownCondition");
+    expect(unknown()).toBeTruthy();
+    expect(useApp.getState().nodes.some((n) => n.data.kind === "RunCommand")).toBe(true); // the action from the file, untouched
+  });
+});
+
+describe("replacing a known condition", () => {
+  const raw = (conditions: object[]) => importGroup({ groupName: "G", plugin: "A.esp", achievements: [{ achievementName: "A", description: "d", conditions }] });
+  const open = (conditions: object[]) => useApp.getState().load(raw(conditions), "G.json", {}, null);
+  const kind = (k: string) => useApp.getState().nodes.find((n) => n.data.kind === k)!;
+
+  it("carries over the fields the new type shares and drops the ones it does not have", () => {
+    open([{ type: "ItemInInventory", formID: "0896F5", quantity: 3, futureKey: true }]);
+    const id = kind("ItemInInventory").id;
+    useApp.getState().replaceConditions([id], "SpellCast"); // both have formID and quantity
+    expect(kind("SpellCast").data).toEqual({ kind: "SpellCast", values: { formID: "0896F5", quantity: 3 }, extra: { futureKey: true } });
+    useApp.getState().replaceConditions([id], "PlayerLevel"); // neither field exists on it
+    expect(kind("PlayerLevel").data).toEqual({ kind: "PlayerLevel", values: {}, extra: { futureKey: true } });
+    expect(useApp.getState().nodes.find((n) => n.id === id)!.position).toEqual(kind("PlayerLevel").position);
+  });
+
+  it("removes the wires the new type cannot hold, and keeps the rest", () => {
+    open([{ type: "ConditionsMet", quantity: 1, conditions: [{ type: "PlayerLevel", level: 1 }, { type: "HasPerk", formID: "1" }] }]);
+    const met = kind("ConditionsMet");
+    const into = (id: string) => useApp.getState().edges.filter((e) => e.target === id).length;
+    expect(into(met.id)).toBe(2); // the two conditions wired into it (its own output goes to Add Conditions)
+    useApp.getState().replaceConditions([met.id], "ItemEquipped");
+    expect(into(met.id)).toBe(0);
+    expect(useApp.getState().edges.some((e) => e.source === met.id && e.sourceHandle === "cond-out")).toBe(true);
+    useApp.temporal.getState().undo(); // one step puts the node and its wires back
+    expect(into(met.id)).toBe(2);
+    expect(kind("ConditionsMet")).toBeTruthy();
+  });
+
+  it("leaves a condition that already has the type alone", () => {
+    open([{ type: "PlayerLevel", level: 4 }]);
+    const before = useApp.getState().nodes;
+    useApp.getState().replaceConditions([kind("PlayerLevel").id], "PlayerLevel");
+    expect(useApp.getState().nodes).toBe(before);
+  });
+});

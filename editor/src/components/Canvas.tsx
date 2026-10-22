@@ -2,7 +2,8 @@ import { Background, BackgroundVariant, Controls, MiniMap, ReactFlow, SelectionM
 import "@xyflow/react/dist/style.css";
 import { useCallback, useEffect, useMemo, useRef, useState, type DragEvent } from "react";
 import { pinKind, type AppNode } from "../graph";
-import { registry } from "../registry";
+import { LIVE_TYPES } from "../schema";
+import { isCondition, nodeDefs, registry, UNKNOWN_CONDITION } from "../registry";
 import { beginDrag, endDrag, useApp } from "../store";
 import { useValidation } from "../validation";
 import { remembered } from "../viewport";
@@ -24,7 +25,9 @@ const EDGE_COLOR = { flow: "var(--pin-flow)", cond: "var(--pin-condition)", loc:
 export function Canvas() {
   const { nodes, edges, onNodesChange, onEdgesChange, onConnect, isValid, addNode, addNodeConnected } = useApp();
   const [menu, setMenu] = useState<{ x: number; y: number; from: SpawnFrom | null } | null>(null);
-  const closeMenu = useCallback(() => setMenu(null), []);
+  // Right-click on a condition: the same menu, listing the condition types to replace it with.
+  const [replace, setReplace] = useState<{ x: number; y: number; ids: string[]; title: string; kinds: string[]; live: boolean } | null>(null);
+  const closeMenu = useCallback(() => (setMenu(null), setReplace(null)), []);
   const { screenToFlowPosition, getViewport, setViewport, fitView } = useReactFlow();
   const box = useRef<HTMLDivElement>(null);
 
@@ -83,6 +86,22 @@ export function Canvas() {
   );
 
   const options = useMemo(() => (menu ? spawnOptions(nodes, edges, menu.from) : []), [menu, nodes, edges]);
+  const openReplace = (e: { clientX: number; clientY: number; preventDefault: () => void }, group: AppNode[]) => {
+    group = group.filter((n) => isCondition(n.data.kind));
+    if (!group.length) return; // nothing to replace: leave the browser's menu alone
+    e.preventDefault();
+    setMenu(null);
+    const name = (n: AppNode) => (n.data.kind === UNKNOWN_CONDITION ? String(n.data.extra?.type ?? "unknown") : registry[n.data.kind].title);
+    const names = [...new Set(group.map(name))];
+    const what = names.length === 1 ? `"${names[0]}" ` : "";
+    // A condition that feeds Live or Negate can only become a type that supports them.
+    const live = group.some((n) => edges.some((x) => x.source === n.id && x.sourceHandle === "cond-out" && registry[nodes.find((m) => m.id === x.target)?.data.kind ?? ""]?.modifier));
+    setReplace({ x: e.clientX, y: e.clientY, ids: group.map((n) => n.id), kinds: [...new Set(group.map((n) => n.data.kind))], live, title: group.length > 1 ? `Replace ${group.length} ${what}conditions with` : `Replace ${what}with` });
+  };
+  const replacements = useMemo(
+    () => nodeDefs.filter((d) => d.category === "condition").map((def) => ({ def, label: def.title })).sort((a, b) => a.label.localeCompare(b.label)),
+    [],
+  );
   const pick = (o: SpawnOption) => {
     if (!menu) return;
     const at = screenToFlowPosition({ x: menu.x, y: menu.y });
@@ -127,6 +146,15 @@ export function Canvas() {
         // Double-clicking a field selects text; only the node's frame and title focus it.
         if (!(e.target as HTMLElement).closest("input, textarea, select, button")) void fitView({ nodes: [{ id: node.id }], duration: 300, maxZoom: 1.2, padding: 0.3 });
       }}
+      onNodeContextMenu={(e, node) => {
+        // On one of several selected nodes it replaces the conditions among them together; otherwise just this one.
+        // A text field keeps the browser's own menu (copy and paste), and so does any node that is not a condition.
+        if ((e.target as HTMLElement).closest("input, textarea, select, [contenteditable]")) return;
+        const picked = node.selected ? nodes.filter((n) => n.selected && isCondition(n.data.kind)) : [];
+        openReplace(e, picked.length > 1 ? picked : [node as AppNode]);
+      }}
+      // With several nodes selected React Flow puts a rectangle over them that takes the right-click, so no node gets it.
+      onSelectionContextMenu={(e, selected) => openReplace(e, selected as AppNode[])}
       onPaneContextMenu={(e) => {
         e.preventDefault();
         setMenu({ x: (e as unknown as MouseEvent).clientX, y: (e as unknown as MouseEvent).clientY, from: null });
@@ -176,6 +204,16 @@ export function Canvas() {
         </div>
       )}
     </ReactFlow>
+    {replace && (
+      <SpawnMenu
+        x={replace.x}
+        y={replace.y}
+        options={replacements.filter((o) => (replace.kinds.length !== 1 || o.def.kind !== replace.kinds[0]) && (!replace.live || LIVE_TYPES.has(o.def.kind)))}
+        onPick={(o) => (useApp.getState().replaceConditions(replace.ids, o.def.kind), setReplace(null))}
+        onClose={closeMenu}
+        title={replace.title}
+      />
+    )}
     {menu && <SpawnMenu x={menu.x} y={menu.y} options={options} onPick={pick} onClose={closeMenu} title={menu.from ? "Create a node that connects here" : "Add a node"} />}
     </div>
   );

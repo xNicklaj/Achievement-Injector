@@ -21,6 +21,7 @@ const NAV_HELP = [
   "Ctrl + C, Ctrl + V, Ctrl + D: copy, paste and duplicate the selected nodes (Localized Text nodes are not copied; their text is).",
   "Double-click a node: zoom to it.",
   "Right-click empty space, or Ctrl + Space: add a node.",
+  "Right-click a condition (or several selected): replace it with another condition type.",
 ].join("\n");
 
 const hasFolderAccess = typeof window !== "undefined" && "showDirectoryPicker" in window;

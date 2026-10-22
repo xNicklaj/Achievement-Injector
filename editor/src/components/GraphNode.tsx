@@ -242,7 +242,7 @@ export function GraphNode({ id, data, selected }: NodeProps<AppNode>) {
             </span>
           </div>
         )}
-        {data.kind === UNKNOWN_CONDITION && <div className="px-3.5 py-1 text-[12px] text-[var(--text-dim)]">Not a type this editor knows. It is kept as it is.</div>}
+        {data.kind === UNKNOWN_CONDITION && <div className="px-3.5 py-1 text-[12px] text-[var(--text-dim)]">Not a type this editor knows. It is kept as it is; right-click it to replace it (select several to replace them together).</div>}
         {(flat ? def.fields : required).map(row)}
         {data.kind === "Icon" && <IconPreview file={data.values.file} />}
         {data.kind === "LocalizedText" && <TranslationRows keyName={typeof data.values.key === "string" ? data.values.key : ""} />}
