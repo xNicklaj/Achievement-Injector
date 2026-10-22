@@ -10,7 +10,6 @@
 // Queries (call after kPostLoad, e.g. on kDataLoaded):
 //     auto* api = AchievementInjectorAPI::RequestInterface();
 //     if (api && api->IsUnlocked("MyGroup", "My Achievement")) { ... }
-// RequestInterfaceV2() returns the same object with the extra getters, or null on an older Achievement Injector.
 #pragma once
 
 #include <cstddef>
@@ -21,7 +20,7 @@ namespace AchievementInjectorAPI {
 
     enum MessageType : std::uint32_t {
         kUnlocked = 'AIUN',          // broadcast on unlock; data is an UnlockedMessage
-        kRequestInterface = 'AIRQ',  // send to kPluginName; data is an IAchievementInjectorV1** to fill
+        kRequestInterface = 'AIRQ',  // send to kPluginName; data is an IAchievementInjector** to fill
     };
 
     // Strings are only valid during the callback: copy what you keep.
@@ -33,20 +32,17 @@ namespace AchievementInjectorAPI {
         bool retroactive;      // true when found met while loading a save, not earned in play
     };
 
-    // Never changed once released: additions go in a IAchievementInjectorV2 that derives from this.
-    class IAchievementInjectorV1 {
+    // String getters copy into buf (always null-terminated when size > 0) and return the full length without the
+    // terminator, like snprintf: pass buf = nullptr, size = 0 to measure first. Group ids and names that don't exist return 0.
+    // Methods are only ever appended at the end, never reordered, so a plugin built against an older header keeps working.
+    class IAchievementInjector {
     public:
-        virtual std::uint32_t GetVersion() = 0;  // 1
+        virtual std::uint32_t GetVersion() = 0;
         // For the currently loaded character. group is the json file name without extension; name is case-insensitive and may be a "$key".
         virtual bool IsUnlocked(const char* group, const char* name) = 0;
         // Unlocks it as if its conditions were met. False if the group or achievement doesn't exist.
         virtual bool Unlock(const char* group, const char* name) = 0;
-    };
 
-    // String getters copy into buf (always null-terminated when size > 0) and return the full length without the
-    // terminator, like snprintf: pass buf = nullptr, size = 0 to measure first. Group ids and names that don't exist return 0.
-    class IAchievementInjectorV2 : public IAchievementInjectorV1 {
-    public:
         // Unix time the character unlocked it, or -1 if locked or not found.
         virtual std::int64_t GetUnlockTime(const char* group, const char* name) = 0;
 
@@ -61,15 +57,10 @@ namespace AchievementInjectorAPI {
         virtual bool IsHidden(const char* group, const char* name) = 0;  // description hidden until unlocked
     };
 
-    inline IAchievementInjectorV1* RequestInterface() {
-        IAchievementInjectorV1* api = nullptr;
+    // Null if Achievement Injector is missing
+    inline IAchievementInjector* RequestInterface() {
+        IAchievementInjector* api = nullptr;
         SKSE::GetMessagingInterface()->Dispatch(kRequestInterface, &api, sizeof(api), kPluginName);
         return api;
-    }
-
-    // Null if the installed Achievement Injector predates V2
-    inline IAchievementInjectorV2* RequestInterfaceV2() {
-        auto* api = RequestInterface();
-        return api && api->GetVersion() >= 2 ? static_cast<IAchievementInjectorV2*>(api) : nullptr;
     }
 }
