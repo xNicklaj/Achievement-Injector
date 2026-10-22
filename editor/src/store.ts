@@ -10,6 +10,7 @@ import {
 } from "@xyflow/react";
 import { create } from "zustand";
 import { temporal } from "zundo";
+import { followMoves, membersOf, restack, type Collapsed } from "./achievements";
 import { type AppNode, isInternalGroup, refuseReason, restoreInline } from "./graph";
 import type { Draft } from "./io/draftStore";
 import { mkEdge, type Snapshot } from "./io/importGroup";
@@ -48,6 +49,16 @@ type State = {
   /** Name of the file the document came from; the group identifier on disk, so reused for saving. */
   fileName: string | null;
   view: View;
+  /** Achievements shown as one node (their Create Achievement ids). Not in the file, the undo history or the unsaved-changes check. */
+  collapsed: Collapsed;
+  /** Collapse an achievement into its Create Achievement node, or expand it again. Nodes it hides are deselected, so Delete cannot reach them. */
+  toggleCollapsed: (id: string) => void;
+  /**
+   * Put the achievements in a new order, given as every Create Achievement id: the order of the file, and the order down the canvas
+   * (each achievement, with the shared nodes only it uses, is moved to follow the one before it). One undo step. Ignored unless
+   * `order` names each achievement once.
+   */
+  reorderAchievements: (order: string[]) => void;
   onNodesChange: (c: NodeChange<AppNode>[]) => void;
   onEdgesChange: (c: EdgeChange[]) => void;
   onConnect: (c: Connection) => void;
@@ -146,8 +157,28 @@ export const useApp = create<State>()(
       savedNames: [],
       fileName: null,
       view: "graph",
-      onNodesChange: (c) => {
-        const { nodes, edges, loc } = get();
+      collapsed: {},
+      toggleCollapsed: (id) => {
+        const { collapsed, nodes, edges } = get();
+        if (collapsed[id]) return set({ collapsed: Object.fromEntries(Object.entries(collapsed).filter(([k]) => k !== id)) });
+        const inside = new Set(membersOf(nodes, edges, id));
+        inside.delete(id);
+        set({ collapsed: { ...collapsed, [id]: true }, nodes: nodes.some((n) => n.selected && inside.has(n.id)) ? nodes.map((n) => (n.selected && inside.has(n.id) ? { ...n, selected: false } : n)) : nodes });
+      },
+      reorderAchievements: (order) => {
+        const { nodes, edges } = get();
+        const creates = new Map(nodes.filter((n) => n.data.kind === "CreateAchievement").map((n) => [n.id, n]));
+        if (order.length !== creates.size || new Set(order).size !== order.length || !order.every((id) => creates.has(id))) return;
+        if (order.every((id, i) => id === [...creates.keys()][i])) return;
+        const moved = restack(nodes, edges, order);
+        // The file lists achievements in the order of these nodes: they take each other's places in the array, the rest stay put.
+        let next = 0;
+        set({ nodes: nodes.map((n) => { const m = n.data.kind === "CreateAchievement" ? creates.get(order[next++])! : n; const to = moved.get(m.id); return to ? { ...m, position: to } : m; }) });
+      },
+      onNodesChange: (changes) => {
+        const { nodes, edges, loc, collapsed } = get();
+        // A collapsed achievement drags what it hides along with it.
+        const c = followMoves(changes, nodes, edges, collapsed);
         const removed = new Set(c.flatMap((x) => (x.type === "remove" ? [x.id] : [])));
         if (!removed.size) return set({ nodes: applyNodeChanges(c, nodes) });
         // Wires of a deleted node go with it in this same update, and the fields they fed keep their text.
@@ -251,6 +282,7 @@ export const useApp = create<State>()(
           pendingIcons: {},
           iconVersion: get().iconVersion + 1,
           view: "graph",
+          collapsed: {},
         });
         set({ savedKey: docKey(get()), savedNames: plainNames(get().nodes) });
         void get().refreshIcons();
@@ -300,6 +332,7 @@ export const useApp = create<State>()(
           fileName: d.fileName,
           workspace,
           view: "graph",
+          collapsed: {},
         });
         void get().refreshIcons();
         useApp.temporal.getState().clear();

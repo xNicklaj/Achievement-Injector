@@ -3,7 +3,7 @@ import { exportGroup } from "./io/exportGroup";
 import { importGroup, mkEdge } from "./io/importGroup";
 import { changedLocFiles, getText, parseLoc } from "./io/localization";
 import { linkedText } from "./graph";
-import { isDirty, useApp } from "./store";
+import { beginDrag, endDrag, isDirty, useApp } from "./store";
 
 const raw = {
   groupName: "G",
@@ -396,5 +396,122 @@ describe("replacing a known condition", () => {
     const before = useApp.getState().nodes;
     useApp.getState().replaceConditions([kind("PlayerLevel").id], "PlayerLevel");
     expect(useApp.getState().nodes).toBe(before);
+  });
+});
+
+describe("collapsing an achievement", () => {
+  const s = () => useApp.getState();
+  const create = () => s().nodes.find((n) => n.data.kind === "CreateAchievement")!;
+
+  it("toggles, and is a view setting: not unsaved changes, not in the undo history", () => {
+    const past = useApp.temporal.getState().pastStates.length;
+    s().toggleCollapsed(create().id);
+    expect(s().collapsed).toEqual({ [create().id]: true });
+    expect(isDirty()).toBe(false);
+    expect(useApp.temporal.getState().pastStates.length).toBe(past);
+    s().toggleCollapsed(create().id);
+    expect(s().collapsed).toEqual({});
+  });
+
+  it("deselects the nodes it hides, so Delete cannot reach them", () => {
+    const level = s().nodes.find((n) => n.data.kind === "PlayerLevel")!;
+    s().onNodesChange([{ type: "select", id: level.id, selected: true }, { type: "select", id: create().id, selected: true }]);
+    s().toggleCollapsed(create().id);
+    expect(s().nodes.find((n) => n.id === level.id)!.selected).toBe(false);
+    expect(s().nodes.find((n) => n.id === create().id)!.selected).toBe(true);
+  });
+
+  it("carries what it hides along when its one node is moved, so they come back together", () => {
+    const level = () => s().nodes.find((n) => n.data.kind === "PlayerLevel")!;
+    const [c0, l0] = [create().position, level().position];
+    s().toggleCollapsed(create().id);
+    s().onNodesChange([{ type: "position", id: create().id, position: { x: c0.x + 120, y: c0.y + 60 }, dragging: false }]);
+    s().toggleCollapsed(create().id);
+    expect(level().position).toEqual({ x: l0.x + 120, y: l0.y + 60 });
+    expect(level().position.x - create().position.x).toBe(l0.x - c0.x); // the layout between them is as it was
+  });
+
+  it("is one undo step, which puts the hidden nodes back too", () => {
+    const level = () => s().nodes.find((n) => n.data.kind === "PlayerLevel")!;
+    const [c0, l0] = [create().position, level().position];
+    s().toggleCollapsed(create().id);
+    beginDrag();
+    for (const step of [20, 60, 100]) s().onNodesChange([{ type: "position", id: create().id, position: { x: c0.x + step, y: c0.y }, dragging: true }]);
+    endDrag();
+    expect(level().position.x).toBe(l0.x + 100);
+    useApp.temporal.getState().undo();
+    expect(create().position).toEqual(c0);
+    expect(level().position).toEqual(l0);
+  });
+
+  it("does not move the rest of an achievement when it is expanded", () => {
+    const level = () => s().nodes.find((n) => n.data.kind === "PlayerLevel")!;
+    const l0 = level().position;
+    s().onNodesChange([{ type: "position", id: create().id, position: { x: create().position.x + 50, y: create().position.y }, dragging: false }]);
+    expect(level().position).toEqual(l0);
+  });
+
+  it("starts over when another document is opened", () => {
+    s().toggleCollapsed(create().id);
+    open();
+    expect(s().collapsed).toEqual({});
+  });
+});
+
+describe("reordering achievements", () => {
+  const s = () => useApp.getState();
+  const three = () =>
+    s().load(
+      importGroup({
+        groupName: "G",
+        plugin: "A.esp",
+        achievements: ["One", "Two", "Three"].map((name, i) => ({ achievementName: name, description: "d", conditions: [{ type: "PlayerLevel", level: i + 1 }] })),
+      }),
+      "G.json",
+      {},
+      null,
+    );
+  const creates = () => s().nodes.filter((n) => n.data.kind === "CreateAchievement");
+  const names = () => creates().map((n) => n.data.values.achievementName);
+  const jsonNames = () => ((exportGroup(s() as never).json.achievements as { achievementName: string }[]).map((a) => a.achievementName));
+
+  it("changes the order of the file and the order down the canvas, in one undo step", () => {
+    three();
+    const [one, two, three_] = creates();
+    const ys = () => Object.fromEntries(creates().map((n) => [n.data.values.achievementName, n.position.y]));
+    const before = ys();
+    expect(before.One).toBeLessThan(before.Two);
+    s().reorderAchievements([three_.id, one.id, two.id]);
+    expect(names()).toEqual(["Three", "One", "Two"]);
+    expect(jsonNames()).toEqual(["Three", "One", "Two"]);
+    expect(ys().Three).toBeLessThan(ys().One);
+    expect(ys().One).toBeLessThan(ys().Two);
+    // each one's conditions moved with it
+    const level = (n: number) => s().nodes.find((x) => x.data.kind === "PlayerLevel" && x.data.values.level === n)!;
+    expect(level(3).position.y).toBeLessThan(level(1).position.y);
+    expect(isDirty()).toBe(true);
+    useApp.temporal.getState().undo();
+    expect(names()).toEqual(["One", "Two", "Three"]);
+    expect(ys()).toEqual(before);
+  });
+
+  it("leaves the other nodes where they are in the node list", () => {
+    three();
+    const [one, , three_] = creates();
+    const others = () => s().nodes.map((n, i) => [i, n.id] as const).filter(([, id]) => !creates().some((c) => c.id === id));
+    const was = others();
+    s().reorderAchievements([three_.id, creates()[1].id, one.id]);
+    expect(others()).toEqual(was);
+  });
+
+  it("ignores an order that is not every achievement exactly once, and one that changes nothing", () => {
+    three();
+    const [one, two, three_] = creates();
+    const before = s().nodes;
+    s().reorderAchievements([one.id, two.id]);
+    s().reorderAchievements([one.id, one.id, two.id]);
+    s().reorderAchievements([one.id, two.id, "nobody"]);
+    s().reorderAchievements([one.id, two.id, three_.id]);
+    expect(s().nodes).toBe(before);
   });
 });

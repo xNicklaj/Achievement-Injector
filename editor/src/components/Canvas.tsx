@@ -10,6 +10,8 @@ import { remembered } from "../viewport";
 import { createWheelClassifier, wheelPixels, zoomFactor } from "../wheel";
 import { spawnOptions, type SpawnFrom, type SpawnOption } from "../spawn";
 import { AeEdge } from "./AeEdge";
+import { hiddenOf, hideNodes } from "../achievements";
+import { AchievementList } from "./AchievementList";
 import { GraphNode } from "./GraphNode";
 import { SpawnMenu } from "./SpawnMenu";
 
@@ -23,7 +25,7 @@ const MAX_ZOOM = 2;
 const EDGE_COLOR = { flow: "var(--pin-flow)", cond: "var(--pin-condition)", loc: "var(--pin-localized)", ach: "var(--pin-achievement)", icon: "var(--pin-icon)", plugin: "var(--pin-plugin)" };
 
 export function Canvas() {
-  const { nodes, edges, onNodesChange, onEdgesChange, onConnect, isValid, addNode, addNodeConnected } = useApp();
+  const { nodes, edges, collapsed, onNodesChange, onEdgesChange, onConnect, isValid, addNode, addNodeConnected } = useApp();
   const [menu, setMenu] = useState<{ x: number; y: number; from: SpawnFrom | null } | null>(null);
   // Right-click on a condition: the same menu, listing the condition types to replace it with.
   const [replace, setReplace] = useState<{ x: number; y: number; ids: string[]; title: string; kinds: string[]; live: boolean } | null>(null);
@@ -80,9 +82,13 @@ export function Canvas() {
 
   // Flow lines are white, data lines are coloured by type (HANDOVER 3.6). The inline stroke beats React Flow's own selected
   // colour, so a selected wire gets a halo like a selected node does (AeEdge).
+  // A collapsed achievement hides its nodes and the wires that touch them (React Flow does not hide those by itself). Which ones follows from
+  // the wires, not the positions, so it is not worked out again on every drag frame.
+  const hidden = useMemo(() => hiddenOf(nodes, edges, collapsed), [edges, collapsed]); // eslint-disable-line react-hooks/exhaustive-deps
+  const shown = useMemo(() => hideNodes(nodes, hidden), [nodes, hidden]);
   const styledEdges = useMemo(
-    () => edges.map((e) => ({ ...e, type: "ae", style: { stroke: EDGE_COLOR[pinKind(e.sourceHandle) ?? "flow"] } })),
-    [edges],
+    () => edges.map((e) => ({ ...e, type: "ae", ...((hidden.has(e.source) || hidden.has(e.target)) && { hidden: true }), style: { stroke: EDGE_COLOR[pinKind(e.sourceHandle) ?? "flow"] } })),
+    [edges, hidden],
   );
 
   const options = useMemo(() => (menu ? spawnOptions(nodes, edges, menu.from) : []), [menu, nodes, edges]);
@@ -122,7 +128,7 @@ export function Canvas() {
     <div ref={box} className="h-full w-full" onPointerMove={(e) => (pointer.current = { x: e.clientX, y: e.clientY })}>
     <ReactFlow
       colorMode="dark"
-      nodes={nodes}
+      nodes={shown}
       edges={styledEdges}
       nodeTypes={nodeTypes}
       edgeTypes={edgeTypes}
@@ -185,6 +191,7 @@ export function Canvas() {
     >
       <Background variant={BackgroundVariant.Dots} gap={20} />
       <Controls />
+      <AchievementList />
       <MiniMap
         pannable
         zoomable

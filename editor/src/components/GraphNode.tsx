@@ -1,5 +1,6 @@
 import { Handle, Position, useStore, type NodeProps } from "@xyflow/react";
-import { AlertTriangle, CircleAlert, CircleHelp } from "lucide-react";
+import { AlertTriangle, CircleAlert, CircleHelp, EyeOff } from "lucide-react";
+import { membersOf, worstLevel } from "../achievements";
 import { incoming, nodeIndex } from "../graphIndex";
 import { achievementNames, conditionsSummary, isInternalGroup, linkedText, pluginOf, type AppNode } from "../graph";
 import { searchFor, usePlugins } from "../io/plugins";
@@ -164,8 +165,11 @@ export function GraphNode({ id, data, selected }: NodeProps<AppNode>) {
   const checked = parseNodeStatus(useValidation((s) => s.byNode[id]));
   const invalid = (useValidation((s) => s.fieldsByNode[id]) ?? "").split(",");
   const summaryLevel = level === "error" || level === "warning" ? level : null;
-  const status = checked.level === "error" || summaryLevel === "error" ? "error" : (checked.level ?? summaryLevel);
-  const problems = [...(def.condIn && summaryLevel ? [text] : []), ...checked.messages].join("\n");
+  // A collapsed achievement is this one node: what is wrong with the nodes it hides shows here.
+  const hiddenCount = useApp((s) => (data.kind === "CreateAchievement" && s.collapsed[id] ? membersOf(s.nodes, s.edges, id).length - 1 : 0));
+  const hiddenLevel = useValidation((v) => (hiddenCount ? (worstLevel(v.byNode, membersOf(useApp.getState().nodes, useApp.getState().edges, id)) ?? "") : ""));
+  const status = checked.level === "error" || summaryLevel === "error" || hiddenLevel === "error" ? "error" : (checked.level ?? summaryLevel ?? (hiddenLevel || null));
+  const problems = [...(def.condIn && summaryLevel ? [text] : []), ...(hiddenLevel ? [`The ${hiddenCount} hidden nodes have ${hiddenLevel === "error" ? "errors" : "warnings"}`] : []), ...checked.messages].join("\n");
   const required = def.fields.filter((f) => !f.optional);
   const optional = def.fields.filter((f) => f.optional);
   // Nodes with no required field (e.g. the one-of conditions) show everything; the rest fold optional rows away,
@@ -258,6 +262,17 @@ export function GraphNode({ id, data, selected }: NodeProps<AppNode>) {
             </button>
             {opened && optional.map(row)}
           </div>
+        )}
+        {hiddenCount > 0 && (
+          <button
+            type="button"
+            title="Expand this achievement"
+            onClick={() => useApp.getState().toggleCollapsed(id)}
+            className="nodrag flex w-full cursor-pointer items-center gap-2 px-3.5 py-1 text-left text-[12px] text-[var(--text-dim)] hover:text-[var(--text)]"
+          >
+            <EyeOff size={13} />
+            {hiddenCount} nodes hidden{hiddenLevel ? ` · ${hiddenLevel === "error" ? "errors" : "warnings"} inside` : ""}
+          </button>
         )}
         {def.achOut && (
           <div className="relative py-1 pl-3.5 pr-4 text-right text-[12px] text-[var(--text-dim)]" title="Connect to an Achievement Unlocked condition that waits for this achievement">
