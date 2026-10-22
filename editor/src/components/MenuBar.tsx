@@ -20,7 +20,8 @@ const NAV_HELP = [
   "Delete or Backspace: remove the selected nodes or wires.",
   "Ctrl + C, Ctrl + V, Ctrl + D: copy, paste and duplicate the selected nodes (Localized Text nodes are not copied; their text is).",
   "Double-click a node: zoom to it.",
-  "Right-click empty space, or Ctrl + Space: add a node.",
+  "Right-click empty space, or Space: add a node.",
+  "Ctrl + F: find nodes by title or value.",
   "Right-click a condition (or several selected): replace it with another condition type.",
 ].join("\n");
 

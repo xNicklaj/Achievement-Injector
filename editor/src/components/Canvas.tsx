@@ -12,6 +12,7 @@ import { spawnOptions, type SpawnFrom, type SpawnOption } from "../spawn";
 import { AeEdge } from "./AeEdge";
 import { hiddenOf, hideNodes } from "../achievements";
 import { AchievementList } from "./AchievementList";
+import { FindBar } from "./FindBar";
 import { GraphNode } from "./GraphNode";
 import { SpawnMenu } from "./SpawnMenu";
 
@@ -58,19 +59,28 @@ export function Canvas() {
     return () => el.removeEventListener("wheel", onWheel, { capture: true });
   }, [getViewport, setViewport]);
 
-  // Ctrl+Space opens the same menu as right-click, at the pointer (or the middle of the canvas when it has not been over it).
+  // Space opens the same menu as right-click, at the pointer (or the middle of the canvas when it has not been over it).
+  // It opens on release, and only if the canvas was not panned meanwhile, because Space + drag pans.
   const pointer = useRef<{ x: number; y: number } | null>(null);
+  const spaceArmed = useRef(false);
+  const [find, setFind] = useState(false);
   useEffect(() => {
-    const key = (e: KeyboardEvent) => {
-      if (!(e.ctrlKey || e.metaKey) || e.code !== "Space" || (e.target as HTMLElement).closest("input, textarea, select")) return;
+    const typing = (e: KeyboardEvent) => !!(e.target as HTMLElement).closest("input, textarea, select, button, [contenteditable]");
+    const down = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "f") return (e.preventDefault(), setFind(true));
+      if (e.code === "Space" && !e.repeat) spaceArmed.current = !e.ctrlKey && !e.metaKey && !e.altKey && !typing(e);
+    };
+    const up = (e: KeyboardEvent) => {
+      if (e.code !== "Space" || !spaceArmed.current) return;
+      spaceArmed.current = false;
       const el = box.current;
       if (!el) return;
-      e.preventDefault();
       const r = el.getBoundingClientRect();
       setMenu({ x: pointer.current?.x ?? r.left + r.width / 2, y: pointer.current?.y ?? r.top + r.height / 2, from: null });
     };
-    window.addEventListener("keydown", key);
-    return () => window.removeEventListener("keydown", key);
+    window.addEventListener("keydown", down);
+    window.addEventListener("keyup", up);
+    return () => (window.removeEventListener("keydown", down), window.removeEventListener("keyup", up));
   }, []);
 
   // "Tidy up" moves every node; look at the result.
@@ -166,7 +176,7 @@ export function Canvas() {
         setMenu({ x: (e as unknown as MouseEvent).clientX, y: (e as unknown as MouseEvent).clientY, from: null });
       }}
       onPaneClick={closeMenu}
-      onMoveStart={closeMenu}
+      onMoveStart={() => ((spaceArmed.current = false), closeMenu())}
       deleteKeyCode={["Delete", "Backspace"]}
       // Only nodes and wires in view are mounted, so a big group costs what is on screen. A node is always mounted until it has been
       // measured once (so a freshly opened file mounts everything one time), and undo keeps the measured sizes (store.test.ts).
@@ -221,6 +231,7 @@ export function Canvas() {
         title={replace.title}
       />
     )}
+    {find && <FindBar nodes={shown} hidden={hidden} onClose={() => setFind(false)} />}
     {menu && <SpawnMenu x={menu.x} y={menu.y} options={options} onPick={pick} onClose={closeMenu} title={menu.from ? "Create a node that connects here" : "Add a node"} />}
     </div>
   );
