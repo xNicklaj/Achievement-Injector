@@ -76,3 +76,13 @@ describe("tidyPositions with Conditions Met", () => {
     for (const [id, p] of at) expect(fresh.get(id)).toEqual({ x: Math.round(p.x), y: Math.round(p.y) });
   });
 });
+
+describe("tidyPositions and the flow wire", () => {
+  it("keeps conditions off the wire from the achievement to Add Conditions", () => {
+    const snap = importGroup(doc);
+    const at = tidyPositions(snap.nodes, snap.edges);
+    const create = snap.nodes.find((n) => n.data.kind === "CreateAchievement")!;
+    const wireY = at.get(create.id)!.y + 14; // the flow pin sits in the header
+    for (const n of snap.nodes.filter((n) => n.data.kind === "PlayerLevel" && n.data.values.level === 1)) expect(at.get(n.id)!.y).toBeGreaterThan(wireY);
+  });
+});

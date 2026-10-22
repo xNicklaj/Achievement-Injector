@@ -26,6 +26,8 @@ export const mkEdge = (source: string, sh: string, target: string, th: string): 
 export const W = 288;
 export const GAP = 110;
 export const COL = W + GAP;
+/** The flow wire from the achievement to Add Conditions runs along the top of the band, through the condition columns; conditions start below it. */
+export const FLOW_CLEAR = 44;
 export const estimateHeight = (def: NodeDef, values: Json = {}) => {
   const required = def.fields.filter((f) => !f.optional).length;
   // Mirrors GraphNode: with no required field every field shows. Otherwise optional ones fold into one summary row,
@@ -207,7 +209,8 @@ export function importGroup(raw: unknown): Snapshot {
 
     // Positions: saved `_editor` when present, otherwise a row layout per achievement band.
     const saved = Array.isArray(ed.chain) && ed.chain.length === chainSpec.length && ed.chain.every((p) => isObj(p) && num(p.x) && num(p.y)) ? (ed.chain as { x: number; y: number }[]) : null;
-    const bandH = Math.max(estimateHeight(registry.CreateAchievement, a), conds.reduce((h, c) => h + rowHeight(c), 0));
+    const clear = conds.length ? FLOW_CLEAR : 0;
+    const bandH = Math.max(estimateHeight(registry.CreateAchievement, a), clear + conds.reduce((h, c) => h + rowHeight(c), 0));
     // Live / Negate nodes sit in columns between the conditions and Add Conditions.
     const condEnd = Math.max(2 * COL, ...conds.map((c) => columnX(c) + COL * (1 + modifiersOf(c).length)));
     const chainX = (i: number) => (hasConds ? condEnd : COL) + i * COL;
@@ -262,7 +265,7 @@ export function importGroup(raw: unknown): Snapshot {
       for (const k of kidsOf(c)) ky += addCond(k, cn, ky);
       return rowHeight(c);
     };
-    let y = bandY;
+    let y = bandY + clear;
     for (const c of conds) y += addCond(c, addNode!, y);
     localize(create);
     linkIcon(create);

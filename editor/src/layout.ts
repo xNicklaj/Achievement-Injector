@@ -1,7 +1,7 @@
 import type { Edge } from "@xyflow/react";
 import { behind, isGroupCondition, type AppNode } from "./graph";
 import { incoming, outgoing } from "./graphIndex";
-import { COL, estimateHeight } from "./io/importGroup";
+import { COL, estimateHeight, FLOW_CLEAR } from "./io/importGroup";
 import { registry } from "./registry";
 import { useApp } from "./store";
 
@@ -67,7 +67,7 @@ export function tidyPositions(nodes: AppNode[], edges: Edge[]): Map<string, Pos>
       if (isGroupCondition(c.data.kind)) for (const k of fedBy(c.id)) inner += place(k, cy + inner);
       return Math.max(Math.max(height(c), ...actions.map(height)) + 20, inner);
     };
-    let cy = bandY;
+    let cy = bandY + (add && fed.length ? FLOW_CLEAR : 0); // below the flow wire to Add Conditions
     for (const f of fed) cy += place(f, cy);
     y += Math.max(height(create), cy - bandY, loc - bandY) + 80;
   }
