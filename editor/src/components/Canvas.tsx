@@ -13,6 +13,7 @@ import { AeEdge } from "./AeEdge";
 import { hiddenOf, hideNodes } from "../achievements";
 import { AchievementList } from "./AchievementList";
 import { FindBar } from "./FindBar";
+import { KeyHints } from "./KeyHints";
 import { GraphNode } from "./GraphNode";
 import { SpawnMenu } from "./SpawnMenu";
 
@@ -74,6 +75,14 @@ export function Canvas() {
         if (!input) setFind(true);
         else if (document.activeElement === input) setFind(false);
         else input.focus();
+        return;
+      }
+      // H folds or unfolds the selected achievements (their Create Achievement nodes): all fold unless they all are folded already.
+      if (e.key.toLowerCase() === "h" && !e.repeat && !e.ctrlKey && !e.metaKey && !e.altKey && !typing(e)) {
+        const { nodes, collapsed, toggleCollapsed } = useApp.getState();
+        const ids = nodes.filter((n) => n.selected && n.data.kind === "CreateAchievement").map((n) => n.id);
+        const fold = ids.some((id) => !collapsed[id]);
+        for (const id of ids) if (!!collapsed[id] !== fold) toggleCollapsed(id);
         return;
       }
       if (e.code === "Space" && !e.repeat) spaceArmed.current = !e.ctrlKey && !e.metaKey && !e.altKey && !typing(e);
@@ -210,6 +219,7 @@ export function Canvas() {
       <Background variant={BackgroundVariant.Dots} gap={20} />
       <Controls />
       <AchievementList />
+      <KeyHints />
       <MiniMap
         pannable
         zoomable
