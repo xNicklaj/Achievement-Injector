@@ -22,7 +22,9 @@ const NAV_HELP = [
   "Double-click a node: zoom to it.",
   "Right-click empty space, or Space: add a node.",
   "Ctrl + F: find nodes by title or value.",
-  "H: fold or unfold the selected achievements (select their Create Achievement node).",
+  "H: fold or unfold the selected achievements (select their Create Achievement node); Shift + H: all of them.",
+  "F: zoom to the selection (everything when nothing is selected). Ctrl + A: select all.",
+  "Alt + Up / Alt + Down: go to the previous or next achievement.",
   "Right-click a condition (or several selected): replace it with another condition type.",
 ].join("\n");
 

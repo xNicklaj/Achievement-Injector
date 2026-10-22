@@ -2,6 +2,7 @@ import { Panel, useReactFlow, useStore } from "@xyflow/react";
 import { ArrowUpDown, ChevronDown, ChevronRight, Eye, EyeOff } from "lucide-react";
 import { memo, useEffect, useMemo, useRef, useState, type DragEvent } from "react";
 import { bandsOf, membersOf, movedOrder, viewRect, visibleBands, worstLevel } from "../achievements";
+import { focusAchievement } from "../focusAchievement";
 import { linkedText } from "../graph";
 import { useApp } from "../store";
 import { useValidation } from "../validation";
@@ -135,15 +136,8 @@ export function AchievementList() {
     else if (el.offsetTop + el.offsetHeight > box.scrollTop + box.clientHeight) box.scrollTop = el.offsetTop + el.offsetHeight - box.clientHeight;
   }, [current, open, shown]);
 
-  const jump = useMemo(
-    () => (id: string) => {
-      const { nodes, edges, onNodesChange } = useApp.getState();
-      // Select it too, so it is marked on the canvas as well as in the list.
-      onNodesChange([...nodes.filter((n) => n.selected && n.id !== id).map((n) => ({ type: "select" as const, id: n.id, selected: false })), { type: "select" as const, id, selected: true }]);
-      void fitView({ nodes: membersOf(nodes, edges, id).map((m) => ({ id: m })), duration: 300, padding: 0.2, maxZoom: 1 });
-    },
-    [fitView],
-  );
+  // Selects it too, so it is marked on the canvas as well as in the list.
+  const jump = useMemo(() => (id: string) => focusAchievement(id, fitView), [fitView]);
   const toggle = useApp((s) => s.toggleCollapsed);
 
   // Reordering: the handle of a row is dragged onto another row, above or below its middle.

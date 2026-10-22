@@ -1,4 +1,4 @@
-import { Background, BackgroundVariant, Controls, MiniMap, ReactFlow, SelectionMode, useReactFlow } from "@xyflow/react";
+import { Background, BackgroundVariant, Controls, MiniMap, ReactFlow, SelectionMode, useReactFlow, useStoreApi } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useCallback, useEffect, useMemo, useRef, useState, type DragEvent } from "react";
 import { pinKind, type AppNode } from "../graph";
@@ -10,7 +10,8 @@ import { remembered } from "../viewport";
 import { createWheelClassifier, wheelPixels, zoomFactor } from "../wheel";
 import { spawnOptions, type SpawnFrom, type SpawnOption } from "../spawn";
 import { AeEdge } from "./AeEdge";
-import { hiddenOf, hideNodes } from "../achievements";
+import { bandsOf, hiddenOf, hideNodes, viewRect, visibleBands } from "../achievements";
+import { focusAchievement } from "../focusAchievement";
 import { AchievementList } from "./AchievementList";
 import { FindBar } from "./FindBar";
 import { KeyHints } from "./KeyHints";
@@ -33,6 +34,7 @@ export function Canvas() {
   const [replace, setReplace] = useState<{ x: number; y: number; ids: string[]; title: string; kinds: string[]; live: boolean } | null>(null);
   const closeMenu = useCallback(() => (setMenu(null), setReplace(null)), []);
   const { screenToFlowPosition, getViewport, setViewport, fitView } = useReactFlow();
+  const store = useStoreApi();
   const box = useRef<HTMLDivElement>(null);
 
   // Mouse and touchpad share one canvas: a touchpad scroll pans, a mouse notch zooms at the cursor.
@@ -77,12 +79,40 @@ export function Canvas() {
         else input.focus();
         return;
       }
-      // H folds or unfolds the selected achievements (their Create Achievement nodes): all fold unless they all are folded already.
-      if (e.key.toLowerCase() === "h" && !e.repeat && !e.ctrlKey && !e.metaKey && !e.altKey && !typing(e)) {
-        const { nodes, collapsed, toggleCollapsed } = useApp.getState();
-        const ids = nodes.filter((n) => n.selected && n.data.kind === "CreateAchievement").map((n) => n.id);
-        const fold = ids.some((id) => !collapsed[id]);
-        for (const id of ids) if (!!collapsed[id] !== fold) toggleCollapsed(id);
+      if (typing(e)) return;
+      const state = useApp.getState();
+      const key = e.key.toLowerCase();
+      // Ctrl+A selects every node in view of the graph (not the ones a folded achievement hides).
+      if ((e.ctrlKey || e.metaKey) && !e.altKey && key === "a") {
+        e.preventDefault();
+        const off = hiddenOf(state.nodes, state.edges, state.collapsed);
+        state.onNodesChange(state.nodes.filter((n) => !n.selected && !off.has(n.id)).map((n) => ({ type: "select" as const, id: n.id, selected: true })));
+        return;
+      }
+      if (e.ctrlKey || e.metaKey) return;
+      // H folds or unfolds the selected achievements (their Create Achievement nodes), Shift+H all of them: all fold unless they all are folded already.
+      if (key === "h" && !e.repeat && !e.altKey) {
+        const ids = state.nodes.filter((n) => n.data.kind === "CreateAchievement" && (e.shiftKey || n.selected)).map((n) => n.id);
+        const fold = ids.some((id) => !state.collapsed[id]);
+        for (const id of ids) if (!!state.collapsed[id] !== fold) state.toggleCollapsed(id);
+        return;
+      }
+      // F zooms to the selection, or to everything when nothing is selected.
+      if (key === "f" && !e.altKey && !e.shiftKey) {
+        const sel = state.nodes.filter((n) => n.selected).map((n) => ({ id: n.id }));
+        void fitView({ nodes: sel.length ? sel : undefined, duration: 300, padding: 0.2, maxZoom: 1.2 });
+        return;
+      }
+      // Alt+Up / Alt+Down: the previous or next achievement, counted from the selected one, else from the one nearest the middle of the view.
+      if (e.altKey && (e.key === "ArrowUp" || e.key === "ArrowDown")) {
+        const creates = state.nodes.filter((n) => n.data.kind === "CreateAchievement").map((n) => n.id);
+        if (!creates.length) return;
+        e.preventDefault();
+        const { transform, width, height } = store.getState();
+        const here = creates.find((id) => state.nodes.find((n) => n.id === id)?.selected) ?? visibleBands(bandsOf(state.nodes, state.edges, state.collapsed), viewRect(transform, width, height)).current;
+        const at = here ? creates.indexOf(here) : -1;
+        const next = at < 0 ? (e.key === "ArrowDown" ? 0 : creates.length - 1) : Math.min(creates.length - 1, Math.max(0, at + (e.key === "ArrowDown" ? 1 : -1)));
+        focusAchievement(creates[next], fitView);
         return;
       }
       if (e.code === "Space" && !e.repeat) spaceArmed.current = !e.ctrlKey && !e.metaKey && !e.altKey && !typing(e);
@@ -98,7 +128,7 @@ export function Canvas() {
     window.addEventListener("keydown", down);
     window.addEventListener("keyup", up);
     return () => (window.removeEventListener("keydown", down), window.removeEventListener("keyup", up));
-  }, []);
+  }, [fitView, store]);
 
   // "Tidy up" moves every node; look at the result.
   useEffect(() => {
