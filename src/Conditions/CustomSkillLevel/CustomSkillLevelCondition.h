@@ -27,6 +27,7 @@ void OnCustomSkillsMessage(SKSE::MessagingInterface::Message* a_msg);
 class CustomSkillLevelCondition : public GlobalVariableStateCondition, public RE::BSTEventSink<RE::MenuOpenCloseEvent>, public RE::BSTEventSink<CustomSkills::SkillIncreaseEvent> {
 public:
     void EnableListener() override;
+    void StopListening() override;
     void OnDataLoaded() override;
     void SetConditionParameters(std::string skill, float level) override;
 

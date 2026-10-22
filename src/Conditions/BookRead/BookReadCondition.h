@@ -5,6 +5,7 @@ public:
 	BookReadCondition();
 	void OnDataLoaded(void) override;
 	void EnableListener(void) override;
+	void StopListening(void) override;
 	void SetConditionParameters(std::string formid) override;
 	bool CheckCondition() override;
 	void Localize(std::string path) override;

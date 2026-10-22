@@ -44,7 +44,7 @@ bool WorldspaceDiscoveryCondition::CheckCondition() {
 	if (count >= this->requiredCount && this->requiredCount > 0) {
 		logger::info("Player met condition: Discovered {} locations in {}.", this->requiredCount, this->worldspaceID);
 		this->UnlockNotify();
-		RE::LocationDiscovery::GetEventSource()->RemoveEventSink(this);
+		StopListening();
 		return true;
 	}
 	
@@ -57,4 +57,7 @@ RE::BSEventNotifyControl WorldspaceDiscoveryCondition::ProcessEvent(const RE::Lo
 		CheckCondition();
 	}
 	return RE::BSEventNotifyControl::kContinue;
+}
+void WorldspaceDiscoveryCondition::StopListening(void) {
+	RE::LocationDiscovery::GetEventSource()->RemoveEventSink(this);
 }

@@ -32,7 +32,7 @@ bool GlobalVariableStateCondition::CheckCondition() {
 	if (!this->cachedGlobal) return false;
 	if(Evaluate()) {
 		this->UnlockNotify();
-		RE::PlayerCharacter::GetSingleton()->AsPositionPlayerEventSource()->RemoveEventSink(this);
+		StopListening();
 		return true;
 	}
 	return false;
@@ -41,4 +41,7 @@ bool GlobalVariableStateCondition::CheckCondition() {
 RE::BSEventNotifyControl GlobalVariableStateCondition::ProcessEvent(const RE::PositionPlayerEvent*, RE::BSTEventSource<RE::PositionPlayerEvent>*) {
 	if (!this->isMet) CheckCondition();
 	return RE::BSEventNotifyControl::kContinue;
+}
+void GlobalVariableStateCondition::StopListening(void) {
+	RE::PlayerCharacter::GetSingleton()->AsPositionPlayerEventSource()->RemoveEventSink(this);
 }

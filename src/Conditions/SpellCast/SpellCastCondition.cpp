@@ -33,8 +33,11 @@ RE::BSEventNotifyControl SpellCastCondition::ProcessEvent(const RE::TESSpellCast
 		if (++this->currQuantity >= this->quantity) {
 			logger::info("Player met condition spell cast {}", this->formid);
 			this->UnlockNotify();
-			KeyedSink<RE::TESSpellCastEvent>::GetSingleton()->Unsubscribe(this);
+			StopListening();
 		} else this->eventManager->dispatch("SerializationRequested");
 	}
 	return RE::BSEventNotifyControl::kContinue;
 };
+void SpellCastCondition::StopListening(void) {
+	KeyedSink<RE::TESSpellCastEvent>::GetSingleton()->Unsubscribe(this);
+}

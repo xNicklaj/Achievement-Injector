@@ -15,7 +15,7 @@ void ActorDeathCondition::OnDataLoaded(void) {
 	RE::TESObjectREFR* targetREFR = RE::TESObjectREFR::LookupByID<RE::TESObjectREFR>(this->cachedFormID);
 	if(targetREFR && targetREFR->IsDead()) {
 		this->UnlockNotify();
-		KeyedSink<RE::TESDeathEvent>::GetSingleton()->Unsubscribe(this);
+		StopListening();
 	}
 }
 void ActorDeathCondition::EnableListener(void) {
@@ -33,7 +33,10 @@ RE::BSEventNotifyControl ActorDeathCondition::ProcessEvent(const RE::TESDeathEve
 	if (a_event->actorDying->formID == this->cachedFormID) {
 		logger::info("Player met condition actor {} dead.", this->formID);
 		this->UnlockNotify();
-		KeyedSink<RE::TESDeathEvent>::GetSingleton()->Unsubscribe(this);
+		StopListening();
 	}
 	return RE::BSEventNotifyControl::kContinue;
 };
+void ActorDeathCondition::StopListening(void) {
+	KeyedSink<RE::TESDeathEvent>::GetSingleton()->Unsubscribe(this);
+}

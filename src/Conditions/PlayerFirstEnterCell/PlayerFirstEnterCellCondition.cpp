@@ -18,11 +18,14 @@ RE::BSEventNotifyControl PlayerFirstEnterCellCondition::ProcessEvent(const RE::B
     if (event->cellID == this->cachedFormID) {
         logger::info("Player met condition entered cell {}.", this->cellID);
         this->UnlockNotify();
-        KeyedSink<RE::BGSActorCellEvent>::GetSingleton()->Unsubscribe(this);
+        StopListening();
     }
     return RE::BSEventNotifyControl::kContinue;
 }
 bool PlayerFirstEnterCellCondition::CheckCondition() {
 
     return false;
+}
+void PlayerFirstEnterCellCondition::StopListening(void) {
+    KeyedSink<RE::BGSActorCellEvent>::GetSingleton()->Unsubscribe(this);
 }

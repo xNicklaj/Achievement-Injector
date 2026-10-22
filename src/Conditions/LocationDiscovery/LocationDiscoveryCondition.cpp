@@ -67,7 +67,7 @@ void LocationDiscoveryCondition::OnDataLoaded(void) {
         if (CheckKnownLocation(this->locationName, this->formID, this->plugin)) {
             logger::info("Player met condition found {} in {}.", this->formID != "" ? this->formID : this->locationName, this->worldspaceID);
             this->UnlockNotify();
-            KeyedSink<RE::LocationDiscovery::Event>::GetSingleton()->Unsubscribe(this);
+            StopListening();
         };
     } catch (const std::exception&) {
         logger::error("An error occurred in OnDataLoaded of LocationDiscoveryCondition, with parameters ({}, {})", this->locationName, this->worldspaceID);
@@ -91,7 +91,7 @@ bool LocationDiscoveryCondition::CheckCondition(std::string locationName_l, std:
     if (locationName_l == this->locationName && (this->worldspaceID.empty() || worldspaceID_l == this->worldspaceID)) {
         logger::info("Player met condition found {} in {}.", this->locationName, this->worldspaceID);
         this->UnlockNotify();
-        KeyedSink<RE::LocationDiscovery::Event>::GetSingleton()->Unsubscribe(this);
+        StopListening();
         return true;
     }
     return false;
@@ -106,7 +106,7 @@ RE::BSEventNotifyControl LocationDiscoveryCondition::ProcessEvent(const RE::Loca
             if (targetRefr && targetRefr->formID == refr->formID) {
                 logger::info("Player met condition found {} in {}.", this->formID, this->worldspaceID);
                 this->UnlockNotify();
-                KeyedSink<RE::LocationDiscovery::Event>::GetSingleton()->Unsubscribe(this);
+                StopListening();
                 return RE::BSEventNotifyControl::kContinue;
             }
         }
@@ -114,4 +114,7 @@ RE::BSEventNotifyControl LocationDiscoveryCondition::ProcessEvent(const RE::Loca
         CheckCondition(a_event->mapMarkerData->locationName.GetFullName(), a_event->worldspaceID);
     }
     return RE::BSEventNotifyControl::kContinue;
+}
+void LocationDiscoveryCondition::StopListening(void) {
+    KeyedSink<RE::LocationDiscovery::Event>::GetSingleton()->Unsubscribe(this);
 }

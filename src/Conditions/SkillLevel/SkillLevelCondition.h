@@ -6,6 +6,7 @@ public:
 
 	void OnDataLoaded(void) override;
 	void EnableListener(void) override;
+	void StopListening(void) override;
 	void SetConditionParameters(std::string skill, int level) override;
 	void SetConditionParameters(std::string skill, std::string op, int level) override;
 	bool CheckCondition() override;

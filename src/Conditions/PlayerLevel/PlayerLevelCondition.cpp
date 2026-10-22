@@ -34,8 +34,11 @@ bool PlayerLevelCondition::Evaluate() {
 bool PlayerLevelCondition::CheckCondition() {
     if (!this->isMet && Evaluate()) {
         this->UnlockNotify();
-        RE::LevelIncrease::GetEventSource()->RemoveEventSink(this);
+        StopListening();
         return true;
     }
     return false;
+}
+void PlayerLevelCondition::StopListening(void) {
+    RE::LevelIncrease::GetEventSource()->RemoveEventSink(this);
 }

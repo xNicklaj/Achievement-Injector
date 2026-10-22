@@ -6,6 +6,7 @@ public:
 
 	void OnDataLoaded(void) override;
 	void EnableListener(void) override;
+	void StopListening(void) override;
 	void SetConditionParameters(std::string formID, std::string, int stage) override;
 	bool CheckCondition() override;
 	bool SupportsLive() override { return true; }

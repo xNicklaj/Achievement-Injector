@@ -58,7 +58,7 @@ bool HasPerksCondition::CheckCondition() {
 
 	if (Evaluate()) {
 		this->UnlockNotify();
-		RE::UI::GetSingleton()->RemoveEventSink(this);
+		StopListening();
 		return true;
 	}
 	
@@ -70,4 +70,7 @@ RE::BSEventNotifyControl HasPerksCondition::ProcessEvent(const RE::MenuOpenClose
 		CheckCondition();
 	}
 	return RE::BSEventNotifyControl::kContinue;
+}
+void HasPerksCondition::StopListening(void) {
+	RE::UI::GetSingleton()->RemoveEventSink(this);
 }

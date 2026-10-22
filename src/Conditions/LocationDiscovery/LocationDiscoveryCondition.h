@@ -9,6 +9,7 @@ public:
 	LocationDiscoveryCondition();
 	void OnDataLoaded(void) override;
 	void EnableListener(void) override;
+	void StopListening(void) override;
 	void SetConditionParameters(std::string locationName_a, std::string worldspaceID_a, std::string formID_a);
 	bool CheckCondition(std::string locationName_l, std::string worldspaceID_l);
 

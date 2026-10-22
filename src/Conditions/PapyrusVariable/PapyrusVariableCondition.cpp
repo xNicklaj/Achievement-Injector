@@ -58,7 +58,7 @@ bool PapyrusVariableCondition::CheckCondition() {
 
 	if (var->GetSInt() >= this->value) {
 		this->UnlockNotify();
-		RE::UI::GetSingleton()->RemoveEventSink(this);
+		StopListening();
 		return true;
 	}
 	return false;
@@ -69,4 +69,7 @@ RE::BSEventNotifyControl PapyrusVariableCondition::ProcessEvent(const RE::MenuOp
 		CheckCondition();
 	}
 	return RE::BSEventNotifyControl::kContinue;
+}
+void PapyrusVariableCondition::StopListening(void) {
+	RE::UI::GetSingleton()->RemoveEventSink(this);
 }

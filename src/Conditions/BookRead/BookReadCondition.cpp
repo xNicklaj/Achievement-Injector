@@ -29,7 +29,10 @@ RE::BSEventNotifyControl BookReadCondition::ProcessEvent(const RE::BooksRead::Ev
 	{
         logger::info("Player met condition read book {}.", this->identifier);
         this->UnlockNotify();
-        RE::BooksRead::GetEventSource()->RemoveEventSink(this);
+        StopListening();
 	}
 	return RE::BSEventNotifyControl::kContinue;
+}
+void BookReadCondition::StopListening(void) {
+    RE::BooksRead::GetEventSource()->RemoveEventSink(this);
 }
