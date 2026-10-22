@@ -8,11 +8,13 @@ import { useValidation } from "../validation";
 import { remembered } from "../viewport";
 import { createWheelClassifier, wheelPixels, zoomFactor } from "../wheel";
 import { spawnOptions, type SpawnFrom, type SpawnOption } from "../spawn";
+import { AeEdge } from "./AeEdge";
 import { GraphNode } from "./GraphNode";
 import { SpawnMenu } from "./SpawnMenu";
 
 export const DRAG_MIME = "application/ae-node";
 const nodeTypes = { ae: GraphNode };
+const edgeTypes = { ae: AeEdge };
 
 const MIN_ZOOM = 0.1;
 const MAX_ZOOM = 2;
@@ -73,9 +75,10 @@ export function Canvas() {
     return () => window.removeEventListener("ae-fit", fit);
   }, [fitView]);
 
-  // Flow lines are white, data lines are coloured by type (HANDOVER 3.6).
+  // Flow lines are white, data lines are coloured by type (HANDOVER 3.6). The inline stroke beats React Flow's own selected
+  // colour, so a selected wire gets a halo like a selected node does (AeEdge).
   const styledEdges = useMemo(
-    () => edges.map((e) => ({ ...e, style: { stroke: EDGE_COLOR[pinKind(e.sourceHandle) ?? "flow"] } })),
+    () => edges.map((e) => ({ ...e, type: "ae", style: { stroke: EDGE_COLOR[pinKind(e.sourceHandle) ?? "flow"] } })),
     [edges],
   );
 
@@ -103,6 +106,7 @@ export function Canvas() {
       nodes={nodes}
       edges={styledEdges}
       nodeTypes={nodeTypes}
+      edgeTypes={edgeTypes}
       onNodesChange={onNodesChange}
       onEdgesChange={onEdgesChange}
       onConnect={onConnect}
@@ -153,6 +157,9 @@ export function Canvas() {
       <MiniMap
         pannable
         zoomable
+        // A selected node gets a bright outline here too.
+        nodeStrokeColor={(n) => (n.selected ? "var(--select)" : "transparent")}
+        nodeStrokeWidth={4}
         // Invalid nodes show red/amber on the minimap (HANDOVER 3.9).
         nodeColor={(n) => {
           const d = (n as AppNode).data;

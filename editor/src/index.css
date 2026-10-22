@@ -24,6 +24,10 @@
   --cat-localization: #be185d;
   --cat-asset: #0e7490;
 
+  /* Selection: a ring and a soft glow around nodes, a halo under wires, the same in the minimap and the lists. */
+  --select: rgba(255, 255, 255, 0.85);
+  --select-soft: rgba(255, 255, 255, 0.3);
+
   --status-error: #ef4444;
   --status-warning: #f59e0b;
 
@@ -50,6 +54,13 @@ body,
 }
 .react-flow__attribution {
   display: none;
+}
+/* Drag-selecting, and the box around several selected nodes. */
+.react-flow__selection,
+.react-flow__nodesselection-rect {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--select);
+  border-radius: 6px;
 }
 
 /* Pins are 12px; a touchpad needs a bigger target. The invisible ring is part of the handle, so dropping a wire on it connects. */

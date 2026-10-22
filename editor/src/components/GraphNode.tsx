@@ -209,7 +209,7 @@ export function GraphNode({ id, data, selected }: NodeProps<AppNode>) {
       style={{
         // Selection is a soft glow; status is a solid border (HANDOVER 3.9).
         border: `2px solid ${status === "error" ? "var(--status-error)" : status === "warning" ? "var(--status-warning)" : "var(--border)"}`,
-        boxShadow: selected ? "0 0 0 3px rgba(255,255,255,.18)" : undefined,
+        boxShadow: selected ? "0 0 0 3px var(--select), 0 0 16px 4px var(--select-soft)" : undefined,
       }}
     >
       <div className="relative flex items-center gap-1.5 rounded-t-sm px-3.5 py-2 font-semibold text-white" style={{ background: `var(--cat-${def.category})` }}>
