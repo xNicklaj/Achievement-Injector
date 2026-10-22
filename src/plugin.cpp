@@ -8,6 +8,7 @@ using namespace SKSE::stl;
 #include "Conditions/Condition.h"
 #include "EventProcessor.h"
 #include "Papyrus.h"
+#include "Api.h"
 #include "ConsoleUtilSSE.h"
 #include "Sync.h"
 #include "log.h"
@@ -48,9 +49,11 @@ void InitializePostLoad() {
         logger::info("Data loaded. Executing {} functions.", postLoadConditionRegistry.size());
         // An existing save can meet many conditions at once: write the progress files once, not per condition
         Serializer::GetSingleton()->DeferSaves(true);
+        AchievementManager::GetSingleton()->retroactive = true;
         for (auto& condition: postLoadConditionRegistry) {
             condition->OnDataLoaded();
         }
+        AchievementManager::GetSingleton()->retroactive = false;
         Serializer::GetSingleton()->DeferSaves(false);
     }
 
@@ -203,6 +206,7 @@ SKSEPluginLoad(const LoadInterface* skse) {
     const auto messaging = SKSE::GetMessagingInterface();
     messaging->RegisterListener("SKSE", MessageHandler);
     messaging->RegisterListener("CustomSkills", OnCustomSkillsMessage);
+    Api::Register();
 
     SKSE::GetPapyrusInterface()->Register(NativePapyrus::Register);
     std::thread(ProcessQueue).detach();

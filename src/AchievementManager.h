@@ -30,7 +30,6 @@ public:
 	bool showInMenu;
 
 	AchievementGroup(std::string name, std::string plugin, std::string iconPath);
-    void ForceUnlock(std::string achievementName);
 	void SetShowInMenu(bool showInMenu_p) { this->showInMenu = showInMenu_p; }
     void SetId(std::string id) { groupid = id; }
     std::string ToString();
@@ -54,6 +53,11 @@ public:
 	void AddEventSink(std::function<void(AchievementUnlockedEvent*)> callback);
 	void RemoveEventSink(std::function<void(AchievementUnlockedEvent*)> callback);
     void ForceUnlock(std::string achievementName, std::string group);
+	// Case-insensitive; a "$key" name is localized first. Null if the group or achievement doesn't exist
+	Achievement* Find(std::string achievementName, const std::string& group);
+	bool IsUnlocked(const std::string& achievementName, const std::string& group);
+	// True while load-time condition checks run, so listeners can tell old unlocks from live ones
+	bool retroactive = false;
 	void Dispatch(AchievementUnlockedEvent*);
 private:
 	std::string cache;

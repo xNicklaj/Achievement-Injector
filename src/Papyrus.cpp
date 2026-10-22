@@ -18,6 +18,10 @@ namespace NativePapyrus {
         AchievementManager::GetSingleton()->ForceUnlock(name, group);
 	}
 
+	bool IsAchievementUnlocked(STATIC_ARGS, std::string name, std::string group) {
+        return AchievementManager::GetSingleton()->IsUnlocked(name, group);
+    }
+
 	std::vector<int> GetVersion(STATIC_ARGS) {
         // The version is set once, in xmake.lua
         const auto version = SKSE::PluginDeclaration::GetSingleton()->GetVersion();
@@ -47,6 +51,7 @@ namespace NativePapyrus {
 
 	bool Bind(VM& a_vm) {
         BIND(UnlockAchievement);
+        BIND(IsAchievementUnlocked);
         BIND(GetVersion);
         logger::debug("Binding Papyrus Static functions...");
         return true;
