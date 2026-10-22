@@ -28,6 +28,8 @@
   --select: rgba(255, 255, 255, 0.85);
   --select-soft: rgba(255, 255, 255, 0.3);
 
+  --scroll-thumb: rgba(255, 255, 255, 0.28);
+
   --status-error: #ef4444;
   --status-warning: #f59e0b;
 
@@ -47,6 +49,12 @@ body,
   background: var(--bg-app);
   color: var(--text);
   font: 13px/1.4 system-ui, sans-serif;
+}
+
+/* Thin dark scrollbars everywhere: without this Chromium draws its light one, with arrow buttons, on the dark panels. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scroll-thumb) transparent;
 }
 
 .react-flow__edge-path {
