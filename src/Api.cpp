@@ -27,7 +27,7 @@ namespace Api {
             return group && name ? AchievementManager::GetSingleton()->Find(name, group) : nullptr;
         }
 
-        class Interface : public AchievementInjectorAPI::IAchievementInjectorV2 {
+        class Interface : public AchievementInjectorAPI::IAchievementInjector {
         public:
             std::uint32_t GetVersion() override { return 2; }
             bool IsUnlocked(const char* group, const char* name) override {
@@ -81,7 +81,7 @@ namespace Api {
         // Registered with no sender filter: requests come from any plugin
         void OnMessage(SKSE::MessagingInterface::Message* a_msg) {
             if (a_msg->type != AchievementInjectorAPI::kRequestInterface || a_msg->dataLen != sizeof(void*)) return;
-            *static_cast<AchievementInjectorAPI::IAchievementInjectorV1**>(a_msg->data) = &instance;
+            *static_cast<AchievementInjectorAPI::IAchievementInjector**>(a_msg->data) = &instance;
         }
 
         void OnUnlocked(AchievementUnlockedEvent* a_event) {
