@@ -22,6 +22,7 @@ function hit(n: AppNode, q: string): string | null {
 export function FindBar({ nodes, hidden, onClose }: { nodes: AppNode[]; hidden: Set<string>; onClose: () => void }) {
   const [q, setQ] = useState("");
   const [active, setActive] = useState(0);
+  const [shift, setShift] = useState({ x: 0, y: 0 });
   const { fitView } = useReactFlow();
 
   const found = useMemo(() => {
@@ -51,7 +52,15 @@ export function FindBar({ nodes, hidden, onClose }: { nodes: AppNode[]; hidden: 
   };
 
   return (
-    <div role="search" className="nowheel nodrag absolute left-1/2 top-2 z-[80] w-[340px] -translate-x-1/2 overflow-hidden rounded-md border border-[var(--border)] bg-[var(--bg-panel)] shadow-2xl" onKeyDown={key}>
+    <div role="search" className="nowheel nodrag absolute left-1/2 top-2 z-[80] w-[340px] overflow-hidden rounded-md border border-[var(--border)] bg-[var(--bg-panel)] shadow-2xl" style={{ transform: `translate(calc(-50% + ${shift.x}px), ${shift.y}px)` }} onKeyDown={key}>
+      <div
+        title="Drag to move"
+        className="h-3 cursor-move bg-white/10 hover:bg-white/20"
+        // Keep focus in the search box.
+        onMouseDown={(e) => e.preventDefault()}
+        onPointerDown={(e) => e.currentTarget.setPointerCapture(e.pointerId)}
+        onPointerMove={(e) => e.buttons && setShift((s) => ({ x: s.x + e.movementX, y: s.y + e.movementY }))}
+      />
       <input
         autoFocus
         value={q}

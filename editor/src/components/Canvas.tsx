@@ -67,7 +67,15 @@ export function Canvas() {
   useEffect(() => {
     const typing = (e: KeyboardEvent) => !!(e.target as HTMLElement).closest("input, textarea, select, button, [contenteditable]");
     const down = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === "f") return (e.preventDefault(), setFind(true));
+      if ((e.ctrlKey || e.metaKey) && e.key === "f") {
+        e.preventDefault();
+        // Closed: open. Open but not focused: focus it. Focused: hide it.
+        const input = box.current?.querySelector<HTMLInputElement>('input[aria-label="Find nodes"]');
+        if (!input) setFind(true);
+        else if (document.activeElement === input) setFind(false);
+        else input.focus();
+        return;
+      }
       if (e.code === "Space" && !e.repeat) spaceArmed.current = !e.ctrlKey && !e.metaKey && !e.altKey && !typing(e);
     };
     const up = (e: KeyboardEvent) => {
