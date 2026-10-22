@@ -15,20 +15,21 @@ function useSelection() {
   });
 }
 
-function hintsFor(key: string): Hint[] {
+/** The hints as groups, most used first: create or edit, organize, navigate, history. */
+function hintsFor(key: string): Hint[][] {
   const [nodes, creates, folded, conditions, wires] = key.split("|").map(Number);
-  const out: Hint[] = [];
-  if (nodes) {
-    if (creates) out.push(["H", folded ? "Unfold achievement" : "Fold achievement"]);
-    out.push(["Ctrl C", "Copy"], ["Ctrl D", "Duplicate"], ["Del", nodes > 1 ? `Delete ${nodes} nodes` : "Delete node"]);
-    if (conditions) out.push(["Right-click", "Replace condition type"]);
-  } else if (wires) {
-    out.push(["Del", "Delete wire"]);
-  } else {
-    out.push(["Space", "Add a node"], ["Ctrl F", "Find nodes"], ["Ctrl V", "Paste"]);
-  }
-  out.push(["Ctrl Z", "Undo"], ["Ctrl Y", "Redo"]);
-  return out;
+  const nav: Hint = ["Alt ↑ ↓", "Previous / next achievement"];
+  const history: Hint[] = [["Ctrl Z", "Undo"], ["Ctrl Y", "Redo"]];
+  const groups: Hint[][] = nodes
+    ? [
+        [["Ctrl C", "Copy"], ["Ctrl D", "Duplicate"], ["Del", nodes > 1 ? `Delete ${nodes} nodes` : "Delete node"]],
+        [...(creates ? [["H", folded ? "Unfold achievement" : "Fold achievement"] as Hint] : []), ...(conditions ? [["Right-click", "Replace condition type"] as Hint] : [])],
+        [["F", "Zoom to selection"], nav],
+      ]
+    : wires
+      ? [[["Del", "Delete wire"]], [nav]]
+      : [[["Space", "Add a node"], ["Ctrl V", "Paste"], ["Ctrl A", "Select all"]], [["Ctrl F", "Find nodes"], ["F", "Zoom to all"], nav], [["Shift H", "Fold all"]]];
+  return [...groups, history].filter((g) => g.length);
 }
 
 /** Faint, click-through cheat sheet of the keys that do something for the current selection. It gets a background only while a node is behind it. */
@@ -52,12 +53,14 @@ export function KeyHints() {
   return (
     <Panel position="bottom-right" className="pointer-events-none select-none" style={{ marginBottom: 170 }}>
       <ul ref={list} aria-label="Keyboard shortcuts" className={`rounded-md px-3 py-2 text-[12px] ${overNode ? "bg-black/60" : ""} text-[var(--text-dim)] [text-shadow:0_0_3px_#000,0_1px_2px_#000]`}>
-        {hints.map(([keys, what]) => (
-          <li key={keys} className="flex items-center justify-between gap-4 py-0.5">
-            <span>{what}</span>
-            <kbd className="rounded border border-white/20 bg-white/5 px-1.5 font-sans text-[11px] text-[var(--text)]">{keys}</kbd>
-          </li>
-        ))}
+        {hints.map((group, g) =>
+          group.map(([keys, what], i) => (
+            <li key={keys} className={`flex items-center justify-between gap-4 py-0.5 ${g && !i ? "mt-2" : ""}`}>
+              <span>{what}</span>
+              <kbd className="rounded border border-white/20 bg-white/5 px-1.5 font-sans text-[11px] text-[var(--text)]">{keys}</kbd>
+            </li>
+          )),
+        )}
       </ul>
     </Panel>
   );
