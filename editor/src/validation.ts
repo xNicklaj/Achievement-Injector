@@ -1,4 +1,6 @@
+import type { Edge } from "@xyflow/react";
 import { create } from "zustand";
+import type { AppNode } from "./graph";
 import { exportGroup, type ExportState, type Issue } from "./io/exportGroup";
 import type { Json } from "./io/importGroup";
 import { usePlugins } from "./io/plugins";
@@ -34,12 +36,29 @@ const current = () => ({ ...useApp.getState(), plugins: usePlugins.getState().pl
 
 export const useValidation = create<Validation>(() => computeValidation(current()));
 
+type Doc = Pick<ExportState, "nodes" | "edges" | "group" | "groupExtra" | "loc" | "fileName" | "iconFiles" | "pendingIcons">;
+const sameWire = (a: Edge, b: Edge) => a === b || (a.id === b.id && a.source === b.source && a.target === b.target && a.sourceHandle === b.sourceHandle && a.targetHandle === b.targetHandle);
+const sameNode = (a: AppNode, b: AppNode) => a === b || (a.id === b.id && a.data === b.data && a.position.x === b.position.x && a.position.y === b.position.y);
+const sameList = <T,>(a: T[], b: T[], same: (x: T, y: T) => boolean) => a === b || (a.length === b.length && a.every((x, i) => same(x, b[i])));
+
+/**
+ * Could the file, or a problem in it, differ between these two states? Selecting, measuring and a drag in progress replace
+ * node and wire objects without changing anything validation reads, and a pass costs milliseconds per hundred nodes.
+ */
+export function docChanged(a: Doc, b: Doc): boolean {
+  return (
+    a.group !== b.group || a.groupExtra !== b.groupExtra || a.loc !== b.loc || a.fileName !== b.fileName || a.iconFiles !== b.iconFiles || a.pendingIcons !== b.pendingIcons ||
+    !sameList(a.nodes, b.nodes, sameNode) ||
+    !sameList(a.edges, b.edges, sameWire)
+  );
+}
+
 /** Recompute shortly after the document stops changing, so dragging a node stays smooth. */
 export function startValidation(wait = 150) {
   let t: ReturnType<typeof setTimeout>;
   const run = () => useValidation.setState(computeValidation(current()), true);
   const later = () => (clearTimeout(t), (t = setTimeout(run, wait)));
-  const offs = [useApp.subscribe(later), usePlugins.subscribe(later)];
+  const offs = [useApp.subscribe((s, was) => docChanged(was, s) && later()), usePlugins.subscribe(later)];
   run();
   return () => (offs.forEach((f) => f()), clearTimeout(t));
 }

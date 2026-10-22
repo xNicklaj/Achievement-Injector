@@ -1,5 +1,6 @@
 import type { Edge, Node } from "@xyflow/react";
 import { fallbackText, type LocFile } from "./io/localization";
+import { incoming, nodeIndex, outgoing } from "./graphIndex";
 import { LIVE_TYPES } from "./schema";
 import { isAction, isCondition, LINK_KINDS, missingRequired, registry, wiredFields, type LinkKind } from "./registry";
 
@@ -19,14 +20,14 @@ const NO_LIVE_INSIDE = "Live and Negate are not supported inside Conditions Met"
 
 /** The condition behind a wire from `id`, looking back through Live / Negate nodes. `mods` run from the condition towards `id`; `seen` holds the modifiers passed. */
 export function behind(nodes: AppNode[], edges: Edge[], id: string) {
-  const byId = new Map(nodes.map((n) => [n.id, n]));
+  const byId = nodeIndex(nodes);
   const mods: AppNode[] = [];
   const seen = new Set<string>();
   let n = byId.get(id);
   while (n && isModifier(n.data.kind) && !seen.has(n.id)) {
     seen.add(n.id);
     mods.unshift(n);
-    const from = edges.find((e) => e.target === n!.id && e.targetHandle === "cond-in")?.source;
+    const from = incoming(edges, n.id).find((e) => e.targetHandle === "cond-in")?.source;
     n = from ? byId.get(from) : undefined;
   }
   return { root: n && !isModifier(n.data.kind) ? n : undefined, mods, seen };
@@ -41,13 +42,11 @@ const walk = (edges: Edge[], start: string, next: (id: string) => string[]) => {
   return seen;
 };
 
-const flowEdges = (edges: Edge[]) => edges.filter((e) => e.sourceHandle === "flow-out");
-
 /** Nodes upstream and downstream of `id` along flow edges (not including `id`). */
 export const upstream = (edges: Edge[], id: string) =>
-  walk(edges, id, (n) => flowEdges(edges).filter((e) => e.target === n).map((e) => e.source));
+  walk(edges, id, (n) => incoming(edges, n).filter((e) => e.sourceHandle === "flow-out").map((e) => e.source));
 export const downstream = (edges: Edge[], id: string) =>
-  walk(edges, id, (n) => flowEdges(edges).filter((e) => e.source === n).map((e) => e.target));
+  walk(edges, id, (n) => outgoing(edges, n).filter((e) => e.sourceHandle === "flow-out").map((e) => e.target));
 
 export type Link = { source: string; target: string; sourceHandle?: string | null; targetHandle?: string | null };
 
@@ -107,15 +106,16 @@ export function refuseReason(nodes: AppNode[], edges: Edge[], c: Link): string |
 /** The achievement a condition node belongs to: the Create Achievement at the head of the chain its Add Conditions is in. */
 export function ownerOf(nodes: AppNode[], edges: Edge[], condition: string): string | undefined {
   // Follow the wire through any Live / Negate nodes and enclosing Conditions Met nodes to the Add Conditions.
+  const byId = nodeIndex(nodes);
   let add: string | undefined = condition;
   for (const seen = new Set<string>(); add && !seen.has(add); ) {
     seen.add(add);
-    add = edges.find((e) => e.source === add && e.sourceHandle === "cond-out")?.target;
-    const kind = nodes.find((n) => n.id === add)?.data.kind ?? "";
+    add = outgoing(edges, add).find((e) => e.sourceHandle === "cond-out")?.target;
+    const kind = (add && byId.get(add)?.data.kind) || "";
     if (!add || !(isModifier(kind) || isGroupCondition(kind))) break;
   }
   if (!add) return undefined;
-  return [...upstream(edges, add)].find((id) => nodes.find((n) => n.id === id)?.data.kind === "CreateAchievement");
+  return [...upstream(edges, add)].find((id) => byId.get(id)?.data.kind === "CreateAchievement");
 }
 
 /** What a link wire stands for: the text of a Localized Text key, an achievement name, an icon file or a plugin. Undefined when the source has none yet. */
@@ -126,20 +126,21 @@ export function linkedText(nodes: AppNode[], edges: Edge[], loc: Record<string, 
   if (kind === "icon") return plain(source.data.values.file);
   if (kind === "plugin") return plain(source.data.values.plugin);
   // A localized achievement name counts as its fallback text: the DLL compares plain text.
-  const wire = edges.find((e) => e.target === source.id && e.targetHandle === "loc:achievementName");
-  return wire ? translated(nodes.find((n) => n.id === wire.source)?.data.values.key) : plain(source.data.values.achievementName);
+  const wire = incoming(edges, source.id).find((e) => e.targetHandle === "loc:achievementName");
+  return wire ? translated(nodeIndex(nodes).get(wire.source)?.data.values.key) : plain(source.data.values.achievementName);
 }
 
 /** The plugin a node resolves forms in: its own override, else its achievement's, else the group's. An override is a wired Plugin Override node or a typed value. */
 export function pluginOf(nodes: AppNode[], edges: Edge[], node: AppNode, groupPlugin: string | undefined): string | undefined {
+  const byId = nodeIndex(nodes);
   const own = (n: AppNode | undefined) => {
     if (!n) return undefined;
-    const wire = edges.find((e) => e.target === n.id && e.targetHandle === "plugin:pluginOverride");
-    const v = wire ? nodes.find((x) => x.id === wire.source)?.data.values.plugin : n.data.values.pluginOverride;
+    const wire = incoming(edges, n.id).find((e) => e.targetHandle === "plugin:pluginOverride");
+    const v = wire ? byId.get(wire.source)?.data.values.plugin : n.data.values.pluginOverride;
     return typeof v === "string" && v ? v : undefined;
   };
-  const owner = isCondition(node.data.kind) ? nodes.find((x) => x.id === ownerOf(nodes, edges, node.id)) : undefined;
-  return own(node) ?? own(owner) ?? groupPlugin;
+  const ownerId = isCondition(node.data.kind) ? ownerOf(nodes, edges, node.id) : undefined;
+  return own(node) ?? own(ownerId ? byId.get(ownerId) : undefined) ?? groupPlugin;
 }
 
 /**
@@ -147,11 +148,16 @@ export function pluginOf(nodes: AppNode[], edges: Edge[], node: AppNode, groupPl
  * compares the reference with the achievement's final (localized) name as plain text.
  */
 export function achievementNames(nodes: AppNode[], edges: Edge[], loc: Record<string, LocFile>): string[] {
-  const names = new Set<string>();
-  for (const n of nodes) if (n.data.kind === "CreateAchievement") names.add(linkedText(nodes, edges, loc, n, "ach") ?? "");
-  names.delete("");
-  return [...names].sort((a, b) => a.localeCompare(b));
+  // Every Achievement Unlocked field asks on each store update: the answer for the same document is computed once.
+  if (lastNames.nodes === nodes && lastNames.edges === edges && lastNames.loc === loc) return lastNames.result;
+  const found = new Set<string>();
+  for (const n of nodes) if (n.data.kind === "CreateAchievement") found.add(linkedText(nodes, edges, loc, n, "ach") ?? "");
+  found.delete("");
+  const result = [...found].sort((a, b) => a.localeCompare(b));
+  Object.assign(lastNames, { nodes, edges, loc, result });
+  return result;
 }
+const lastNames: { nodes?: AppNode[]; edges?: Edge[]; loc?: Record<string, LocFile>; result: string[] } = { result: [] };
 
 /** An `AchievementUnlocked` reference is inside this group when it names no group or this group's file name. */
 export const isInternalGroup = (group: unknown, groupFile: string | null | undefined) =>
@@ -179,10 +185,11 @@ export function restoreInline(nodes: AppNode[], gone: Edge[], loc: Record<string
 /** Human summary of an AddConditions or ConditionsMet node, derived from edges (HANDOVER 3.2), never stored. */
 export function conditionsSummary(nodes: AppNode[], edges: Edge[], id: string) {
   const incomplete = (n: AppNode) => missingRequired(registry[n.data.kind], n.data.values, wiredFields(edges, n.id));
-  const fed = edges.filter((e) => e.target === id && e.targetHandle === "cond-in").flatMap((e) => behind(nodes, edges, e.source).root ?? []);
+  const byId = nodeIndex(nodes);
+  const fed = incoming(edges, id).filter((e) => e.targetHandle === "cond-in").flatMap((e) => behind(nodes, edges, e.source).root ?? []);
   if (!fed.length) return { text: "No conditions", level: "error" as const };
   const bad = fed.filter(incomplete).length;
-  const self = nodes.find((n) => n.id === id);
+  const self = byId.get(id);
   if (self && isGroupCondition(self.data.kind)) {
     const q = self.data.values.quantity;
     const need = typeof q === "number" ? q : undefined;
@@ -190,7 +197,7 @@ export function conditionsSummary(nodes: AppNode[], edges: Edge[], id: string) {
     if (need !== undefined && need > fed.length) return { text: `Needs ${need}, but has ${total}`, level: "error" as const };
     return { text: `${need !== undefined ? `${need} of ` : ""}${total}${bad ? ` · ${bad} incomplete` : ""}`, level: bad ? ("warning" as const) : ("ok" as const) };
   }
-  const join = [...upstream(edges, id), ...downstream(edges, id)].map((n) => nodes.find((x) => x.id === n)).find((n) => n?.data.kind === "JoinType");
+  const join = [...upstream(edges, id), ...downstream(edges, id)].map((n) => byId.get(n)).find((n) => n?.data.kind === "JoinType");
   const joinText = join ? "" : " · OR (default)";
   return {
     text: `${fed.length} condition${fed.length > 1 ? "s" : ""}${bad ? ` · ${bad} incomplete` : ""}${joinText}`,

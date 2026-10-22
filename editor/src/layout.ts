@@ -1,5 +1,6 @@
 import type { Edge } from "@xyflow/react";
 import { behind, isGroupCondition, type AppNode } from "./graph";
+import { incoming, outgoing } from "./graphIndex";
 import { COL, estimateHeight } from "./io/importGroup";
 import { registry } from "./registry";
 import { useApp } from "./store";
@@ -14,7 +15,7 @@ type Pos = { x: number; y: number };
 export function tidyPositions(nodes: AppNode[], edges: Edge[]): Map<string, Pos> {
   const byId = new Map(nodes.map((n) => [n.id, n]));
   const height = (n: AppNode) => n.measured?.height ?? estimateHeight(registry[n.data.kind], n.data.values);
-  const target = (id: string, handle: string) => edges.find((e) => e.source === id && e.sourceHandle === handle)?.target;
+  const target = (id: string, handle: string) => outgoing(edges, id).find((e) => e.sourceHandle === handle)?.target;
   const chain = (id: string) => {
     const out: AppNode[] = [];
     const seen = new Set([id]);
@@ -31,8 +32,8 @@ export function tidyPositions(nodes: AppNode[], edges: Edge[]): Map<string, Pos>
     const bandY = y;
     let loc = bandY; // next free row in the left column
     const text = (n: AppNode) => {
-      for (const e of edges) {
-        const src = e.target === n.id && (e.sourceHandle === "loc-out" || e.sourceHandle === "icon-out" || e.sourceHandle === "plugin-out") ? byId.get(e.source) : undefined;
+      for (const e of incoming(edges, n.id)) {
+        const src = e.sourceHandle === "loc-out" || e.sourceHandle === "icon-out" || e.sourceHandle === "plugin-out" ? byId.get(e.source) : undefined;
         if (src && !placed.has(src.id)) (put(src, -COL, loc), (loc += height(src) + 20));
       }
     };
@@ -43,7 +44,7 @@ export function tidyPositions(nodes: AppNode[], edges: Edge[]): Map<string, Pos>
     const add = main.find((n) => n.data.kind === "AddConditions");
     type Fed = ReturnType<typeof behind>;
     /** The conditions wired into `id`, each with its Live / Negate nodes. */
-    const fedBy = (id: string): Fed[] => edges.filter((x) => x.target === id && x.targetHandle === "cond-in").map((e) => behind(nodes, edges, e.source));
+    const fedBy = (id: string): Fed[] => incoming(edges, id).filter((x) => x.targetHandle === "cond-in").map((e) => behind(nodes, edges, e.source));
     /** A Conditions Met sits past the columns of what it holds, which are to its left. */
     const columnX = (f: Fed): number => Math.max(COL, ...(f.root && isGroupCondition(f.root.data.kind) ? fedBy(f.root.id) : []).map((k) => columnX(k) + COL * (1 + k.mods.length)));
     // Live / Negate nodes sit in columns between the conditions and Add Conditions.

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { importGroup, type Json } from "./io/importGroup";
-import { computeValidation, parseNodeStatus } from "./validation";
+import { computeValidation, docChanged, parseNodeStatus } from "./validation";
 
 const group = (a: Json): Json => ({ groupName: "G", plugin: "A.esp", achievements: [{ achievementName: "A", description: "d", ...a }] });
 const check = (raw: Json, edit?: (nodes: ReturnType<typeof importGroup>["nodes"]) => void) => {
@@ -102,5 +102,35 @@ describe("AchievementUnlocked references", () => {
     const snap = importGroup({ groupName: "G", plugin: "A.esp", achievements: [{ achievementName: "$N", description: "d" }, { achievementName: "B", description: "d", conditions: [{ type: "AchievementUnlocked", achievement: "Hello" }] }] });
     const en = { fileName: "G_EN.txt", lines: [{ raw: "$N\tHello", key: "N", value: "Hello" }], eol: "\r\n", finalEol: true };
     expect(computeValidation({ ...snap, loc: { EN: en }, fileName: "G.json" }).issues).toEqual([]);
+  });
+});
+
+describe("docChanged: when validation has to run again", () => {
+  const snap = importGroup(group({ conditions: [{ type: "PlayerLevel", level: 5 }, { type: "HasPerk", formID: "1" }] }));
+  const doc = (s: typeof snap = snap) => ({ ...s, loc: {}, fileName: "G.json", iconFiles: null, pendingIcons: {} });
+  const before = doc();
+
+  it("ignores selecting, measuring and dragging, which only replace the node and wire objects", () => {
+    const touched = {
+      ...snap,
+      nodes: snap.nodes.map((n, i) => ({ ...n, selected: i % 2 === 0, dragging: true, measured: { width: 288, height: 100 } })),
+      edges: snap.edges.map((e) => ({ ...e, selected: true })),
+    };
+    expect(docChanged(before, { ...before, ...touched })).toBe(false);
+  });
+
+  it("sees a node moved (the file records positions), a value edited and a wire added or removed", () => {
+    const moved = snap.nodes.map((n, i) => (i === 0 ? { ...n, position: { x: n.position.x + 10, y: n.position.y } } : n));
+    expect(docChanged(before, { ...before, nodes: moved })).toBe(true);
+    const edited = snap.nodes.map((n) => (n.data.kind === "PlayerLevel" ? { ...n, data: { ...n.data, values: { level: 6 } } } : n));
+    expect(docChanged(before, { ...before, nodes: edited })).toBe(true);
+    expect(docChanged(before, { ...before, edges: snap.edges.slice(1) })).toBe(true);
+    expect(docChanged(before, { ...before, nodes: snap.nodes.slice(1) })).toBe(true);
+  });
+
+  it("sees the group, translations and file name change", () => {
+    expect(docChanged(before, { ...before, group: { ...snap.group, plugin: "B.esp" } })).toBe(true);
+    expect(docChanged(before, { ...before, loc: {} })).toBe(true); // a new object: the store only makes one when it changed
+    expect(docChanged(before, { ...before, fileName: "H.json" })).toBe(true);
   });
 });

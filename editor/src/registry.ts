@@ -1,3 +1,5 @@
+import type { Edge } from "@xyflow/react";
+import { incoming } from "./graphIndex";
 import {
   AchievementSchema,
   type FieldInfo,
@@ -125,5 +127,5 @@ export const missingRequired = (def: NodeDef, values: Record<string, unknown>, w
   def.fields.some((f) => !f.optional && !wired.has(f.name) && (values[f.name] === undefined || values[f.name] === ""));
 
 /** Names of `node`'s fields that have a LocalizedText wire into them. */
-export const wiredFields = (edges: { target: string; targetHandle?: string | null }[], id: string) =>
-  new Set(edges.filter((e) => e.target === id && e.targetHandle && LINK_KINDS.some((k) => e.targetHandle!.startsWith(`${k}:`))).map((e) => e.targetHandle!.slice(e.targetHandle!.indexOf(":") + 1)));
+export const wiredFields = (edges: Edge[], id: string) =>
+  new Set(incoming(edges, id).filter((e) => e.targetHandle && LINK_KINDS.some((k) => e.targetHandle!.startsWith(`${k}:`))).map((e) => e.targetHandle!.slice(e.targetHandle!.indexOf(":") + 1)));

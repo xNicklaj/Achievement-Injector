@@ -1,5 +1,6 @@
 import { Handle, Position, useStore, type NodeProps } from "@xyflow/react";
 import { AlertTriangle, CircleAlert, CircleHelp } from "lucide-react";
+import { incoming, nodeIndex } from "../graphIndex";
 import { achievementNames, conditionsSummary, isInternalGroup, linkedText, pluginOf, type AppNode } from "../graph";
 import { searchFor, usePlugins } from "../io/plugins";
 import { getText } from "../io/localization";
@@ -21,8 +22,8 @@ const LINK_COLOR: Record<LinkKind, string> = { loc: "var(--pin-localized)", ach:
 /** What a linked field shows in place of its input: the achievement name or icon file its wire stands for. */
 function LinkedValue({ id, field, kind }: { id: string; field: string; kind: LinkKind }) {
   const value = useApp((s) => {
-    const wire = s.edges.find((e) => e.target === id && e.targetHandle === `${kind}:${field}`);
-    const source = wire && s.nodes.find((n) => n.id === wire.source);
+    const wire = incoming(s.edges, id).find((e) => e.targetHandle === `${kind}:${field}`);
+    const source = wire && nodeIndex(s.nodes).get(wire.source);
     return source ? (linkedText(s.nodes, s.edges, s.loc, source, kind) ?? "") : "";
   });
   return (
@@ -146,7 +147,7 @@ export function GraphNode({ id, data, selected }: NodeProps<AppNode>) {
   const locked = useStore((s) => !(s.nodesDraggable || s.nodesConnectable || s.elementsSelectable));
   // Own override (wired or typed), else the achievement's, else the group's.
   const plugin = useApp((s) => {
-    const self = s.nodes.find((n) => n.id === id);
+    const self = nodeIndex(s.nodes).get(id);
     return self ? pluginOf(s.nodes, s.edges, self, s.group.plugin) : s.group.plugin;
   });
   const plugins = usePlugins((s) => s.plugins);

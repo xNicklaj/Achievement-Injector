@@ -1,4 +1,5 @@
 import type { Edge } from "@xyflow/react";
+import { incoming, outgoing } from "../graphIndex";
 import { achievementNames, behind, isGroupCondition, isInternalGroup, linkedText, type AppNode } from "../graph";
 import { isAction, linkKind, registry, UNKNOWN_CONDITION } from "../registry";
 import { BASELINE_VERSION, compareVersions, GroupSchema, LIVE_TYPES, SCHEMA_VERSION } from "../schema";
@@ -66,7 +67,7 @@ export function exportGroup(s: ExportState): { json: Json; issues: Issue[] } {
   const add = (level: Issue["level"], message: string, nodeId?: string, extra: Pick<Issue, "field" | "detail"> = {}) =>
     issues.push({ level, message, nodeId, ...extra });
   const byId = new Map(s.nodes.map((n) => [n.id, n]));
-  const flowNext = (id: string) => s.edges.find((e) => e.source === id && e.sourceHandle === "flow-out")?.target;
+  const flowNext = (id: string) => outgoing(s.edges, id).find((e) => e.sourceHandle === "flow-out")?.target;
   const keyOf = (n: AppNode) => (typeof n.data.values.key === "string" ? n.data.values.key : "");
 
   // Two LocalizedText nodes with the same key are an error (HANDOVER 3.13).
@@ -82,7 +83,7 @@ export function exportGroup(s: ExportState): { json: Json; issues: Issue[] } {
   // A used key without text in some language falls back to English, then to the raw `$key` in game (LocalizationManager).
   const loc = s.loc ?? {};
   const langs = Object.keys(loc).sort();
-  const usedKeys = keyNodes.filter((n) => keyOf(n) && s.edges.some((e) => e.source === n.id));
+  const usedKeys = keyNodes.filter((n) => keyOf(n) && outgoing(s.edges, n.id).length > 0);
   if (usedKeys.length && !langs.length)
     add("warning", "No languages are set up, so localized fields show their raw $key in game. Add one on Group Properties.");
   // English is the fallback for every other language, so keys without it show raw `$key` text to those players.
@@ -125,12 +126,12 @@ export function exportGroup(s: ExportState): { json: Json; issues: Issue[] } {
   }
   for (const n of s.nodes.filter((x) => x.data.kind === "Icon")) {
     if (!n.data.values.file) add("warning", "An Icon node has no file.", n.id, { field: "file", detail: "file is required" });
-    if (!s.edges.some((e) => e.source === n.id)) add("warning", "An Icon node is not used by any achievement.", n.id, { detail: "Not used by any achievement" });
+    if (!outgoing(s.edges, n.id).length) add("warning", "An Icon node is not used by any achievement.", n.id, { detail: "Not used by any achievement" });
   }
 
   for (const n of s.nodes.filter((x) => x.data.kind === "PluginOverride")) {
     if (!n.data.values.plugin) add("warning", "A Plugin Override node has no plugin.", n.id, { field: "plugin", detail: "plugin is required" });
-    if (!s.edges.some((e) => e.source === n.id)) add("warning", "A Plugin Override node is not used by any achievement or condition.", n.id, { detail: "Not used by any achievement or condition" });
+    if (!outgoing(s.edges, n.id).length) add("warning", "A Plugin Override node is not used by any achievement or condition.", n.id, { detail: "Not used by any achievement or condition" });
   }
 
   /** Field values of one node: wired fields take what their wire stands for (`$key`, achievement name, icon file), then its unknown keys. */
@@ -139,7 +140,7 @@ export function exportGroup(s: ExportState): { json: Json; issues: Issue[] } {
     const def = registry[n.data.kind];
     for (const f of def.fields) {
       const kind = linkKind(def, f);
-      const wire = kind ? s.edges.find((e) => e.target === n.id && e.targetHandle === `${kind}:${f.name}`) : undefined;
+      const wire = kind ? incoming(s.edges, n.id).find((e) => e.targetHandle === `${kind}:${f.name}`) : undefined;
       if (wire && kind) {
         const source = byId.get(wire.source)!;
         const value = kind === "loc" ? (keyOf(source) ? `$${keyOf(source)}` : undefined) : linkedText(s.nodes, s.edges, loc, source, kind);
@@ -184,7 +185,7 @@ export function exportGroup(s: ExportState): { json: Json; issues: Issue[] } {
     const condList = (into: AppNode, inside?: AppNode): { json: Json[]; refs: CondRef[] } => {
       const json: Json[] = [];
       const refs: CondRef[] = [];
-      for (const e of s.edges.filter((x) => x.target === into.id && x.targetHandle === "cond-in")) {
+      for (const e of incoming(s.edges, into.id).filter((x) => x.targetHandle === "cond-in")) {
         const { root: c, mods } = behind(s.nodes, s.edges, e.source);
         for (const m of mods) used.add(m.id);
         if (!c) {
@@ -251,7 +252,7 @@ export function exportGroup(s: ExportState): { json: Json; issues: Issue[] } {
     for (const id of flat(r.conds)) {
       const c = byId.get(id)!;
       if (c.data.kind !== "AchievementUnlocked") continue;
-      const wire = s.edges.find((e) => e.target === id && e.targetHandle === "ach:achievement");
+      const wire = incoming(s.edges, id).find((e) => e.targetHandle === "ach:achievement");
       const target = wire ? wire.source : isInternalGroup(c.data.values.group, s.fileName) ? byName.get(String(c.data.values.achievement ?? "")) : undefined;
       if (target) waits.set(r.create, (waits.get(r.create) ?? new Set()).add(target));
     }
@@ -271,7 +272,7 @@ export function exportGroup(s: ExportState): { json: Json; issues: Issue[] } {
     add("warning", msg, n.id, { detail: "Not connected to an achievement: it will not be saved" });
   }
   for (const n of keyNodes) {
-    if (!s.edges.some((e) => e.source === n.id)) add("warning", `Localized Text "${keyOf(n)}" is not used by any field.`, n.id, { detail: "Not used by any field" });
+    if (!outgoing(s.edges, n.id).length) add("warning", `Localized Text "${keyOf(n)}" is not used by any field.`, n.id, { detail: "Not used by any field" });
   }
 
   const keys: Record<string, { x: number; y: number }> = {};
