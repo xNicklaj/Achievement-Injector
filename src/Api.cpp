@@ -92,7 +92,8 @@ namespace Api {
     }
 
     void Register() {
-        SKSE::GetMessagingInterface()->RegisterListener(OnMessage);
+        // The one-argument overload only listens to "SKSE"; nullptr listens to every plugin
+        SKSE::GetMessagingInterface()->RegisterListener(nullptr, OnMessage);
         AchievementManager::GetSingleton()->AddEventSink(OnUnlocked);
     }
 }

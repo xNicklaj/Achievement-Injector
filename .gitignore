@@ -12,3 +12,4 @@ conditions.json
 graphify-out
 editor/dist
 editor/node_modules
+ApiTestPlugin
