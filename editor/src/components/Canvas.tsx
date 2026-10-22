@@ -134,6 +134,9 @@ export function Canvas() {
       onPaneClick={closeMenu}
       onMoveStart={closeMenu}
       deleteKeyCode={["Delete", "Backspace"]}
+      // Only nodes and wires in view are mounted, so a big group costs what is on screen. A node is always mounted until it has been
+      // measured once (so a freshly opened file mounts everything one time), and undo keeps the measured sizes (store.test.ts).
+      onlyRenderVisibleElements
       fitView={!remembered.viewport}
       defaultViewport={remembered.viewport ?? undefined}
       onMoveEnd={(_, v) => (remembered.viewport = v)}

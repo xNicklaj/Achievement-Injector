@@ -274,3 +274,22 @@ describe("naming a new achievement", () => {
     expect(useApp.getState().nodes.find((n) => n.id === create)!.data.values.achievementName).toBe("Typed after");
   });
 });
+
+describe("history keeps measured sizes", () => {
+  // With only the visible nodes mounted, a node that loses its measured size is mounted again to be measured: restoring
+  // history without them would mount the whole document on every undo.
+  it("undo and redo restore nodes with their measured size", () => {
+    const s = () => useApp.getState();
+    s().onNodesChange(s().nodes.map((n) => ({ type: "dimensions" as const, id: n.id, dimensions: { width: 288, height: 120 } })));
+    const level = s().nodes.find((n) => n.data.kind === "PlayerLevel")!;
+    s().setValue(level.id, "level", 9);
+    s().setValue(level.id, "level", 10);
+    expect(s().nodes.every((n) => n.measured?.width === 288)).toBe(true);
+    s().setValue(level.id, "level", 11);
+    useApp.temporal.getState().undo();
+    expect(s().nodes.find((n) => n.id === level.id)!.data.values.level).not.toBe(11);
+    expect(s().nodes.every((n) => n.measured?.width === 288 && n.measured?.height === 120)).toBe(true);
+    useApp.temporal.getState().redo();
+    expect(s().nodes.every((n) => n.measured?.width === 288)).toBe(true);
+  });
+});

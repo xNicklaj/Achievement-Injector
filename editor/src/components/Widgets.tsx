@@ -1,4 +1,4 @@
-import { useStore } from "@xyflow/react";
+import { useStoreApi } from "@xyflow/react";
 import { useDeferredValue, useState } from "react";
 import type { FieldInfo } from "../schema";
 import { lookup, usePlugins, type Search } from "../io/plugins";
@@ -30,8 +30,9 @@ function Pickable({ search, onPick, children }: { search?: Search; onPick: (v: s
   const term = useDeferredValue(q);
   const rows = open && search ? search.run(term) : [];
   const [shift, setShift] = useState({ x: 0, y: 0 });
-  // The node is scaled by the canvas zoom, so a screen-pixel drag is divided by it to follow the pointer.
-  const zoom = useStore((s) => s.transform[2]);
+  // The node is scaled by the canvas zoom, so a screen-pixel drag is divided by it to follow the pointer. Read when dragging:
+  // subscribing would re-render every searchable field of every node on each frame of a zoom.
+  const flow = useStoreApi();
   const close = () => (setOpen(false), setQ(""), setShift({ x: 0, y: 0 }));
   const pick = (v: string | number) => (onPick(v), close());
   return (
@@ -50,7 +51,7 @@ function Pickable({ search, onPick, children }: { search?: Search; onPick: (v: s
             // Keep focus in the search box, or the blur handler would close the popup.
             onMouseDown={(e) => e.preventDefault()}
             onPointerDown={(e) => e.currentTarget.setPointerCapture(e.pointerId)}
-            onPointerMove={(e) => e.buttons && setShift((s) => ({ x: s.x + e.movementX / zoom, y: s.y + e.movementY / zoom }))}
+            onPointerMove={(e) => e.buttons && setShift((s) => ({ x: s.x + e.movementX / flow.getState().transform[2], y: s.y + e.movementY / flow.getState().transform[2] }))}
           />
           <input
             autoFocus
