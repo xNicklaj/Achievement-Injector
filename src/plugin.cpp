@@ -143,6 +143,8 @@ void MessageHandler(SKSE::MessagingInterface::Message* a_msg) {
                 for (json achievement: achievementFile.FileData) {
                     try {
                         ag.achievements.push_back(new Achievement(achievement, ag.plugin, StripExtension(achievementFile.path)));
+                    } catch (const AchievementSkipped& e) {
+                        logger::info("Skipping achievement {} in {}: {}", achievement.value("achievementName", "?"), achievementFile.path, e.what());
                     } catch (const std::exception& e) {
                         logger::error("Skipping malformed achievement in {}: {}", achievementFile.path, e.what());
                     }

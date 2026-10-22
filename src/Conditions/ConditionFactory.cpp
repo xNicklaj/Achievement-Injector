@@ -1,5 +1,6 @@
 #include "ConditionFactory.h"
 #include "ConditionsMet/ConditionsMetCondition.h"
+#include "../Utility.h"
 
 #include "Conditions/DragonSoulAbsorbed/DragonSoulsAbsorbedCondition.h"
 #include "Conditions/ItemInInventory/ItemInInventoryCondition.h"
@@ -217,6 +218,12 @@ Condition* CreateCondition(json& condition, const std::string& plugin, const std
     if (a_condition) {
         if (condition.value("pluginOverride", "") != "") a_condition->SetPlugin(condition["pluginOverride"].get<std::string>());
         else a_condition->SetPlugin(plugin);
+        // Authors ship optional achievements for other mods in one json; the whole achievement is skipped when any plugin is absent
+        if (!CheckIfModIsLoaded(a_condition->plugin)) {
+            logger::info("[{}.json] Plugin {} not loaded, skipping {}.", groupName, a_condition->plugin, achievementName);
+            delete a_condition;
+            return nullptr;
+        }
         a_condition->Localize(groupName);
         a_condition->push_back(condition.value("onUnlock", json::array()));
     }

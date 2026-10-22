@@ -14,11 +14,11 @@ ConditionsMetCondition::ConditionsMetCondition() : Condition() {
 void ConditionsMetCondition::SetParameters(int quantity_a, json& conditions, const std::string& plugin, const std::string& groupName, const std::string& achievementName) {
 	for (json& entry : conditions) {
 		Condition* child = CreateCondition(entry, plugin, groupName, achievementName);
-		if (!child) continue;
+		// A dropped child would let the group fire on fewer conditions than the author wrote
+		if (!child) throw std::invalid_argument("ConditionsMet has an invalid or unavailable sub-condition");
 		if (child->live) {
-			logger::warn("[{}.json] \"live\"/\"negate\" is not supported inside ConditionsMet in {}. Skipping sub-condition.", groupName, achievementName);
 			delete child;
-			continue;
+			throw std::invalid_argument(fmt::format("\"live\"/\"negate\" is not supported inside ConditionsMet in {}", achievementName));
 		}
 		children.push_back(child);
 	}

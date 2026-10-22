@@ -57,11 +57,14 @@ Achievement::Achievement(json& jsonData, std::string plugin, std::string groupNa
 
     for (json& condition : jsonData["conditions"]) {
         Condition* a_condition = CreateCondition(condition, this->plugin, this->groupName, this->achievementName);
-        if (!a_condition) continue;
+        // Already logged by the factory; a partial condition set could unlock on less than the author wrote
+        if (!a_condition) throw AchievementSkipped("invalid condition or plugin not loaded");
         conditions.push_back(a_condition);
         conditionMet.push_back(false);
     }
-    if (!conditions.empty() && std::all_of(conditions.begin(), conditions.end(), [](Condition* c) { return c->live; }))
+    // Use a PapyrusBinding condition for script/console-only unlocks
+    if (conditions.empty()) throw AchievementSkipped("no conditions");
+    if (std::all_of(conditions.begin(), conditions.end(), [](Condition* c) { return c->live; }))
         logger::warn("Achievement {} has only live conditions and can never unlock.", this->achievementName);
 }
 
@@ -73,9 +76,6 @@ void Achievement::ForceUnlock() {
 }
 
 void Achievement::EnableListener(void) {
-    if(conditions.size() == 0) {
-		logger::warn("Achievement {} has no conditions.", this->achievementName);
-	}
     // Runs again on a character switch: drop the previous character's in-memory progress
     this->unlocked = false;
     conditionMet.assign(conditionMet.size(), false);
@@ -165,8 +165,7 @@ void Achievement::OnConditionMet(void) {
         }
     }
 
-    // Zero conditions: only ForceUnlock dispatches here
-    if (allConditionsMet || conditions.empty()) {
+    if (allConditionsMet) {
         unlocked = true;
         logger::info("Achievement {} unlocked", achievementName);
         AchievementUnlockedEvent e;
