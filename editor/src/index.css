@@ -64,11 +64,24 @@ body,
   display: none;
 }
 /* Drag-selecting, and the box around several selected nodes. */
-.react-flow__selection,
-.react-flow__nodesselection-rect {
+.react-flow__selection {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--select);
   border-radius: 6px;
+}
+/* React Flow sizes the box to the nodes exactly; the visible box is a pseudo-element grown by the padding. It is part of the element,
+   so a drag or right-click on the padding still reaches the selection. */
+.react-flow__nodesselection-rect {
+  background: none;
+  border: none;
+}
+.react-flow__nodesselection-rect::before {
+  content: "";
+  position: absolute;
+  inset: -14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--select);
+  border-radius: 8px;
 }
 
 /* Pins are 12px; a touchpad needs a bigger target. The invisible ring is part of the handle, so dropping a wire on it connects. */
