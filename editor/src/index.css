@@ -30,6 +30,16 @@
   /* The kit reads these (--kw-*); the editor maps its own palette onto them. */
   --kw-select: var(--select);
   --kw-select-soft: var(--select-soft);
+  --kw-bg-panel: var(--bg-panel);
+  --kw-bg-app: var(--bg-app);
+  --kw-border: var(--border);
+  --kw-text: var(--text);
+  --kw-text-dim: var(--text-dim);
+  --kw-cat-entry: var(--cat-entry);
+  --kw-cat-flow: var(--cat-flow);
+  --kw-cat-condition: var(--cat-condition);
+  --kw-cat-localization: var(--cat-localization);
+  --kw-cat-asset: var(--cat-asset);
 
   --scroll-thumb: rgba(255, 255, 255, 0.28);
 

@@ -5,3 +5,6 @@ export { pinKind, pinField, wiredFields, walk } from "./pins";
 export { composeRules, pinsMatch, noSelfLink, pinUsedOnce, noLoop, onePerChain, type Link, type Rule, type RuleCtx } from "./rules";
 export { createHistory, type TemporalHost } from "./history";
 export { createValidation, graphChanged, groupIssues, parseNodeStatus, type Issue } from "./validation";
+export type { PinDef, NodeDef } from "./defs";
+export { SPAWN_NEW, spawnOptions, matchesSpawn, type SpawnFrom, type SpawnOption } from "./spawn";
+export { SpawnMenu } from "./SpawnMenu";

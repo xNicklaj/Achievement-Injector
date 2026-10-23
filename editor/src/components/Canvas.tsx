@@ -3,7 +3,7 @@ import "@xyflow/react/dist/style.css";
 import { useCallback, useEffect, useMemo, useRef, useState, type DragEvent } from "react";
 import { pinKind, type AppNode } from "../graph";
 import { LIVE_TYPES } from "../schema";
-import { isCondition, nodeDefs, registry, UNKNOWN_CONDITION } from "../registry";
+import { CATEGORIES, isCondition, nodeDefs, registry, UNKNOWN_CONDITION } from "../registry";
 import { beginDrag, endDrag, useApp } from "../store";
 import { useValidation } from "../validation";
 import { remembered } from "../viewport";
@@ -15,7 +15,7 @@ import { AchievementList } from "./AchievementList";
 import { FindBar } from "./FindBar";
 import { KeyHints } from "./KeyHints";
 import { GraphNode } from "./GraphNode";
-import { SpawnMenu } from "./SpawnMenu";
+import { SpawnMenu } from "@xnicklaj/knotwork";
 
 export const DRAG_MIME = "application/ae-node";
 const nodeTypes = { ae: GraphNode };
@@ -270,6 +270,7 @@ export function Canvas() {
     </ReactFlow>
     {replace && (
       <SpawnMenu
+        categories={CATEGORIES}
         x={replace.x}
         y={replace.y}
         options={replacements.filter((o) => (replace.kinds.length !== 1 || o.def.kind !== replace.kinds[0]) && (!replace.live || LIVE_TYPES.has(o.def.kind)))}
@@ -279,7 +280,7 @@ export function Canvas() {
       />
     )}
     {find && <FindBar nodes={shown} hidden={hidden} onClose={() => setFind(false)} />}
-    {menu && <SpawnMenu x={menu.x} y={menu.y} options={options} onPick={pick} onClose={closeMenu} title={menu.from ? "Create a node that connects here" : "Add a node"} />}
+    {menu && <SpawnMenu categories={CATEGORIES} x={menu.x} y={menu.y} options={options} onPick={pick} onClose={closeMenu} title={menu.from ? "Create a node that connects here" : "Add a node"} />}
     </div>
   );
 }

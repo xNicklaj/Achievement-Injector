@@ -1,3 +1,4 @@
+import type { NodeDef as KitNodeDef, PinDef } from "@xnicklaj/knotwork";
 import {
   AchievementSchema,
   type FieldInfo,
@@ -15,12 +16,9 @@ export const CATEGORIES: { id: Category; label: string }[] = [
   { id: "asset", label: "Assets" },
 ];
 
-export type NodeDef = {
-  kind: string;
+export type NodeDef = KitNodeDef & {
   category: Category;
-  title: string;
   description?: string;
-  keywords: string[];
   flowIn: boolean;
   flowOut: boolean;
   /** Data output: the node is a Condition value. */
@@ -42,9 +40,10 @@ export type NodeDef = {
   modifier?: boolean;
   /** First DLL version that reads this node. Absent = BASELINE_VERSION. */
   since?: string;
-  /** Exists only to carry data (an unknown condition type): never offered for creation. */
-  hidden?: boolean;
 };
+
+/** What the literals below spell out; `pins` is derived once in `registry`. */
+type Def = Omit<NodeDef, "pins">;
 
 const field = (f: Pick<FieldInfo, "name" | "widget"> & Partial<FieldInfo>): FieldInfo => ({ optional: false, ...f });
 
@@ -56,7 +55,7 @@ const achievementFields = describeFields(
   new Set(["conditions", "onUnlock", "joinType", "_editor"]),
 );
 
-const flowNodes: NodeDef[] = [
+const flowNodes: Def[] = [
   { ...base, kind: "CreateAchievement", description: "The achievement itself. Its Unlock pin feeds an Achievement Unlocked condition; the flow pin continues to Add Conditions, Join Type and On Unlock actions.", category: "entry", title: "Create Achievement", flowOut: true, achOut: true, keywords: ["achievement", "start", "entry"], fields: achievementFields },
   { ...base, kind: "AddConditions", description: "Collects the conditions that must be met. Wire each condition (directly or through Live / Negate) into its input. Only one per achievement.", category: "flow", title: "Add Conditions", flowIn: true, flowOut: true, condIn: true, unique: true, keywords: ["conditions", "collect"], fields: [] },
   {
@@ -80,7 +79,7 @@ const flowNodes: NodeDef[] = [
   { ...base, kind: "LocalizedText", description: "A translation key written as $key. Wire it into any text field, and fill in each language on this node.", category: "localization", title: "Localized Text", locOut: true, keywords: ["translation", "key", "language"], fields: [field({ name: "key", widget: "string", description: "Written as $key" })] },
 ];
 
-const conditionNodes: NodeDef[] = Object.values(conditionRegistry).map((c) => ({
+const conditionNodes: Def[] = Object.values(conditionRegistry).map((c) => ({
   ...base,
   kind: c.type,
   category: "condition" as const,
@@ -99,15 +98,7 @@ const conditionNodes: NodeDef[] = Object.values(conditionRegistry).map((c) => ({
 
 /** A condition type this editor does not know: kept as it is (the real type is in `extra.type`) and flagged, so nothing is lost. */
 export const UNKNOWN_CONDITION = "UnknownCondition";
-const unknownCondition: NodeDef = { ...base, kind: UNKNOWN_CONDITION, category: "condition", title: "Unknown Condition", condOut: true, flowOut: true, hidden: true, fields: [] };
-
-export const registry: Record<string, NodeDef> = Object.fromEntries([...flowNodes, ...conditionNodes, unknownCondition].map((d) => [d.kind, d]));
-export const nodeDefs = Object.values(registry).filter((d) => !d.hidden);
-
-export const isCondition = (kind: string) => registry[kind]?.category === "condition";
-export const isAction = (kind: string) => kind === "RunCommand" || kind === "CallPapyrus";
-
-export const isLocalizable = (f: FieldInfo) => f.widget === "localizedString";
+const unknownCondition: Def = { ...base, kind: UNKNOWN_CONDITION, category: "condition", title: "Unknown Condition", condOut: true, flowOut: true, hidden: true, fields: [] };
 
 /**
  * Fields that can be fed by another node instead of typed: text by a Localized Text node (`loc`), an achievement name by a
@@ -119,6 +110,31 @@ const LINK_WIDGET = { localizedString: "loc", achievementRef: "ach", iconPath: "
 /** The link kind a field accepts, or null. An Icon or Plugin Override node's own value is typed, never wired. */
 export const linkKind = (def: NodeDef, f: FieldInfo): LinkKind | null => (def.kind === "Icon" || def.kind === "PluginOverride" ? null : LINK_WIDGET[f.widget as keyof typeof LINK_WIDGET] ?? null);
 export const linkOut = (def: NodeDef): LinkKind | null => (def.locOut ? "loc" : def.achOut ? "ach" : def.iconOut ? "icon" : def.pluginOut ? "plugin" : null);
+
+/** Pins in the order spawn lists them: flow/cond inputs, one input per linkable field, then the outputs. */
+const pinsOf = (def: Def): PinDef[] => {
+  const d = def as NodeDef; // linkKind/linkOut read only fields and flags
+  const pins: PinDef[] = [];
+  if (def.flowIn) pins.push({ id: "flow-in", side: "in" });
+  if (def.condIn || def.modifier) pins.push({ id: "cond-in", side: "in" });
+  for (const f of def.fields) {
+    const lk = linkKind(d, f);
+    if (lk) pins.push({ id: `${lk}:${f.name}`, side: "in", label: f.name });
+  }
+  if (def.flowOut) pins.push({ id: "flow-out", side: "out" });
+  if (def.condOut) pins.push({ id: "cond-out", side: "out" });
+  const lo = linkOut(d);
+  if (lo) pins.push({ id: `${lo}-out`, side: "out" });
+  return pins;
+};
+
+export const registry: Record<string, NodeDef> = Object.fromEntries([...flowNodes, ...conditionNodes, unknownCondition].map((d) => [d.kind, { ...d, pins: pinsOf(d) }]));
+export const nodeDefs = Object.values(registry).filter((d) => !d.hidden);
+
+export const isCondition = (kind: string) => registry[kind]?.category === "condition";
+export const isAction = (kind: string) => kind === "RunCommand" || kind === "CallPapyrus";
+
+export const isLocalizable = (f: FieldInfo) => f.widget === "localizedString";
 
 /** `wired`: fields fed by a LocalizedText node, which count as filled. */
 export const missingRequired = (def: NodeDef, values: Record<string, unknown>, wired: ReadonlySet<string> = new Set()) =>
