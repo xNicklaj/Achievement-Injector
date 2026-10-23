@@ -10,6 +10,7 @@ import {
 } from "@xyflow/react";
 import { create } from "zustand";
 import { temporal } from "zundo";
+import { createHistory } from "@xnicklaj/knotwork";
 import { followMoves, membersOf, restack, type Collapsed } from "./achievements";
 import { type AppNode, isInternalGroup, refuseReason, restoreInline } from "./graph";
 import type { Draft } from "./io/draftStore";
@@ -120,25 +121,12 @@ export const isDirty = () => {
   return docKey(s) !== s.savedKey;
 };
 
-// Time of the last history entry; see `handleSet` below. Opening a document starts a fresh window.
-let lastRecorded = -Infinity;
-
-// Typing in one field is undone a word at a time, like an editor: edits to the same field within a moment, with no
-// whitespace typed before them, join the entry the word started. Anything else that changes the document ends the word.
-let typing: { key: string; at: number; space: boolean; nodes: unknown; loc: unknown } | null = null;
-let coalesce = false;
-const joinsTyping = (key: string, s: Pick<State, "nodes" | "loc">) =>
-  !!typing && typing.key === key && performance.now() - typing.at < 1500 && !typing.space && typing.nodes === s.nodes && typing.loc === s.loc;
-const markTyping = (key: string, value: unknown, s: Pick<State, "nodes" | "loc">) => {
-  typing = typeof value === "string" || typeof value === "number" || Array.isArray(value) ? { key, at: performance.now(), space: typeof value === "string" && /\s$/.test(value), nodes: s.nodes, loc: s.loc } : null;
-};
-/** Run an update that continues the current word, so history does not record it separately. */
-const edit = (key: string, value: unknown, get: () => State, update: () => void) => {
-  coalesce = (typeof value === "string" || typeof value === "number" || Array.isArray(value)) && joinsTyping(key, get());
-  update();
-  coalesce = false;
-  markTyping(key, value, get());
-};
+type Snap = Pick<State, "nodes" | "edges" | "group" | "groupExtra" | "loc">;
+const history = createHistory<State, Snap>({
+  partialize: (s) => ({ nodes: s.nodes, edges: s.edges, group: s.group, groupExtra: s.groupExtra, loc: s.loc }),
+  key: (p) => JSON.stringify(doc(p)),
+  slices: (s) => [s.nodes, s.loc],
+});
 
 export const useApp = create<State>()(
   temporal(
@@ -221,7 +209,7 @@ export const useApp = create<State>()(
         const old = node?.data.kind === "LocalizedText" && name === "key" ? node.data.values.key : undefined;
         const renamed = typeof old === "string" && typeof value === "string";
         // One set, so one undo step covers both the node and its translations.
-        edit(`${id}:${name}`, value, get, () =>
+        history.edit(`${id}:${name}`, value, get, () =>
           set({
             ...(renamed && { loc: Object.fromEntries(Object.entries(get().loc).map(([l, f]) => [l, renameKey(f, old, value)])) }),
             nodes: get().nodes.map((n) => {
@@ -286,8 +274,7 @@ export const useApp = create<State>()(
         });
         set({ savedKey: docKey(get()), savedNames: plainNames(get().nodes) });
         void get().refreshIcons();
-        useApp.temporal.getState().clear();
-        lastRecorded = -Infinity;
+        history.reset(useApp);
         remembered.viewport = null;
       },
       renameAchievement: (id, name) => {
@@ -335,13 +322,12 @@ export const useApp = create<State>()(
           collapsed: {},
         });
         void get().refreshIcons();
-        useApp.temporal.getState().clear();
-        lastRecorded = -Infinity;
+        history.reset(useApp);
         remembered.viewport = null;
       },
       setTranslation: (locale, key, value) => {
         const f = get().loc[locale];
-        if (f) edit(`t:${locale}:${key}`, value, get, () => set({ loc: { ...get().loc, [locale]: setText(f, key, value) } }));
+        if (f) history.edit(`t:${locale}:${key}`, value, get, () => set({ loc: { ...get().loc, [locale]: setText(f, key, value) } }));
       },
       addLanguage: (locale) => {
         const { loc, fileName } = get();
@@ -367,21 +353,7 @@ export const useApp = create<State>()(
         set({ savedKey: docKey(get()), savedNames: plainNames(get().nodes) });
       },
     }),
-    {
-      partialize: (s) => ({ nodes: s.nodes, edges: s.edges, group: s.group, groupExtra: s.groupExtra, loc: s.loc }),
-      equality: (a, b) => JSON.stringify(doc(a as State)) === JSON.stringify(doc(b as State)),
-      // Deleting selected elements arrives as several store updates (wires first, then nodes). Updates within 30ms
-      // of the last recorded one share its history entry, so one Delete is one undo step.
-      handleSet: (handleSet) => {
-        return (pastState, replace, ...rest) => {
-          if (coalesce) return;
-          const t = performance.now();
-          if (t - lastRecorded < 30) return;
-          lastRecorded = t;
-          (handleSet as (...a: unknown[]) => void)(pastState, replace, ...rest);
-        };
-      },
-    },
+    history.options,
   ),
 );
 
@@ -389,28 +361,5 @@ export const useApp = create<State>()(
 useApp.setState({ savedKey: docKey(useApp.getState()) });
 
 /** One undo entry per node drag: pause on start, record the pre-drag state on drop. */
-let dragStart: ReturnType<typeof doc> | null = null;
-export function beginDrag() {
-  const s = useApp.getState();
-  dragStart = doc(s);
-  useApp.temporal.getState().pause();
-}
-export function endDrag() {
-  const t = useApp.temporal.getState();
-  t.resume();
-  const now = doc(useApp.getState());
-  if (dragStart && JSON.stringify(dragStart) !== JSON.stringify(now)) {
-    const before = useApp.getState();
-    // Past entries hold the partialized state: current nodes moved back to their pre-drag positions.
-    const start = new Map(dragStart.nodes.map((n) => [n.id, n.position]));
-    const snapshot = {
-      nodes: before.nodes.map((n) => ({ ...n, position: start.get(n.id) ?? n.position })),
-      edges: before.edges,
-      group: before.group,
-      groupExtra: before.groupExtra,
-      loc: before.loc,
-    };
-    useApp.temporal.setState({ pastStates: [...t.pastStates, snapshot], futureStates: [] });
-  }
-  dragStart = null;
-}
+export const beginDrag = () => history.beginDrag(useApp);
+export const endDrag = () => history.endDrag(useApp);
