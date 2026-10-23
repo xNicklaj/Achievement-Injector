@@ -7,14 +7,14 @@ import { CATEGORIES, isCondition, nodeDefs, registry, UNKNOWN_CONDITION } from "
 import { beginDrag, endDrag, useApp } from "../store";
 import { useValidation } from "../validation";
 import { remembered } from "../viewport";
-import { FIND_LABEL, FindBar, HaloEdge, isTyping, NAVIGATION_PROPS, useSpaceMenu, useWheelNavigation } from "@xnicklaj/knotwork";
+import { FIND_LABEL, FindBar, HaloEdge, isTyping, NAVIGATION_PROPS, useSpaceMenu, useWheelNavigation } from "@nicklaj/knotwork";
 import { spawnOptions, type SpawnFrom, type SpawnOption } from "../spawn";
 import { bandsOf, hiddenOf, hideNodes, viewRect, visibleBands } from "../achievements";
 import { focusAchievement } from "../focusAchievement";
 import { AchievementList } from "./AchievementList";
 import { KeyHints } from "./KeyHints";
 import { GraphNode } from "./GraphNode";
-import { SpawnMenu } from "@xnicklaj/knotwork";
+import { SpawnMenu } from "@nicklaj/knotwork";
 
 export const DRAG_MIME = "application/ae-node";
 const nodeTypes = { ae: GraphNode };

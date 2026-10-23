@@ -1,6 +1,6 @@
 import type { Edge } from "@xyflow/react";
 import { behind, isGroupCondition, type AppNode } from "./graph";
-import { incoming, outgoing } from "@xnicklaj/knotwork";
+import { incoming, outgoing } from "@nicklaj/knotwork";
 import { COL, estimateHeight, FLOW_CLEAR } from "./io/importGroup";
 import { registry } from "./registry";
 import { useApp } from "./store";

@@ -1,4 +1,4 @@
-import { createValidation, graphChanged, groupIssues, parseNodeStatus } from "@xnicklaj/knotwork";
+import { createValidation, graphChanged, groupIssues, parseNodeStatus } from "@nicklaj/knotwork";
 import { exportGroup, type ExportState, type Issue } from "./io/exportGroup";
 import type { Json } from "./io/importGroup";
 import { usePlugins } from "./io/plugins";

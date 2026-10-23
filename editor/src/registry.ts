@@ -1,4 +1,4 @@
-import type { NodeDef as KitNodeDef, PinDef } from "@xnicklaj/knotwork";
+import type { NodeDef as KitNodeDef, PinDef } from "@nicklaj/knotwork";
 import {
   AchievementSchema,
   type FieldInfo,
@@ -142,4 +142,4 @@ export const isLocalizable = (f: FieldInfo) => f.widget === "localizedString";
 export const missingRequired = (def: NodeDef, values: Record<string, unknown>, wired: ReadonlySet<string> = new Set()) =>
   def.fields.some((f) => !f.optional && !wired.has(f.name) && (values[f.name] === undefined || values[f.name] === ""));
 
-export { wiredFields } from "@xnicklaj/knotwork";
+export { wiredFields } from "@nicklaj/knotwork";

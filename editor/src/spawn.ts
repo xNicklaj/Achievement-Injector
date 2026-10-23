@@ -1,5 +1,5 @@
 import type { Edge } from "@xyflow/react";
-import { matchesSpawn, spawnOptions as kitSpawn, SPAWN_NEW, type SpawnFrom, type SpawnOption as KitOption } from "@xnicklaj/knotwork";
+import { matchesSpawn, spawnOptions as kitSpawn, SPAWN_NEW, type SpawnFrom, type SpawnOption as KitOption } from "@nicklaj/knotwork";
 import { refuseReason, type AppNode } from "./graph";
 import { CATEGORIES, nodeDefs, type NodeDef } from "./registry";
 

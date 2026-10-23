@@ -10,7 +10,7 @@ import {
 } from "@xyflow/react";
 import { create } from "zustand";
 import { temporal } from "zundo";
-import { createHistory } from "@xnicklaj/knotwork";
+import { createHistory } from "@nicklaj/knotwork";
 import { followMoves, membersOf, restack, type Collapsed } from "./achievements";
 import { type AppNode, isInternalGroup, refuseReason, restoreInline } from "./graph";
 import type { Draft } from "./io/draftStore";

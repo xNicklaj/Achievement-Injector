@@ -1,6 +1,6 @@
 import type { Edge, Node } from "@xyflow/react";
 import { fallbackText, type LocFile } from "./io/localization";
-import { composeRules, wiredFields, incoming, nodeIndex, noLoop, noSelfLink, onePerChain, outgoing, pinKind as kitPinKind, pinsMatch, pinUsedOnce, walk, type Link, type Rule, type RuleCtx } from "@xnicklaj/knotwork";
+import { composeRules, wiredFields, incoming, nodeIndex, noLoop, noSelfLink, onePerChain, outgoing, pinKind as kitPinKind, pinsMatch, pinUsedOnce, walk, type Link, type Rule, type RuleCtx } from "@nicklaj/knotwork";
 import { LIVE_TYPES } from "./schema";
 import { isAction, isCondition, LINK_KINDS, missingRequired, registry, type LinkKind } from "./registry";
 

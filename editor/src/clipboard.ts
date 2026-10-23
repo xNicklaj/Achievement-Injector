@@ -1,4 +1,4 @@
-import { createClipboard, nodeIndex } from "@xnicklaj/knotwork";
+import { createClipboard, nodeIndex } from "@nicklaj/knotwork";
 import { achievementNames, linkedText, type AppNode } from "./graph";
 import { LINK_KINDS } from "./registry";
 import { mkEdge } from "./io/importGroup";
