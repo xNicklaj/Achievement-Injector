@@ -1,4 +1,4 @@
-import { Background, BackgroundVariant, Controls, MiniMap, ReactFlow, SelectionMode, useReactFlow, useStoreApi } from "@xyflow/react";
+import { Background, BackgroundVariant, Controls, MiniMap, ReactFlow, useReactFlow, useStoreApi } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useCallback, useEffect, useMemo, useRef, useState, type DragEvent } from "react";
 import { pinKind, type AppNode } from "../graph";
@@ -7,12 +7,11 @@ import { CATEGORIES, isCondition, nodeDefs, registry, UNKNOWN_CONDITION } from "
 import { beginDrag, endDrag, useApp } from "../store";
 import { useValidation } from "../validation";
 import { remembered } from "../viewport";
-import { createWheelClassifier, HaloEdge, wheelPixels, zoomFactor } from "@xnicklaj/knotwork";
+import { FIND_LABEL, FindBar, HaloEdge, isTyping, NAVIGATION_PROPS, useSpaceMenu, useWheelNavigation } from "@xnicklaj/knotwork";
 import { spawnOptions, type SpawnFrom, type SpawnOption } from "../spawn";
 import { bandsOf, hiddenOf, hideNodes, viewRect, visibleBands } from "../achievements";
 import { focusAchievement } from "../focusAchievement";
 import { AchievementList } from "./AchievementList";
-import { FindBar } from "./FindBar";
 import { KeyHints } from "./KeyHints";
 import { GraphNode } from "./GraphNode";
 import { SpawnMenu } from "@xnicklaj/knotwork";
@@ -21,8 +20,8 @@ export const DRAG_MIME = "application/ae-node";
 const nodeTypes = { ae: GraphNode };
 const edgeTypes = { ae: HaloEdge };
 
-const MIN_ZOOM = 0.1;
-const MAX_ZOOM = 2;
+const titleOf = (n: AppNode) => (n.data.kind === UNKNOWN_CONDITION ? `Unknown: ${String(n.data.extra?.type ?? "")}` : registry[n.data.kind]?.title ?? n.data.kind);
+const accentOf = (n: AppNode) => `var(--cat-${registry[n.data.kind]?.category})`;
 
 const EDGE_COLOR = { flow: "var(--pin-flow)", cond: "var(--pin-condition)", loc: "var(--pin-localized)", ach: "var(--pin-achievement)", icon: "var(--pin-icon)", plugin: "var(--pin-plugin)" };
 
@@ -32,47 +31,22 @@ export function Canvas() {
   // Right-click on a condition: the same menu, listing the condition types to replace it with.
   const [replace, setReplace] = useState<{ x: number; y: number; ids: string[]; title: string; kinds: string[]; live: boolean } | null>(null);
   const closeMenu = useCallback(() => (setMenu(null), setReplace(null)), []);
-  const { screenToFlowPosition, getViewport, setViewport, fitView } = useReactFlow();
+  const { screenToFlowPosition, fitView } = useReactFlow();
   const store = useStoreApi();
   const box = useRef<HTMLDivElement>(null);
 
-  // Mouse and touchpad share one canvas: a touchpad scroll pans, a mouse notch zooms at the cursor.
-  // Ctrl+wheel and pinch fall through to React Flow, which always zooms. Fields and the minimap keep their own wheel.
-  useEffect(() => {
-    const el = box.current;
-    if (!el) return;
-    const classify = createWheelClassifier();
-    const onWheel = (e: WheelEvent) => {
-      if (e.ctrlKey || e.metaKey) return;
-      if ((e.target as HTMLElement).closest(".nowheel, .react-flow__minimap, .react-flow__controls")) return;
-      e.preventDefault();
-      e.stopPropagation();
-      const { x, y, zoom } = getViewport();
-      if (classify(e) === "pan") return void setViewport({ x: x - e.deltaX, y: y - e.deltaY, zoom });
-      // Mouse wheel: Shift pans sideways, otherwise zoom keeping the point under the cursor fixed.
-      if (e.shiftKey) return void setViewport({ x: x - wheelPixels(e), y, zoom });
-      const next = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoom * zoomFactor(e)));
-      const r = el.getBoundingClientRect();
-      const cx = e.clientX - r.left;
-      const cy = e.clientY - r.top;
-      setViewport({ x: cx - ((cx - x) * next) / zoom, y: cy - ((cy - y) * next) / zoom, zoom: next });
-    };
-    el.addEventListener("wheel", onWheel, { passive: false, capture: true });
-    return () => el.removeEventListener("wheel", onWheel, { capture: true });
-  }, [getViewport, setViewport]);
+  useWheelNavigation(box);
 
   // Space opens the same menu as right-click, at the pointer (or the middle of the canvas when it has not been over it).
-  // It opens on release, and only if the canvas was not panned meanwhile, because Space + drag pans.
-  const pointer = useRef<{ x: number; y: number } | null>(null);
-  const spaceArmed = useRef(false);
+  const space = useSpaceMenu(box, (p) => setMenu({ ...p, from: null }));
   const [find, setFind] = useState(false);
   useEffect(() => {
-    const typing = (e: KeyboardEvent) => !!(e.target as HTMLElement).closest("input, textarea, select, button, [contenteditable]");
+    const typing = isTyping;
     const down = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === "f") {
         e.preventDefault();
         // Closed: open. Open but not focused: focus it. Focused: hide it.
-        const input = box.current?.querySelector<HTMLInputElement>('input[aria-label="Find nodes"]');
+        const input = box.current?.querySelector<HTMLInputElement>(`input[aria-label="${FIND_LABEL}"]`);
         if (!input) setFind(true);
         else if (document.activeElement === input) setFind(false);
         else input.focus();
@@ -114,19 +88,9 @@ export function Canvas() {
         focusAchievement(creates[next], fitView);
         return;
       }
-      if (e.code === "Space" && !e.repeat) spaceArmed.current = !e.ctrlKey && !e.metaKey && !e.altKey && !typing(e);
-    };
-    const up = (e: KeyboardEvent) => {
-      if (e.code !== "Space" || !spaceArmed.current) return;
-      spaceArmed.current = false;
-      const el = box.current;
-      if (!el) return;
-      const r = el.getBoundingClientRect();
-      setMenu({ x: pointer.current?.x ?? r.left + r.width / 2, y: pointer.current?.y ?? r.top + r.height / 2, from: null });
     };
     window.addEventListener("keydown", down);
-    window.addEventListener("keyup", up);
-    return () => (window.removeEventListener("keydown", down), window.removeEventListener("keyup", up));
+    return () => window.removeEventListener("keydown", down);
   }, [fitView, store]);
 
   // "Tidy up" moves every node; look at the result.
@@ -181,7 +145,7 @@ export function Canvas() {
   };
 
   return (
-    <div ref={box} className="h-full w-full" onPointerMove={(e) => (pointer.current = { x: e.clientX, y: e.clientY })}>
+    <div ref={box} className="h-full w-full">
     <ReactFlow
       colorMode="dark"
       nodes={shown}
@@ -222,28 +186,12 @@ export function Canvas() {
         setMenu({ x: (e as unknown as MouseEvent).clientX, y: (e as unknown as MouseEvent).clientY, from: null });
       }}
       onPaneClick={closeMenu}
-      onMoveStart={() => ((spaceArmed.current = false), closeMenu())}
+      onMoveStart={() => (space.cancel(), closeMenu())}
       deleteKeyCode={["Delete", "Backspace"]}
-      // Only nodes and wires in view are mounted, so a big group costs what is on screen. A node is always mounted until it has been
-      // measured once (so a freshly opened file mounts everything one time), and undo keeps the measured sizes (store.test.ts).
-      onlyRenderVisibleElements
       fitView={!remembered.viewport}
       defaultViewport={remembered.viewport ?? undefined}
       onMoveEnd={(_, v) => (remembered.viewport = v)}
-      minZoom={MIN_ZOOM}
-      maxZoom={MAX_ZOOM}
-      // A touchpad tap jitters; without a threshold it nudges nodes. A double-tap must not zoom.
-      nodeDragThreshold={4}
-      zoomOnDoubleClick={false}
-      connectionRadius={32}
-      // Same for every device: left-drag on empty space selects; right-drag, middle-drag or Space+drag pans; pinch and
-      // ctrl+wheel zoom. Plain wheel is handled above, so React Flow's own scroll handling is off.
-      zoomOnScroll={false}
-      panOnScroll={false}
-      zoomOnPinch
-      selectionOnDrag
-      panOnDrag={[1, 2]}
-      selectionMode={SelectionMode.Partial}
+      {...NAVIGATION_PROPS}
     >
       <Background variant={BackgroundVariant.Dots} gap={20} />
       <Controls />
@@ -279,7 +227,7 @@ export function Canvas() {
         title={replace.title}
       />
     )}
-    {find && <FindBar nodes={shown} hidden={hidden} onClose={() => setFind(false)} />}
+    {find && <FindBar nodes={shown} hidden={hidden} titleOf={titleOf} accent={accentOf} onPick={(id) => useApp.getState().onNodesChange(shown.map((n) => ({ type: "select" as const, id: n.id, selected: n.id === id })))} onClose={() => setFind(false)} />}
     {menu && <SpawnMenu categories={CATEGORIES} x={menu.x} y={menu.y} options={options} onPick={pick} onClose={closeMenu} title={menu.from ? "Create a node that connects here" : "Add a node"} />}
     </div>
   );

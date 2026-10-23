@@ -9,3 +9,5 @@ export type { PinDef, NodeDef } from "./defs";
 export { SPAWN_NEW, spawnOptions, matchesSpawn, type SpawnFrom, type SpawnOption } from "./spawn";
 export { SpawnMenu } from "./SpawnMenu";
 export { createClipboard } from "./clipboard";
+export { MIN_ZOOM, MAX_ZOOM, NAVIGATION_PROPS, useWheelNavigation, useSpaceMenu, isTyping } from "./canvas";
+export { FindBar, findNodes, FIND_LABEL } from "./FindBar";
