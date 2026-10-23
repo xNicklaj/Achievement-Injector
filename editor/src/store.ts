@@ -26,7 +26,7 @@ export type View = "graph" | "group" | "localization" | "plugins" | "json";
 /** Group-level fields (HANDOVER 3.4). Unset = not serialized. */
 export type GroupValues = { groupName?: string; plugin?: string; showInMenu?: boolean };
 
-type State = {
+export type State = {
   nodes: AppNode[];
   edges: Edge[];
   group: GroupValues;

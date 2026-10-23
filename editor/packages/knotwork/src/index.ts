@@ -8,3 +8,4 @@ export { createValidation, graphChanged, groupIssues, parseNodeStatus, type Issu
 export type { PinDef, NodeDef } from "./defs";
 export { SPAWN_NEW, spawnOptions, matchesSpawn, type SpawnFrom, type SpawnOption } from "./spawn";
 export { SpawnMenu } from "./SpawnMenu";
+export { createClipboard } from "./clipboard";
