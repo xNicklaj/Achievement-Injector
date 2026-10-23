@@ -93,9 +93,10 @@ describe("history", () => {
     expect(past(store)).toBe(0);
     history.endDrag(store);
     expect(past(store)).toBe(1);
-    expect(store.temporal.getState().pastStates[0]!.nodes[0]!.measured).toEqual({ width: 5, height: 5 });
+    const kept = store.temporal.getState().pastStates[0] as { nodes: { measured?: unknown }[] };
+    expect(kept.nodes[0]?.measured).toEqual({ width: 5, height: 5 });
     store.temporal.getState().undo();
-    expect(store.getState().nodes[0].position).toEqual({ x: 0, y: 0 });
+    expect(store.getState().nodes[0]!.position).toEqual({ x: 0, y: 0 });
   });
 
   it("reset clears history and restarts the window", () => {
