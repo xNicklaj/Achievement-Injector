@@ -7,7 +7,7 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && npm run typecheck -w @xnicklaj/knotwork",
     "schema": "tsx scripts/emit-json-schema.ts"
   },
   "workspaces": ["packages/*"],

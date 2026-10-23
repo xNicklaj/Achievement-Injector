@@ -93,7 +93,7 @@ describe("history", () => {
     expect(past(store)).toBe(0);
     history.endDrag(store);
     expect(past(store)).toBe(1);
-    expect(store.temporal.getState().pastStates[0].nodes[0].measured).toEqual({ width: 5, height: 5 });
+    expect(store.temporal.getState().pastStates[0]!.nodes[0]!.measured).toEqual({ width: 5, height: 5 });
     store.temporal.getState().undo();
     expect(store.getState().nodes[0].position).toEqual({ x: 0, y: 0 });
   });

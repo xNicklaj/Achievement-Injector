@@ -78,7 +78,7 @@ describe("createClipboard", () => {
     const { store, cb } = make([node("a", true)], [], { copy, paste });
     cb.copy();
     expect(copy.mock.calls[0][0][0].selected).toBe(false);
-    expect(copy.mock.calls[0][1]).toBe(store.getState());
+    expect((copy.mock.calls[0] as unknown[])[1]).toBe(store.getState());
     cb.paste();
     expect(paste).toHaveBeenCalledTimes(1);
     expect(store.getState().nodes[1].data).toEqual({ kind: "a", v: "copied", w: "pasted" });
