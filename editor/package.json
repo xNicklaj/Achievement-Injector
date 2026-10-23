@@ -10,7 +10,9 @@
     "typecheck": "tsc --noEmit",
     "schema": "tsx scripts/emit-json-schema.ts"
   },
+  "workspaces": ["packages/*"],
   "dependencies": {
+    "@xnicklaj/knotwork": "*",
     "@xyflow/react": "^12.12.0",
     "lucide-react": "^1.60.0",
     "react": "^19.3.1",

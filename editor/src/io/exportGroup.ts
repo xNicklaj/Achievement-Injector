@@ -1,5 +1,5 @@
 import type { Edge } from "@xyflow/react";
-import { incoming, outgoing } from "../graphIndex";
+import { incoming, outgoing } from "@xnicklaj/knotwork";
 import { achievementNames, behind, isGroupCondition, isInternalGroup, linkedText, type AppNode } from "../graph";
 import { isAction, linkKind, registry, UNKNOWN_CONDITION } from "../registry";
 import { BASELINE_VERSION, compareVersions, GroupSchema, LIVE_TYPES, SCHEMA_VERSION } from "../schema";

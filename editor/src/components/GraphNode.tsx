@@ -1,7 +1,7 @@
 import { Handle, Position, useStore, type NodeProps } from "@xyflow/react";
 import { AlertTriangle, CircleAlert, CircleHelp, EyeOff } from "lucide-react";
 import { membersOf, worstLevel } from "../achievements";
-import { incoming, nodeIndex } from "../graphIndex";
+import { incoming, nodeIndex } from "@xnicklaj/knotwork";
 import { achievementNames, conditionsSummary, isInternalGroup, linkedText, pluginOf, type AppNode } from "../graph";
 import { searchFor, usePlugins } from "../io/plugins";
 import { getText } from "../io/localization";

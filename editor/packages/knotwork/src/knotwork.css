@@ -1,0 +1,5 @@
+/* Knotwork defaults. An app maps its own variables onto these, e.g. `--kw-select: var(--select)`. */
+:root {
+  --kw-select: #6ea8fe;
+  --kw-select-soft: rgb(110 168 254 / 0.35);
+}

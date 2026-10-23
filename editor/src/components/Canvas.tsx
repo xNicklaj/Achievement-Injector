@@ -7,9 +7,8 @@ import { isCondition, nodeDefs, registry, UNKNOWN_CONDITION } from "../registry"
 import { beginDrag, endDrag, useApp } from "../store";
 import { useValidation } from "../validation";
 import { remembered } from "../viewport";
-import { createWheelClassifier, wheelPixels, zoomFactor } from "../wheel";
+import { createWheelClassifier, HaloEdge, wheelPixels, zoomFactor } from "@xnicklaj/knotwork";
 import { spawnOptions, type SpawnFrom, type SpawnOption } from "../spawn";
-import { AeEdge } from "./AeEdge";
 import { bandsOf, hiddenOf, hideNodes, viewRect, visibleBands } from "../achievements";
 import { focusAchievement } from "../focusAchievement";
 import { AchievementList } from "./AchievementList";
@@ -20,7 +19,7 @@ import { SpawnMenu } from "./SpawnMenu";
 
 export const DRAG_MIME = "application/ae-node";
 const nodeTypes = { ae: GraphNode };
-const edgeTypes = { ae: AeEdge };
+const edgeTypes = { ae: HaloEdge };
 
 const MIN_ZOOM = 0.1;
 const MAX_ZOOM = 2;
@@ -138,7 +137,7 @@ export function Canvas() {
   }, [fitView]);
 
   // Flow lines are white, data lines are coloured by type (HANDOVER 3.6). The inline stroke beats React Flow's own selected
-  // colour, so a selected wire gets a halo like a selected node does (AeEdge).
+  // colour, so a selected wire gets a halo like a selected node does (HaloEdge).
   // A collapsed achievement hides its nodes and the wires that touch them (React Flow does not hide those by itself). Which ones follows from
   // the wires, not the positions, so it is not worked out again on every drag frame.
   const hidden = useMemo(() => hiddenOf(nodes, edges, collapsed), [edges, collapsed]); // eslint-disable-line react-hooks/exhaustive-deps

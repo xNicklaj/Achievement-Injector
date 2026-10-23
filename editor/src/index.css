@@ -27,6 +27,9 @@
   /* Selection: a ring and a soft glow around nodes, a halo under wires, the same in the minimap and the lists. */
   --select: rgba(255, 255, 255, 0.85);
   --select-soft: rgba(255, 255, 255, 0.3);
+  /* The kit reads these (--kw-*); the editor maps its own palette onto them. */
+  --kw-select: var(--select);
+  --kw-select-soft: var(--select-soft);
 
   --scroll-thumb: rgba(255, 255, 255, 0.28);
 

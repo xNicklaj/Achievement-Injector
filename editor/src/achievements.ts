@@ -1,6 +1,6 @@
 import type { Edge, NodeChange, Rect } from "@xyflow/react";
 import { downstream, type AppNode } from "./graph";
-import { incoming, nodeIndex, outgoing } from "./graphIndex";
+import { incoming, nodeIndex, outgoing } from "@xnicklaj/knotwork";
 import { estimateHeight, W } from "./io/importGroup";
 import { isCondition, registry } from "./registry";
 

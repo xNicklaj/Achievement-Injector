@@ -1,5 +1,5 @@
 import type { Edge } from "@xyflow/react";
-import { incoming } from "./graphIndex";
+import { incoming } from "@xnicklaj/knotwork";
 import {
   AchievementSchema,
   type FieldInfo,

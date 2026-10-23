@@ -1,0 +1,22 @@
+{
+  "name": "@xnicklaj/knotwork",
+  "version": "0.1.0",
+  "description": "Generic node-graph foundations for React Flow editors: indexes, connection rules, undo, spawn menu, clipboard, canvas navigation.",
+  "type": "module",
+  "sideEffects": ["*.css"],
+  "exports": {
+    ".": "./src/index.ts",
+    "./knotwork.css": "./src/knotwork.css"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "@xyflow/react": "^12.12.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "zundo": "^2.3.0",
+    "zustand": "^5.0.0"
+  }
+}

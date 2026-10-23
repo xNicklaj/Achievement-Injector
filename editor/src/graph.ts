@@ -1,6 +1,6 @@
 import type { Edge, Node } from "@xyflow/react";
 import { fallbackText, type LocFile } from "./io/localization";
-import { incoming, nodeIndex, outgoing } from "./graphIndex";
+import { incoming, nodeIndex, outgoing } from "@xnicklaj/knotwork";
 import { LIVE_TYPES } from "./schema";
 import { isAction, isCondition, LINK_KINDS, missingRequired, registry, wiredFields, type LinkKind } from "./registry";
 
