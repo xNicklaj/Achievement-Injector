@@ -18,6 +18,8 @@ export const CATEGORIES: { id: Category; label: string }[] = [
 
 export type NodeDef = KitNodeDef & {
   category: Category;
+  /** Exists only to carry data (an unknown condition type): never offered for creation. */
+  hidden?: boolean;
   description?: string;
   flowIn: boolean;
   flowOut: boolean;

@@ -21,6 +21,7 @@ const nodeTypes = { ae: GraphNode };
 const edgeTypes = { ae: HaloEdge };
 
 const titleOf = (n: AppNode) => (n.data.kind === UNKNOWN_CONDITION ? `Unknown: ${String(n.data.extra?.type ?? "")}` : registry[n.data.kind]?.title ?? n.data.kind);
+const defAccent = (d: { category: string }) => `var(--cat-${d.category})`;
 const accentOf = (n: AppNode) => `var(--cat-${registry[n.data.kind]?.category})`;
 
 const EDGE_COLOR = { flow: "var(--pin-flow)", cond: "var(--pin-condition)", loc: "var(--pin-localized)", ach: "var(--pin-achievement)", icon: "var(--pin-icon)", plugin: "var(--pin-plugin)" };
@@ -219,6 +220,7 @@ export function Canvas() {
     {replace && (
       <SpawnMenu
         categories={CATEGORIES}
+        accent={defAccent}
         x={replace.x}
         y={replace.y}
         options={replacements.filter((o) => (replace.kinds.length !== 1 || o.def.kind !== replace.kinds[0]) && (!replace.live || LIVE_TYPES.has(o.def.kind)))}
@@ -227,8 +229,8 @@ export function Canvas() {
         title={replace.title}
       />
     )}
-    {find && <FindBar nodes={shown} hidden={hidden} titleOf={titleOf} accent={accentOf} onPick={(id) => useApp.getState().onNodesChange(shown.map((n) => ({ type: "select" as const, id: n.id, selected: n.id === id })))} onClose={() => setFind(false)} />}
-    {menu && <SpawnMenu categories={CATEGORIES} x={menu.x} y={menu.y} options={options} onPick={pick} onClose={closeMenu} title={menu.from ? "Create a node that connects here" : "Add a node"} />}
+    {find && <FindBar nodes={shown} hidden={hidden} titleOf={titleOf} valuesOf={(n) => n.data.values} accent={accentOf} onPick={(id) => useApp.getState().onNodesChange(shown.map((n) => ({ type: "select" as const, id: n.id, selected: n.id === id })))} onClose={() => setFind(false)} />}
+    {menu && <SpawnMenu categories={CATEGORIES} accent={defAccent} x={menu.x} y={menu.y} options={options} onPick={pick} onClose={closeMenu} title={menu.from ? "Create a node that connects here" : "Add a node"} />}
     </div>
   );
 }

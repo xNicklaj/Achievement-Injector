@@ -11,7 +11,7 @@
     "schema": "tsx scripts/emit-json-schema.ts"
   },
   "dependencies": {
-    "@xnicklaj/knotwork": "git+https://github.com/xNicklaj/Knotwork-Graph-Kit.git#6b8fad47a7fa9deb5dd3178073ee522b775bcd8b",
+    "@xnicklaj/knotwork": "git+https://github.com/xNicklaj/Knotwork-Graph-Kit.git#95347545ce8bc69f9757603e1dd10eb17795c5d7",
     "@xyflow/react": "^12.12.0",
     "lucide-react": "^1.60.0",
     "react": "^19.3.1",

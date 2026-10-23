@@ -101,10 +101,8 @@ export const refuseReason = composeRules<AppNode>(
   pinUsedOnce("cond", "source", "Condition already used"),
   conditionsMetRules,
   modifierRules,
-  pinUsedOnce("loc", "target", "Field already localized"),
-  pinUsedOnce("ach", "target", "Field already linked"),
-  pinUsedOnce("icon", "target", "Field already linked"),
-  pinUsedOnce("plugin", "target", "Field already linked"),
+  // One wire per linked field, for every link kind (CLAUDE.md "Link pins").
+  ...LINK_KINDS.map((k) => pinUsedOnce(k, "target", k === "loc" ? "Field already localized" : "Field already linked")),
   achNoSelfWait,
 ) as (nodes: AppNode[], edges: Edge[], c: Link, extra?: AppNode) => string | null;
 
