@@ -1,6 +1,6 @@
 # Extraction plan: Knotwork Graph Kit
 
-Status: **Phase 1 (inventory), awaiting review. No code has been changed.** Branch `extract-knotwork` (from `editor`).
+Status: **extraction done** (phases 1-5). Decisions taken after review: the kit ships built `dist/` only in build commits (`build/<main sha>`, made by CI) and release tags, never in `main` and with no `prepare` script; `createValidation` kept; `Dialog` stays in the editor; the editor pins a build commit SHA and the tag is created last, from that commit. Phases 2 and 3 were done together (each module group was extracted and generalized in one step). Sections 1-6 below are the original plan; where the code differs (for example `noSelfLink(msg?)`, `onePerChain` taking a `{key,title}` callback, `PinDef` without `multi`), the kit source and its README are authoritative.
 
 Goal: move the generic node-graph foundations into `@xnicklaj/knotwork`, make the editor consume it, change no user-visible behaviour. Inkwell is not built here; it only constrains what the kit must not assume.
 
