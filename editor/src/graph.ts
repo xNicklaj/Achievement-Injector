@@ -1,8 +1,8 @@
 import type { Edge, Node } from "@xyflow/react";
 import { fallbackText, type LocFile } from "./io/localization";
-import { incoming, nodeIndex, outgoing } from "@xnicklaj/knotwork";
+import { composeRules, wiredFields, incoming, nodeIndex, noLoop, noSelfLink, onePerChain, outgoing, pinKind as kitPinKind, pinsMatch, pinUsedOnce, walk, type Link, type Rule, type RuleCtx } from "@xnicklaj/knotwork";
 import { LIVE_TYPES } from "./schema";
-import { isAction, isCondition, LINK_KINDS, missingRequired, registry, wiredFields, type LinkKind } from "./registry";
+import { isAction, isCondition, LINK_KINDS, missingRequired, registry, type LinkKind } from "./registry";
 
 /** `values`: fields the editor has a widget for (unset = absent). `extra`: unknown keys, kept so import/export is lossless. */
 export type NodeData = { kind: string; values: Record<string, unknown>; extra?: Record<string, unknown> };
@@ -10,8 +10,10 @@ export type AppNode = Node<NodeData, "ae">;
 
 // Handle ids: `flow-in|flow-out`, `cond-in|cond-out`, and for text, achievement, icon and plugin links `<kind>-out` and `<kind>:<field>`.
 export type PinKind = "flow" | "cond" | LinkKind;
-export const pinKind = (handle: string | null | undefined): PinKind | null =>
-  handle?.startsWith("flow") ? "flow" : handle?.startsWith("cond") ? "cond" : LINK_KINDS.find((k) => handle?.startsWith(k)) ?? null;
+export const pinKind = (handle: string | null | undefined): PinKind | null => {
+  const k = kitPinKind(handle);
+  return k === "flow" || k === "cond" ? k : LINK_KINDS.find((l) => l === k) ?? null;
+};
 
 export const isModifier = (kind: string) => !!registry[kind]?.modifier;
 /** A condition that collects other conditions through its own `cond-in` pin. */
@@ -19,8 +21,8 @@ export const isGroupCondition = (kind: string) => kind === "ConditionsMet";
 const NO_LIVE_INSIDE = "Live and Negate are not supported inside Conditions Met";
 
 /** The condition behind a wire from `id`, looking back through Live / Negate nodes. `mods` run from the condition towards `id`; `seen` holds the modifiers passed. */
-export function behind(nodes: AppNode[], edges: Edge[], id: string) {
-  const byId = nodeIndex(nodes);
+export function behind(nodes: AppNode[], edges: Edge[], id: string, node?: (id: string) => AppNode | undefined) {
+  const byId = { get: node ?? ((i: string) => nodeIndex(nodes).get(i)) };
   const mods: AppNode[] = [];
   const seen = new Set<string>();
   let n = byId.get(id);
@@ -33,75 +35,78 @@ export function behind(nodes: AppNode[], edges: Edge[], id: string) {
   return { root: n && !isModifier(n.data.kind) ? n : undefined, mods, seen };
 }
 
-const walk = (edges: Edge[], start: string, next: (id: string) => string[]) => {
-  const seen = new Set<string>();
-  const stack = [start];
-  while (stack.length) {
-    for (const n of next(stack.pop()!)) if (!seen.has(n)) (seen.add(n), stack.push(n));
-  }
-  return seen;
+/** Nodes upstream and downstream of `id` along flow edges (not including `id`). */
+export const upstream = (edges: Edge[], id: string) => walk(edges, id, "flow", "up");
+export const downstream = (edges: Edge[], id: string) => walk(edges, id, "flow", "down");
+
+export type { Link };
+
+const flowReason = "Flow pin already connected";
+type Ctx = RuleCtx<AppNode>;
+
+// A chain that starts at a condition is that condition's `onUnlock`: it can hold actions only.
+const onUnlockActionsOnly: Rule<AppNode> = (l, { edges, node }) => {
+  if (pinKind(l.sourceHandle) !== "flow") return null;
+  const ids = [...walk(edges, l.source, "flow", "up").add(l.source), ...walk(edges, l.target, "flow", "down").add(l.target)];
+  const kinds = ids.map((id) => node(id)?.data.kind ?? "");
+  return kinds.some(isCondition) && !kinds.every((k) => isCondition(k) || isAction(k)) ? "A condition's On Unlock can only run commands and Papyrus calls" : null;
 };
 
-/** Nodes upstream and downstream of `id` along flow edges (not including `id`). */
-export const upstream = (edges: Edge[], id: string) =>
-  walk(edges, id, (n) => incoming(edges, n).filter((e) => e.sourceHandle === "flow-out").map((e) => e.source));
-export const downstream = (edges: Edge[], id: string) =>
-  walk(edges, id, (n) => outgoing(edges, n).filter((e) => e.sourceHandle === "flow-out").map((e) => e.target));
-
-export type Link = { source: string; target: string; sourceHandle?: string | null; targetHandle?: string | null };
-
-/** Why a connection is refused, or null when it is fine. Shared by `isValidConnection` and tests. */
-export function refuseReason(nodes: AppNode[], edges: Edge[], c: Link): string | null {
-  const kind = pinKind(c.sourceHandle);
-  if (!kind || kind !== pinKind(c.targetHandle)) return "Pin types differ";
-  if (c.source === c.target) return "Cannot connect a node to itself";
-
-  const used = (handle: string | null | undefined, side: "source" | "target", id: string) =>
-    edges.some((e) => e[side] === id && (side === "source" ? e.sourceHandle : e.targetHandle) === handle);
-
-  if (kind === "flow") {
-    if (used(c.sourceHandle, "source", c.source) || used(c.targetHandle, "target", c.target)) return "Flow pin already connected";
-    const before = upstream(edges, c.source).add(c.source);
-    const after = downstream(edges, c.target).add(c.target);
-    if (before.has(c.target)) return "Would create a loop";
-    // Generic "chain already contains node type X" rule (HANDOVER 3.2).
-    const count = new Map<string, number>();
-    for (const id of [...before, ...after]) {
-      const def = registry[nodes.find((n) => n.id === id)?.data.kind ?? ""];
-      if (def?.unique) count.set(def.kind, (count.get(def.kind) ?? 0) + 1);
-    }
-    for (const [k, n] of count) if (n > 1) return `A chain can have only one ${registry[k].title}`;
-    // A chain that starts at a condition is that condition's `onUnlock`: it can hold actions only.
-    const kinds = [...before, ...after].map((id) => nodes.find((n) => n.id === id)?.data.kind ?? "");
-    if (kinds.some(isCondition) && !kinds.every((k) => isCondition(k) || isAction(k))) return "A condition's On Unlock can only run commands and Papyrus calls";
+// Conditions Met takes its sub-conditions as they are: the mod rejects a live or negated one, and a loop would never end.
+const conditionsMetRules: Rule<AppNode> = (l, { edges, node }: Ctx) => {
+  const into = node(l.target);
+  if (pinKind(l.sourceHandle) !== "cond" || !into || !isGroupCondition(into.data.kind)) return null;
+  const src = node(l.source);
+  if (src && isModifier(src.data.kind)) return NO_LIVE_INSIDE;
+  const seen = new Set<string>();
+  for (const stack = [l.source]; stack.length; ) {
+    const id = stack.pop()!;
+    if (id === l.target) return "Would create a loop";
+    if (!seen.has(id)) (seen.add(id), stack.push(...incoming(edges, id).filter((e) => e.targetHandle === "cond-in").map((e) => e.source)));
   }
-  // A condition node feeds one AddConditions only (HANDOVER 3.2); a localizable field takes one text node.
-  if (kind === "cond" && used(c.sourceHandle, "source", c.source)) return "Condition already used";
-  const into = nodes.find((n) => n.id === c.target);
-  // Conditions Met takes its sub-conditions as they are: the mod rejects a live or negated one, and a loop would never end.
-  if (kind === "cond" && into && isGroupCondition(into.data.kind)) {
-    if (nodes.find((n) => n.id === c.source && isModifier(n.data.kind))) return NO_LIVE_INSIDE;
-    const seen = new Set<string>();
-    for (const stack = [c.source]; stack.length; ) {
-      const id = stack.pop()!;
-      if (id === c.target) return "Would create a loop";
-      if (!seen.has(id)) (seen.add(id), stack.push(...edges.filter((e) => e.target === id && e.targetHandle === "cond-in").map((e) => e.source)));
-    }
-  }
-  if (kind === "cond" && into && isModifier(into.data.kind)) {
-    if (used(c.targetHandle, "target", c.target)) return "Already has a condition";
-    const { root, seen } = behind(nodes, edges, c.source);
-    if (seen.has(c.target)) return "Would create a loop";
-    if (root && !LIVE_TYPES.has(root.data.kind)) return `${registry[root.data.kind].title} does not support Live or Negate`;
-    // The modifier already feeds a Conditions Met.
-    const out = edges.find((e) => e.source === c.target && e.sourceHandle === "cond-out")?.target;
-    if (isGroupCondition(nodes.find((n) => n.id === out)?.data.kind ?? "")) return NO_LIVE_INSIDE;
-  }
-  if (kind !== "flow" && kind !== "cond" && used(c.targetHandle, "target", c.target)) return kind === "loc" ? "Field already localized" : "Field already linked";
-  // An achievement cannot wait for itself: the condition's own achievement is the one whose chain holds it.
-  if (kind === "ach" && ownerOf(nodes, edges, c.target) === c.source) return "An achievement cannot wait for itself";
   return null;
-}
+};
+
+const modifierRules: Rule<AppNode> = (l, { nodes, edges, node }: Ctx) => {
+  const into = node(l.target);
+  if (pinKind(l.sourceHandle) !== "cond" || !into || !isModifier(into.data.kind)) return null;
+  if (incoming(edges, l.target).some((e) => e.targetHandle === l.targetHandle)) return "Already has a condition";
+  const { root, seen } = behind(nodes, edges, l.source, node);
+  if (seen.has(l.target)) return "Would create a loop";
+  if (root && !LIVE_TYPES.has(root.data.kind)) return `${registry[root.data.kind].title} does not support Live or Negate`;
+  // The modifier already feeds a Conditions Met.
+  const out = outgoing(edges, l.target).find((e) => e.sourceHandle === "cond-out")?.target;
+  return isGroupCondition((out && node(out)?.data.kind) || "") ? NO_LIVE_INSIDE : null;
+};
+
+// An achievement cannot wait for itself: the condition's own achievement is the one whose chain holds it.
+const achNoSelfWait: Rule<AppNode> = (l, { nodes, edges }) =>
+  pinKind(l.sourceHandle) === "ach" && ownerOf(nodes, edges, l.target) === l.source ? "An achievement cannot wait for itself" : null;
+
+const KNOWN_KINDS: readonly string[] = ["flow", "cond", ...LINK_KINDS];
+
+/** Why a connection is refused, or null when it is fine. Shared by `isValidConnection`, spawn (`extra` is the node not yet in `nodes`) and tests. */
+export const refuseReason = composeRules<AppNode>(
+  pinsMatch((a, b) => a === b && KNOWN_KINDS.includes(a)),
+  noSelfLink(),
+  pinUsedOnce("flow", "both", flowReason),
+  noLoop("flow"),
+  // Generic "chain already contains node type X" rule (HANDOVER 3.2).
+  onePerChain<AppNode>("flow", (n) => {
+    const def = registry[n.data.kind];
+    return def?.unique ? { key: def.kind, title: def.title } : undefined;
+  }),
+  onUnlockActionsOnly,
+  // A condition node feeds one AddConditions only (HANDOVER 3.2); a localizable field takes one text node.
+  pinUsedOnce("cond", "source", "Condition already used"),
+  conditionsMetRules,
+  modifierRules,
+  pinUsedOnce("loc", "target", "Field already localized"),
+  pinUsedOnce("ach", "target", "Field already linked"),
+  pinUsedOnce("icon", "target", "Field already linked"),
+  pinUsedOnce("plugin", "target", "Field already linked"),
+  achNoSelfWait,
+) as (nodes: AppNode[], edges: Edge[], c: Link, extra?: AppNode) => string | null;
 
 /** The achievement a condition node belongs to: the Create Achievement at the head of the chain its Add Conditions is in. */
 export function ownerOf(nodes: AppNode[], edges: Edge[], condition: string): string | undefined {
